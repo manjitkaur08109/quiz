@@ -41,7 +41,8 @@
 
 <script setup>
 import { ref } from "vue";
-
+import { useRouter } from "vue-router";
+const router = useRouter(); 
 const drawer = ref(true);
 const menu = ref(false);
 
@@ -49,8 +50,9 @@ const items = [
   { title: "Dashboard", path: "/", icon: "mdi-view-dashboard" },
   { title: "Quiz", path: "/quiz", icon: "mdi-help-circle-outline" },
   { title: "Users", path: "/users", icon: "mdi-account-group" },
+
 ];
 
-const goToProfile = () => alert("Go to Profile");
+const goToProfile = () => {router.push('/profile')};
 const logout = () => alert("Logout");
 </script>
