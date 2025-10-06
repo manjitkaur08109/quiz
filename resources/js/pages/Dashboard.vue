@@ -1,20 +1,29 @@
   <template>
   <v-row>
     <v-col cols="3">
-      <v-card class="mx-auto my-8" elevation="16" max-width="344">
+      <v-card class="mx-auto my-8" elevation="16" max-width="344"  @click="goToQuiz">
         <v-card-item>
-          <v-card-title> Total quiz </v-card-title>
+          <v-card-title> Total Quiz </v-card-title>
         </v-card-item>
-
         <v-card-text> 5 </v-card-text>
+
       </v-card>
     </v-col>
+
     <v-col cols="3">
-      <v-card class="mx-auto my-8" elevation="16" max-width="344">
+      <v-card class="mx-auto my-8" elevation="16" max-width="344" @click="goToUsers">
         <v-card-item>
           <v-card-title> Total Users </v-card-title>
         </v-card-item>
+        <v-card-text> 10 </v-card-text>
+      </v-card>
+    </v-col>
 
+    <v-col cols="3">
+      <v-card class="mx-auto my-8" elevation="16" max-width="344" @click="goToCategory">
+        <v-card-item>
+          <v-card-title> Total Category </v-card-title>
+        </v-card-item>
         <v-card-text> 10 </v-card-text>
       </v-card>
     </v-col>
@@ -86,8 +95,22 @@
 console.log("Dashboard");
 
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const search = ref("");
+
+const goToQuiz = () => {
+  router.push("/quiz");
+};
+
+const goToUsers = () => {
+  router.push("/users");
+};
+
+const goToCategory = () => {
+  router.push("/category");
+};
 const items = [
   {
     name: "Nebula GTX 3080",
@@ -103,27 +126,8 @@ const items = [
     rating: 4,
     stock: false,
   },
-  {
-    name: "Orion RX 6800 XT",
-    image: "3.png",
-    price: 649.99,
-    rating: 3,
-    stock: true,
-  },
-  {
-    name: "Vortex RTX 3090",
-    image: "4.png",
-    price: 1499.99,
-    rating: 4,
-    stock: true,
-  },
-  {
-    name: "Cosmos GTX 1660 Super",
-    image: "5.png",
-    price: 299.99,
-    rating: 4,
-    stock: false,
-  },
+
+
 ];
 </script>
 

@@ -15,7 +15,10 @@
         single-line
       ></v-text-field>
     </v-card-title>
-
+ 
+ <v-btn color="primary" @click="goToAddQuiz" prepend-icon="mdi-plus">
+        Add New
+      </v-btn>
     <v-divider></v-divider>
     <v-data-table
       v-model:search="search"
