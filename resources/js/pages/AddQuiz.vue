@@ -96,7 +96,6 @@ const categories = ["Science", "Math", "History", "GK", "Sports"];
 
 const handleSubmit = () => {
   console.log("Quiz Data:", quiz);
-
   alert("Quiz added successfully!");
   router.push("/quiz");
 };

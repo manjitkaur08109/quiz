@@ -15,10 +15,7 @@
         single-line
       ></v-text-field>
     </v-card-title>
- 
- <v-btn color="primary" @click="goToAddQuiz" prepend-icon="mdi-plus">
-        Add New
-      </v-btn>
+
     <v-divider></v-divider>
     <v-data-table
       v-model:search="search"
@@ -26,7 +23,7 @@
       :items="items"
     >
       <template v-slot:header.stock>
-        <div class="text-end">Stock</div>
+        <div class="text-center">Stock</div>
       </template>
 
       <template v-slot:item.image="{ item }">
@@ -49,7 +46,7 @@
         ></v-rating>
       </template>
 
-      <template v-slot:item.stock="{ item }">
+      <!-- <template v-slot:item.stock="{ item }">
         <div class="text-end">
           <v-chip
             :color="item.stock ? 'green' : 'red'"
@@ -58,6 +55,15 @@
             size="small"
             label
           ></v-chip>
+        </div>
+      </template>-->
+
+      <template #item.stock="{ item }">
+        <div class="text-center">
+
+        <v-btn size="x-small" icon color="primary" @click="editQuiz(item.id)">
+          <v-icon >mdi-eye</v-icon>
+        </v-btn>
         </div>
       </template>
     </v-data-table>

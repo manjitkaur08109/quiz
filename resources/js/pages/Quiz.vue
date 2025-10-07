@@ -14,10 +14,10 @@
         hide-details
         single-line
       ></v-text-field>
+      <v-btn color="primary" @click="goToAddQuiz" prepend-icon="mdi-plus" class="ml-4 mb-3">
+     Add New
+   </v-btn>
     </v-card-title>
-       <v-btn color="primary" @click="goToAddQuiz" prepend-icon="mdi-plus" class="ml-4 mb-3">
-      Add New
-    </v-btn>
     <v-divider></v-divider>
     <v-data-table
       v-model:search="search"
@@ -30,8 +30,8 @@
       </template>
 
       <template #item.actions="{ item }">
-        <v-btn icon color="primary" @click="editQuiz(item.id)">
-          <v-icon>mdi-pencil</v-icon>
+        <v-btn size="x-small" icon color="primary" @click="editQuiz(item.id)">
+          <v-icon >mdi-pencil</v-icon>
         </v-btn>
       </template>
 

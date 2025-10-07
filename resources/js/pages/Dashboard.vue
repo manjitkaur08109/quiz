@@ -1,17 +1,19 @@
   <template>
   <v-row>
     <v-col cols="3">
-      <v-card class="mx-auto my-8" elevation="16" max-width="344"  @click="goToQuiz">
-        <v-card-item>
-          <v-card-title> Total Quiz </v-card-title>
-        </v-card-item>
-        <v-card-text> 5 </v-card-text>
+      <v-card class="mx-auto my-8" elevation="16" max-width="344"  @click="goToQuiz" color="#1F7087">
 
-      </v-card>
-    </v-col>
+                    <v-card-item>
+                        <v-card-title> Total Quiz </v-card-title>
+                    </v-card-item>
+                    <v-card-text> 5 </v-card-text>
+
+
+                </v-card>
+            </v-col>
 
     <v-col cols="3">
-      <v-card class="mx-auto my-8" elevation="16" max-width="344" @click="goToUsers">
+      <v-card class="mx-auto my-8" elevation="16" max-width="344" @click="goToUsers" color="#1F7087">
         <v-card-item>
           <v-card-title> Total Users </v-card-title>
         </v-card-item>
@@ -20,7 +22,7 @@
     </v-col>
 
     <v-col cols="3">
-      <v-card class="mx-auto my-8" elevation="16" max-width="344" @click="goToCategory">
+      <v-card class="mx-auto my-8" elevation="16" max-width="344" @click="goToCategory" color="#1F7087">
         <v-card-item>
           <v-card-title> Total Category </v-card-title>
         </v-card-item>

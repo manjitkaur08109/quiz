@@ -1,7 +1,7 @@
 <template>
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2">
-    Category
+    Categories
       <v-spacer></v-spacer>
 
       <v-text-field
@@ -14,11 +14,11 @@
         hide-details
         single-line
       ></v-text-field>
+      <v-btn class="ml-5" color="primary" @click="goToAddCategory" prepend-icon="mdi-plus">
+             Add New
+           </v-btn>
     </v-card-title>
 
- <v-btn color="primary" @click="goToAddCategory" prepend-icon="mdi-plus">
-        Add New
-      </v-btn>
     <v-divider></v-divider>
     <v-data-table
       v-model:search="search"
@@ -35,7 +35,7 @@
 </template>
 
 <template #item.actions="{ item }">
-  <v-btn icon color="primary" @click="editCategory(item.id)">
+  <v-btn size="x-small" icon color="primary" @click="editCategory(item.id)">
     <v-icon>mdi-pencil</v-icon>
   </v-btn>
 </template>
@@ -55,7 +55,6 @@ const search = ref("");
 const headers = [
     { title: "S.No", value: "sn" },
   { title: "Name", value: "name" },
-  
   { title: "Actions", value: "actions", sortable: false },
 ];
 const categoryItems = [

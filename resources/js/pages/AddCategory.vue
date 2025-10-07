@@ -26,7 +26,7 @@
           />
 
           <v-card-actions class="justify-end">
-            <v-btn variant="outlined" color="grey" @click="goBack">
+            <v-btn  color="secondary" @click="goBack">
               Cancel
             </v-btn>
             <v-btn color="primary" type="submit" class="ml-2">
