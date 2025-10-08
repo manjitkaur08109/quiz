@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('quiz', function (Blueprint $table) {
-            $table->id();
+            $table->uuid()->primary();
             $table->string('title');
-            $table->string('description');
+            $table->text('description')->nullable();
             $table->integer('category_id');
+            $table->json('questions');
             $table->timestamps();
         });
     }

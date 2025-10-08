@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
-class CategoryModel extends Model
-{
+class CategoryModel extends Model {
+    use HasUuids;
     protected $table = 'categories';
-  protected $fillable = ['title'];
+    protected $fillable = [ 'title' ];
 }
