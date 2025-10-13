@@ -8,7 +8,6 @@ import AddQuiz from "../pages/AddQuiz.vue";
 import EditQuiz from "../pages/EditQuiz.vue";
 import AddCategory from "../pages/AddCategory.vue";
 import EditCategory from "../pages/EditCategory.vue";
-
 const routes = [
   { path: "/", name: "Dashboard", component: Dashboard },
   { path: "/quiz", name: "Quiz", component: Quiz },
@@ -18,7 +17,8 @@ const routes = [
 { path:"/addQuiz", name:"AddQuiz", component:AddQuiz },
   { path: "/editQuiz/:id", name: "EditQuiz", component: EditQuiz },
   { path: "/addCategory", name: "AddCategory", component: AddCategory },
-  { path: "/editCategory/:id", name: "EditCategory", component: EditCategory }
+  { path: "/editCategory/:id", name: "EditCategory", component: EditCategory },
+  { path: "/category", redirect: "/category" }
 ];
 
 const router = createRouter({

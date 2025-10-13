@@ -1,7 +1,7 @@
 <template>
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2">
-    Categories
+      Categories
       <v-spacer></v-spacer>
 
       <v-text-field
@@ -10,33 +10,39 @@
         label="Search"
         prepend-inner-icon="mdi-magnify"
         variant="solo-filled"
-        flat
-        hide-details
-        single-line
-      ></v-text-field>
-      <v-btn class="ml-5" color="primary" @click="goToAddCategory" prepend-icon="mdi-plus">
-             Add New
-           </v-btn>
+        :flat="true"
+        :hide-details="true"
+        :single-line="true"
+      />
+      <v-btn
+        class="ml-5"
+        color="primary"
+        @click="goToAddCategory"
+        prepend-icon="mdi-plus"
+      >
+        Add New
+      </v-btn>
     </v-card-title>
 
     <v-divider></v-divider>
     <v-data-table
       v-model:search="search"
       :filter-keys="['name']"
-       :headers="headers"
+      :headers="headers"
       :items="categoryItems"
     >
-<template #item.sn="{ index }">
-  {{ index + 1 }}
-</template>
+      <template #item.sn="{ index }">
+        {{ index + 1 }}
+      </template>
 
-<template #item.name="{ item }">
-  {{ item.name }}
-</template>
+
 
 <template #item.actions="{ item }">
   <v-btn size="x-small" icon color="primary" @click="editCategory(item.id)">
     <v-icon>mdi-pencil</v-icon>
+  </v-btn>
+  <v-btn size="x-small" class="ml-2" icon color="red" @click="deleteCategory(item.id)">
+    <v-icon>mdi-delete</v-icon>
   </v-btn>
 </template>
 
@@ -45,24 +51,20 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-
+import axios from "axios";
 const router = useRouter();
 const search = ref("");
-
+const loading = ref(false);
+const categoryItems = ref([]);
 
 const headers = [
-    { title: "S.No", value: "sn" },
-  { title: "Name", value: "name" },
+  { title: "S.No", value: "sn" },
+  { title: "Title", value: "title" },
+  { title: "Description", value: "description" },
   { title: "Actions", value: "actions", sortable: false },
 ];
-const categoryItems = [
-  { id: 1, name: "Science",  },
-  { id: 2, name: "Math",  },
-  { id: 3, name: "History",  },
-];
-
 
 const goToAddCategory = () => {
   router.push("/addCategory");
@@ -71,6 +73,29 @@ const goToAddCategory = () => {
 const editCategory = (id) => {
   router.push(`/editCategory/${id}`);
 };
+const fetchCategories = async () => {
+  loading.value = true;
+  try {
+    const res = await axios.get("/api/category/index");
+    categoryItems.value = res.data.data;
+  } finally {
+    loading.value = false;
+  }
+};
+
+const deleteCategory = async (id) => {
+  if (!confirm("Delete this category?")) return;
+  try {
+    await axios.delete(`/api/category/delete/${id}`);
+    fetchCategories();
+  } catch (error) {
+    console.error("Error deleting category:", error);
+  }
+};
+onMounted(() => {
+  fetchCategories();
+});
 </script>
+
 
 

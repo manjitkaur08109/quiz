@@ -11,8 +11,8 @@
       <v-card-text>
         <v-form @submit.prevent="handleSubmit">
           <v-text-field
-            v-model="category.name"
-            label="Category Name"
+            v-model="category.title"
+            label="Category Title"
             prepend-inner-icon="mdi-shape-outline"
             required
           />
@@ -29,7 +29,12 @@
             <v-btn variant="outlined" color="grey" @click="goBack">
               Cancel
             </v-btn>
-            <v-btn color="primary" type="submit" class="ml-2">
+            <v-btn
+              color="primary"
+              type="submit"
+              class="ml-2"
+              :loading="loading"
+            >
               Update Category
             </v-btn>
           </v-card-actions>
@@ -40,39 +45,44 @@
 </template>
 
 <script setup>
-import { reactive, onMounted } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import axios from "axios";
 
 const router = useRouter();
 const route = useRoute();
 const categoryId = route.params.id;
 
 const category = reactive({
-  name: "",
+  title: "",
   description: "",
 });
+const loading = ref(false);
 
-onMounted(() => {
-  const dummyCategories = [
-    { id: 1, name: "Science", description: "Science related quiz" },
-    { id: 2, name: "Math", description: "Math related quiz" },
-    { id: 3, name: "History", description: "History topics" },
-  ];
 
-  const existing = dummyCategories.find((c) => c.id == categoryId);
-  if (existing) {
-    category.name = existing.name;
-    category.description = existing.description;
+onMounted(async () => {
+  try {
+    const res = await axios.get(`/api/category/show/${categoryId}`);
+    const data = res.data.data;
+    category.title = data.title;
+    category.description = data.description ;
+  } catch (err) {
+    console.error("Error loading category:", err);
   }
 });
 
-const handleSubmit = () => {
-  console.log("Category Updated:", category);
-  alert("Category Updated Successfully!");
-  router.push("/category");
+const handleSubmit = async () => {
+  loading.value = true;
+  try {
+    const res = await axios.put(`/api/category/update/${categoryId}`, category);
+    alert(res.data.message || "Category Updated Successfully!");
+    router.push("/category");
+  } catch (err) {
+    console.error( err);
+  } finally {
+    loading.value = false;
+  }
 };
 
-const goBack = () => {
-  router.push("/category");
-};
+const goBack = () => router.push("/category");
 </script>

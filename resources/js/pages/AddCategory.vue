@@ -11,8 +11,8 @@
       <v-card-text>
         <v-form @submit.prevent="handleSubmit">
           <v-text-field
-            v-model="category.name"
-            label="Category Name"
+            v-model="category.title"
+            label="Category Title"
             prepend-inner-icon="mdi-shape-outline"
             required
           />
@@ -40,22 +40,36 @@
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import { ref,reactive } from "vue";
 import { useRouter } from "vue-router";
-
+import axios from "axios";
 const router = useRouter();
 
 const category = reactive({
-  name: "",
+  title: "",
   description: "",
 });
+const loading = ref(false);
 
-const handleSubmit = () => {
-  console.log("Category Added:", category);
-  alert("Category Added Successfully!");
-  router.push("/category");
+const handleSubmit = async () => {
+  try {
+    loading.value = true;
+
+    const res = await axios.post("/api/category/store", category);
+
+    alert(" Category Added Successfully!");
+    console.log("Saved:", res.data);
+
+    category.title = "";
+    category.description = "";
+
+    router.push("/category");
+  } catch (error) {
+    console.error(error.response?.data);
+  } finally {
+    loading.value = false;
+  }
 };
-
 const goBack = () => {
   router.push("/category");
 };
