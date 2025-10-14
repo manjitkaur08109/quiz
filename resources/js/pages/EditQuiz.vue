@@ -28,7 +28,14 @@
             label="Select Category"
             prepend-inner-icon="mdi-shape-outline"
           />
-        
+          <v-textarea
+            v-model="quiz.question"
+            label="Question"
+            prepend-inner-icon="mdi-help-circle-outline"
+            rows="2"
+            auto-grow
+          />
+
           <v-card-actions class="justify-end">
             <v-btn color="grey" variant="outlined" @click="goBack">Cancel</v-btn>
             <v-btn color="primary" type="submit">Update Quiz</v-btn>
@@ -40,7 +47,8 @@
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import axios from "axios";
+import { reactive,ref,onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
@@ -48,16 +56,43 @@ const route = useRoute();
 const quizId = route.params.id;
 
 const quiz = reactive({
-  title: "Sample Quiz " + quizId,
-  description: "This is a demo quiz.",
-  category: "Science",
+  title: "",
+  description: "",
+  category: "",
+  question: "",
+  correctAnswer: "",
 });
 
-const categories = ["Science", "Math", "History", "GK", "Sports"];
+const category = ["", "", "", "", ""];
+const loading = ref(false);
 
-const updateQuiz = () => {
-  alert("Quiz updated successfully!");
-  router.push("/quiz");
+
+onMounted(async () => {
+  try {
+    const res = await axios.get(`/api/quiz/show/${quizId}`);
+    const data = res.data.data;
+    quiz.title = data.title;
+    quiz.description = data.description ;
+    quiz.category = data.category;
+  quiz.question = data.question;
+  quiz.correctAnswer = data.correctAnswer;
+  } catch (err) {
+    console.error("Error loading quiz:", err);
+  }
+});
+
+
+const updateQuiz = async () => {
+  loading.value = true;
+  try {
+    const res = await axios.put(`/api/quiz/update/${quizId}`, quiz);
+    alert(res.data.message || "Quiz Updated Successfully!");
+    router.push("/quiz");
+  } catch (err) {
+    console.error( err);
+  } finally {
+    loading.value = false;
+  }
 };
 
 const goBack = () => {

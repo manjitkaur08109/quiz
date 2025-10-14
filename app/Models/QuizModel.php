@@ -8,5 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 class QuizModel extends Model {
     use HasUuids;
     protected $table = 'quiz';
-    protected $fillable = [ 'title', 'description', 'category_id', ];
+    protected $fillable = [ 'title', 'description', 'category', 'question','options','correct_answer'];
 }

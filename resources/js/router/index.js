@@ -18,7 +18,8 @@ const routes = [
   { path: "/editQuiz/:id", name: "EditQuiz", component: EditQuiz },
   { path: "/addCategory", name: "AddCategory", component: AddCategory },
   { path: "/editCategory/:id", name: "EditCategory", component: EditCategory },
-  { path: "/category", redirect: "/category" }
+  { path: "/category", redirect: "/category" },
+  { path: "/quiz", redirect: "/quiz" },
 ];
 
 const router = createRouter({

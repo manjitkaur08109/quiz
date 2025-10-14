@@ -1,7 +1,7 @@
 <template>
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2">
-      Quiz
+      Quiz List
       <v-spacer></v-spacer>
 
       <v-text-field
@@ -22,8 +22,7 @@
     <v-data-table
       v-model:search="search"
        :headers="headers"
-      :filter-keys="['name']"
-      :items="items"
+      :items="quizzes"
     >
      <template #item.sn="{ index }">
         {{ index + 1 }}
@@ -33,52 +32,70 @@
         <v-btn size="x-small" icon color="primary" @click="editQuiz(item.id)">
           <v-icon >mdi-pencil</v-icon>
         </v-btn>
+         <v-btn size="small" icon color="error" @click="deleteQuiz(item.id)">
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
       </template>
-
-
-
-
     </v-data-table>
   </v-card>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+// import quizApi from "./api/quizApi.js";
+import axios from "axios";
 
 const router = useRouter();
 const search = ref("");
-const goToAddQuiz = () => {
-  router.push("/addQuiz");
-};
-const editQuiz = (id) => router.push(`/editQuiz/${id}`);
-const items = [
-  {
-    name: "Nebula GTX 3080",
-    image: "1.png",
-    price: 699.99,
-    rating: 5,
-    stock: true,
-  },
-  {
-    name: "Galaxy RTX 3080",
-    image: "2.png",
-    price: 799.99,
-    rating: 4,
-    stock: false,
-  },
+const quizzes = ref([]);
+const loading = ref(false);
 
-];
 const headers = [
   { title: "S.No", key: "sn" },
-  { title: "Quiz Name", key: "name" },
-  { title: "Status", key: "stock" },
+  { title: "Quiz Title", key: "title" },
+  { title: "Description", value: "description" },
+  { title: "Category", key: "category" },
   { title: "Actions", key: "actions", sortable: false },
 ];
-const item = [
-  { id: 1, name: "Science Quiz", stock: true },
-  { id: 2, name: "Math Quiz", stock: false },
-  { id: 3, name: "History Quiz", stock: true },
-];
+
+// const fetchQuizzes = async () => {
+//   const { data } = await quizApi.getAll();
+//   quizzes.value = data.data;
+// };
+
+// const deleteQuiz = async (id) => {
+//   if (confirm("Are you sure to delete this quiz?")) {
+//     await quizApi.delete(id);
+//     fetchQuizzes();
+//   }
+// };
+const fetchQuizzes = async () => {
+  loading.value = true;
+  try {
+    const res = await axios.get("/api/quiz/index");
+    quizzes.value = res.data.data;
+  } finally {
+    loading.value = false;
+  }
+};
+
+const deleteQuiz = async (id) => {
+  if (!confirm("Delete this quiz?")) return;
+  try {
+    await axios.delete(`/api/quiz/delete/${id}`);
+    fetchQuizzes();
+  } catch (error) {
+    console.error("Error deleting quiz:", error);
+  }
+};
+onMounted(() => {
+  fetchQuizzes();
+});
+
+const goToAddQuiz = () => router.push("/addQuiz");
+const editQuiz = (id) => router.push(`/editQuiz/${id}`);
+
+
 </script>
 
