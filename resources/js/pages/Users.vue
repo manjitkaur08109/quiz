@@ -46,18 +46,6 @@
         ></v-rating>
       </template>
 
-      <!-- <template v-slot:item.stock="{ item }">
-        <div class="text-end">
-          <v-chip
-            :color="item.stock ? 'green' : 'red'"
-            :text="item.stock ? 'In stock' : 'Out of stock'"
-            class="text-uppercase"
-            size="small"
-            label
-          ></v-chip>
-        </div>
-      </template>-->
-
       <template #item.stock="{ item }">
         <div class="text-center">
 

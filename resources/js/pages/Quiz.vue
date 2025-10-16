@@ -28,6 +28,9 @@
         {{ index + 1 }}
       </template>
 
+      <template #item.category="{ item }">
+        {{ item.category.title }}
+        </template>
       <template #item.actions="{ item }">
         <v-btn size="x-small" icon color="primary" @click="editQuiz(item.id)">
           <v-icon >mdi-pencil</v-icon>
@@ -43,7 +46,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-// import quizApi from "./api/quizApi.js";
 import axios from "axios";
 
 const router = useRouter();
@@ -59,21 +61,11 @@ const headers = [
   { title: "Actions", key: "actions", sortable: false },
 ];
 
-// const fetchQuizzes = async () => {
-//   const { data } = await quizApi.getAll();
-//   quizzes.value = data.data;
-// };
-
-// const deleteQuiz = async (id) => {
-//   if (confirm("Are you sure to delete this quiz?")) {
-//     await quizApi.delete(id);
-//     fetchQuizzes();
-//   }
-// };
 const fetchQuizzes = async () => {
   loading.value = true;
   try {
     const res = await axios.get("/api/quiz/index");
+
     quizzes.value = res.data.data;
   } finally {
     loading.value = false;

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->string('category');
+            $table->uuid('category_id');
             $table->text('question');
             $table->json('options');
             $table->string('correct_answer');

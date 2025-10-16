@@ -9,10 +9,11 @@
       <v-divider></v-divider>
 
       <v-card-text>
-        <v-form @submit.prevent="handleSubmit">
+        <v-form ref="formRef" @submit.prevent="handleSubmit">
           <v-text-field
             v-model="category.title"
             label="Category Title"
+            :rules="CategoryTitleRules"
             prepend-inner-icon="mdi-shape-outline"
             required
           />
@@ -20,6 +21,7 @@
           <v-textarea
             v-model="category.description"
             label="Category Description"
+            :rules="CategoryDescriptionRules"
             prepend-inner-icon="mdi-text-box-outline"
             rows="3"
             auto-grow
@@ -59,6 +61,19 @@ const category = reactive({
 });
 const loading = ref(false);
 
+const formRef = ref("");
+const CategoryTitleRules = [
+    (value) => {
+    if (value?.length >= 3) return true;
+    return ' Title required|string|max:15';
+  },
+];
+const CategoryDescriptionRules = [
+  (value) => {
+    if (value?.length >= 10) return true;
+    return "Description must be at least 10 characters.";
+  },
+];
 
 onMounted(async () => {
   try {
@@ -72,6 +87,8 @@ onMounted(async () => {
 });
 
 const handleSubmit = async () => {
+    const { valid } = await formRef.value.validate(); // ✅ validate all fields
+  if (!valid) return; // stop if invalid
   loading.value = true;
   try {
     const res = await axios.put(`/api/category/update/${categoryId}`, category);

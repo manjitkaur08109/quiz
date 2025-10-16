@@ -26,10 +26,11 @@
                 rows="3"
                 auto-grow
               />
-
               <v-select
-                v-model="quiz.category"
+                v-model="quiz.category_id"
                 :items="categories"
+                item-title="title"
+                item-value="id"
                 label="Select Category"
                 prepend-inner-icon="mdi-shape-outline"
                 required
@@ -47,7 +48,8 @@
                 :key="i"
                 v-model="quiz.options[i]"
                 :label="`Option ${i + 1}`"
-                prepend-inner-icon="mdi-format-list-bulleted"
+                @click="quiz.options.push('')"
+                prepend-icon="mdi-plus"
               />
 
               <v-select
@@ -75,26 +77,36 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
-// import quizApi from "./api/quizApi.js";
 import axios from "axios";
-
 const goToAdQuiz = () => router.push("/addQuiz");
 
+const categories = ref([]);
 const quiz = reactive({
   title: "",
   description: "",
-  category: "",
+  category_id: null,
   question: "",
   options: ["", "", "", ""],
   correctAnswer: "",
 });
 const loading = ref(false);
-const categories = ["Science", "Math", "History", "GK", "Sports"];
+// const categories = ["Science", "Math", "History", "GK", "Sports"];
+// ✅ Fetch categories from backend
+onMounted(async () => {
+  try {
+    const res = await axios.get("/api/quiz/create");
+    categories.value = res.data.data;
+    console.log("Categories loaded:", categories.value);
+  } catch (error) {
+    console.error("Error loading categories:", error);
+  }
+});
 
 const handleSubmit = async () => {
+  console.log("Submitting quiz:", JSON.stringify(quiz));
   try {
     loading.value = true;
 
@@ -103,15 +115,15 @@ const handleSubmit = async () => {
     console.log("Quiz created:", res.data);
     quiz.title = "";
     quiz.description = "";
-    quiz.category = "";
+    quiz.category_id = "";
     quiz.question = "";
     quiz.options = ["", "", "", ""];
     quiz.correctAnswer = "";
 
     router.push("/quiz");
   } catch (error) {
-    console.error("Error adding quiz:", error);
-    alert("Failed to add quiz!");
+    console.error("Error adding quiz:", error.response?.data || error);
+    alert("Failed to add quiz! Check console for details.");
   } finally {
     loading.value = false;
   }

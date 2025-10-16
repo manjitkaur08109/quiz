@@ -16,6 +16,7 @@ Route::prefix('category')->group(function(){
 
 Route::prefix('quiz')->group(function(){
     Route::get('/index', [QuizController::class, 'index']);
+    Route::get('/create', [QuizController::class, 'create']);
     Route::post('/store', [QuizController::class, 'store']);
     Route::get('/show/{id}', [QuizController::class, 'show']);
       Route::put('/update/{id}', [QuizController::class, 'update']);

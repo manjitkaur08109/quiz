@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class CategoryModel extends Model {
     use HasUuids;
-    protected $table = 'categories';
+    protected $table = 'category';
     protected $fillable = [ 'title','description' ];
 }

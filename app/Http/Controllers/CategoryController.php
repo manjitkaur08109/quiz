@@ -14,24 +14,34 @@ class CategoryController extends Controller {
 
     public function store( Request $request ) {
         $validated = $request->validate( [
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:255|unique:category,title',
             'description' => 'nullable|string',
         ] );
+        $exists = CategoryModel::where( 'title', $request->title )
+        ->exists();
+        if ( $exists ) {
+            return $this->actionSuccess( 'This category title already exists!' );
+        }
 
         $category = CategoryModel::create( $validated );
-        return $this->actionSuccess('Category added successfully',$category);
+        return $this->actionSuccess( 'Category added successfully', $category );
     }
 
     public function show( $id ) {
         $category = CategoryModel::findOrFail( $id );
-        return $this->actionSuccess('Category show',$category);
+        return $this->actionSuccess( 'Category show', $category );
     }
 
     public function update( Request $request, $id ) {
         $category = CategoryModel::findOrFail( $id );
+        $exists = CategoryModel::where( 'title', $request->title )
+        ->whereNot( 'id', $request->id )
+        ->exists();
+        if ( $exists ) {
+            return $this->actionSuccess( 'This category title already exists.' );
+        }
         $category->update( $request->only( [ 'title', 'description' ] ) );
-
-        return $this->actionSuccess('Category updated successfully',$category);
+        return $this->actionSuccess( 'Category updated successfully', $category );
     }
 
     public function destroy( $id ) {
