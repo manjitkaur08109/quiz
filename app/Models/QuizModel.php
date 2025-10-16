@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class QuizModel extends Model {
     use HasUuids;
     protected $table = 'quiz';
-    protected $fillable = [ 'title', 'description', 'category_id', 'question', 'options', 'correct_answer' ];
+    protected $fillable = [ 'title', 'description', 'category_id', 'questions' ];
 
     function category() {
         return $this->hasOne( CategoryModel::class, 'id', 'category_id' );

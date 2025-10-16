@@ -13,6 +13,7 @@
           <v-text-field
             v-model="quiz.title"
             label="Quiz Title"
+            :rules="QuizTitleRules"
             prepend-inner-icon="mdi-format-title"
           />
 
@@ -20,6 +21,7 @@
             v-model="quiz.description"
             label="Description"
             prepend-inner-icon="mdi-text-box-outline"
+            :rules="QuizDescriptionRules"
           />
 
           <v-select
@@ -27,11 +29,13 @@
             :items="categories"
             label="Select Category"
             prepend-inner-icon="mdi-shape-outline"
+            :rules="SCRules"
           />
           <v-textarea
             v-model="quiz.question"
             label="Question"
             prepend-inner-icon="mdi-help-circle-outline"
+            :rules="QuestionRules"
             rows="2"
             auto-grow
           />
@@ -66,6 +70,31 @@ const quiz = reactive({
 const category = ["", "", "", "", ""];
 const loading = ref(false);
 
+const QuizTitleRules = [
+    (value) => {
+    if (value?.length >= 3) return true;
+    return ' Title required|string|max:15';
+  },
+];
+const QuizDescriptionRules = [
+  (value) => {
+    if (value?.length >= 10) return true;
+    return "Description must be at least 10 characters.|nullable";
+  },
+];
+const SCRules = [
+    (value) =>{
+        if(value) return true;
+        return ' Category is required';
+    },
+];
+const QuestionRules =[
+    (value)=>{
+        if(value) return true;
+        return 'Required';
+    },
+];
+
 
 onMounted(async () => {
   try {
@@ -83,6 +112,8 @@ onMounted(async () => {
 
 
 const updateQuiz = async () => {
+      const { valid } = await formRef.value.validate(); // ✅ validate all fields
+  if (!valid) return; // stop if invalid
   loading.value = true;
   try {
     const res = await axios.put(`/api/quiz/update/${quizId}`, quiz);

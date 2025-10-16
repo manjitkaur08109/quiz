@@ -25,20 +25,26 @@ class QuizController extends Controller {
         $request->validate( [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'question' => 'required|string',
-            'options' => 'required|array|min:2',
-            'correctAnswer' => 'required|string',
             'category_id' => 'required|exists:category,id',
-        ] );
+            'questions' => 'required|array',
+            'questions.*.question' => 'required|string',
+        'questions.*.options' => 'required|array|min:2',
+        'questions.*.correctAnswer' => 'required|string',
 
-        $quiz = QuizModel::create( [
-            'title' => $request->title,
-            'description' => $request->description,
-            'question' => $request->question,
-            'options' => json_encode( $request->options ),
-            'correct_answer' => $request->correctAnswer,
-            'category_id' => $request->category_id,
         ] );
+        $exists = QuizModel::where( 'title', $request->title )
+        ->exists();
+        if ( $exists ) {
+            return $this->actionSuccess( 'This quiz title already exists!' );
+        }
+
+    $quiz = QuizModel::create([
+        'title' => $request->title,
+        'description' => $request->description,
+        'category_id' => $request->category_id,
+        'questions' => json_encode($request->questions),
+    ]);
+
         return $this->actionSuccess( 'Quiz added successfully', $quiz );
     }
 
@@ -49,6 +55,13 @@ class QuizController extends Controller {
 
     function update( Request $request, $id ) {
         $quiz = QuizModel::findOrFail( $id );
+
+        $exists = QuizModel::where( 'title', $request->title )
+        ->whereNot( 'id', $request->id )
+        ->exists();
+        if ( $exists ) {
+            return $this->actionSuccess( 'This quiz title already exists.' );
+        }
         $quiz->update( $request->all() );
         return $this->actionSuccess( 'Quiz updated successfully', $quiz );
     }

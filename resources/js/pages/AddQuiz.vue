@@ -11,10 +11,11 @@
           <v-divider></v-divider>
 
           <v-card-text>
-            <v-form @submit.prevent="handleSubmit">
+            <v-form ref="formRef" @submit.prevent="handleSubmit">
               <v-text-field
                 v-model="quiz.title"
                 label="Quiz Title"
+                :rules="QuizTitleRules"
                 prepend-inner-icon="mdi-format-title"
                 required
               />
@@ -22,6 +23,7 @@
               <v-textarea
                 v-model="quiz.description"
                 label="Quiz Description"
+                :rules="QuizDescriptionRules"
                 prepend-inner-icon="mdi-text-box-outline"
                 rows="3"
                 auto-grow
@@ -32,34 +34,63 @@
                 item-title="title"
                 item-value="id"
                 label="Select Category"
+                :rules="SCRules"
                 prepend-inner-icon="mdi-shape-outline"
                 required
               />
 
-              <v-textarea
-                v-model="quiz.question"
-                label="Question"
-                prepend-inner-icon="mdi-help-circle-outline"
-                rows="2"
-                auto-grow
-              />
-              <v-text-field
-                v-for="(o, i) in quiz.options"
-                :key="i"
-                v-model="quiz.options[i]"
-                :label="`Option ${i + 1}`"
-                @click="quiz.options.push('')"
-                prepend-icon="mdi-plus"
-              />
+               <div v-for="(q, qIndex) in quiz.questions" :key="qIndex" class="mb-4">
+                <v-textarea
+                  v-model="q.question"
+                  :label="`Question ${qIndex + 1}`"
+                  :rules="QuestionRules"
+                  rows="2"
+                  auto-grow
+                  class="mb-2"
+                />
 
-              <v-select
-                v-model="quiz.correctAnswer"
-                :items="quiz.options"
-                label="Select Correct Answer"
-                prepend-inner-icon="mdi-check-circle-outline"
-                required
-              />
+                <!-- Options -->
+                <div v-for="(o, oIndex) in q.options" :key="oIndex" class="mb-2">
+                  <v-text-field
+                    v-model="q.options[oIndex]"
+                    :label="`Option ${oIndex + 1}`"
+                    :rules="OptionRules"
+                    class="flex-grow-1"
+                  />
+                  <v-icon color="red" @click="removeOption(qIndex, oIndex)">mdi-delete</v-icon>
+                </div>
 
+                <v-btn small color="primary" @click="addOption(qIndex)">Add Option</v-btn>
+
+                <v-select
+                  v-model="q.correctAnswer"
+                  :items="q.options"
+                  label="Select Correct Answer"
+                  :rules="SCARules"
+                  required
+                  class="mt-2"
+                />
+
+                <v-btn
+                  v-if="quiz.questions.length > 1"
+                  color="red"
+                  small
+                  class="mt-2"
+                  @click="removeQuestion(qIndex)"
+                >
+                  Delete Question
+                </v-btn>
+
+                <v-divider class="my-4"></v-divider>
+              </div>
+
+              <v-btn
+                color="secondary"
+                @click="addQuestion"
+                class="mb-4"
+              >
+                Add Question
+              </v-btn>
               <v-card-actions class="justify-end">
                 <v-btn variant="outlined" color="grey" @click="goBack">
                   Cancel
@@ -82,19 +113,58 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 import axios from "axios";
 const goToAdQuiz = () => router.push("/addQuiz");
-
+const formRef = ref('')
+const QuizTitleRules = [
+    (value) => {
+    if (value?.length >= 3) return true;
+    return ' Title required|string|max:15';
+  },
+];
+const QuizDescriptionRules = [
+  (value) => {
+    if (value?.length >= 10) return true;
+    return "Description must be at least 10 characters.|nullable";
+  },
+];
+const SCRules = [
+    (value) =>{
+        if(value) return true;
+        return ' Category is required';
+    },
+];
+const QuestionRules =[
+    (value)=>{
+        if(value) return true;
+        return 'Required';
+    },
+];
+const OptionRules =[
+    (value)=>{
+        if(value) return true;
+        return 'Option is Required';
+    },
+];
+const SCARules =[
+    (value)=>{
+        if(value) return true;
+        return 'Required';
+    },
+];
 const categories = ref([]);
 const quiz = reactive({
   title: "",
   description: "",
   category_id: null,
-  question: "",
-  options: ["", "", "", ""],
-  correctAnswer: "",
+  questions:[
+    {
+      question: "",
+      options: ["", ""],
+      correctAnswer: "",
+    },
+  ],
 });
+
 const loading = ref(false);
-// const categories = ["Science", "Math", "History", "GK", "Sports"];
-// ✅ Fetch categories from backend
 onMounted(async () => {
   try {
     const res = await axios.get("/api/quiz/create");
@@ -104,8 +174,30 @@ onMounted(async () => {
     console.error("Error loading categories:", error);
   }
 });
+const addQuestion = () => {
+  quiz.questions.push({
+    question: "",
+    options: ["", ""],
+    correctAnswer: "",
+  });
+};
+
+const removeQuestion = (qIndex) => {
+  quiz.questions.splice(qIndex, 1);
+};
+
+const addOption = (qIndex) => {
+  quiz.questions[qIndex].options.push("");
+};
+
+const removeOption = (qIndex, oIndex) => {
+  quiz.questions[qIndex].options.splice(oIndex, 1);
+};
+
 
 const handleSubmit = async () => {
+      const { valid } = await formRef.value.validate(); // ✅ validate all fields
+  if (!valid) return; // stop if invalid
   console.log("Submitting quiz:", JSON.stringify(quiz));
   try {
     loading.value = true;
@@ -116,11 +208,8 @@ const handleSubmit = async () => {
     quiz.title = "";
     quiz.description = "";
     quiz.category_id = "";
-    quiz.question = "";
-    quiz.options = ["", "", "", ""];
-    quiz.correctAnswer = "";
 
-    router.push("/quiz");
+      router.push("/quiz");
   } catch (error) {
     console.error("Error adding quiz:", error.response?.data || error);
     alert("Failed to add quiz! Check console for details.");
