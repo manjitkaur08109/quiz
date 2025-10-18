@@ -2,7 +2,7 @@
   <v-container class="py-8">
     <v-card class="mx-auto" max-width="500" elevation="8">
       <v-card-title class="text-h6">
-        <v-icon icon="mdi-plus-circle-outline" class="mr-2" />
+        <v-icon size="x-small" icon="mdi-plus-circle-outline" class="mr-2" />
         Add New Category
       </v-card-title>
 

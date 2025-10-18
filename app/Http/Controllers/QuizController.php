@@ -23,13 +23,13 @@ class QuizController extends Controller {
     function store( Request $request ) {
 
         $request->validate( [
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:255|unique:quiz,title',
             'description' => 'required|string',
             'category_id' => 'required|exists:category,id',
             'questions' => 'required|array',
             'questions.*.question' => 'required|string',
-        'questions.*.options' => 'required|array|min:2',
-        'questions.*.correctAnswer' => 'required|string',
+            'questions.*.options' => 'required|array|min:2',
+            'questions.*.correctAnswer' => 'required|string',
 
         ] );
         $exists = QuizModel::where( 'title', $request->title )
@@ -38,31 +38,48 @@ class QuizController extends Controller {
             return $this->actionSuccess( 'This quiz title already exists!' );
         }
 
-    $quiz = QuizModel::create([
-        'title' => $request->title,
-        'description' => $request->description,
-        'category_id' => $request->category_id,
-        'questions' => json_encode($request->questions),
-    ]);
+        $quiz = QuizModel::create( [
+            'title' => $request->title,
+            'description' => $request->description,
+            'category_id' => $request->category_id,
+            'questions' => json_encode( $request->questions ),
+        ] );
 
         return $this->actionSuccess( 'Quiz added successfully', $quiz );
     }
 
     function show( $id ) {
         $quiz = QuizModel::findOrFail( $id );
-        return $this->actionSuccess( 'success', $quiz );
+        return $this->actionSuccess( 'Quiz show', $quiz );
     }
 
     function update( Request $request, $id ) {
         $quiz = QuizModel::findOrFail( $id );
 
+        $request->validate( [
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'category_id' => 'required|exists:category,id',
+            'questions' => 'required|array',
+            'questions.*.question' => 'required|string',
+            'questions.*.options' => 'required|array|min:2',
+            'questions.*.correctAnswer' => 'required|string',
+
+        ] );
         $exists = QuizModel::where( 'title', $request->title )
         ->whereNot( 'id', $request->id )
         ->exists();
         if ( $exists ) {
             return $this->actionSuccess( 'This quiz title already exists.' );
         }
-        $quiz->update( $request->all() );
+
+        $quiz->update( [
+            'title' => $request->title,
+            'description' => $request->description,
+            'category_id' => $request->category_id,
+            'questions' => json_encode( $request->questions ),
+        ] );
+
         return $this->actionSuccess( 'Quiz updated successfully', $quiz );
     }
 

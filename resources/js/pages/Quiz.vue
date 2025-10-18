@@ -35,7 +35,7 @@
         <v-btn size="x-small" icon color="primary" @click="editQuiz(item.id)">
           <v-icon >mdi-pencil</v-icon>
         </v-btn>
-         <v-btn size="small" icon color="error" @click="deleteQuiz(item.id)">
+         <v-btn size="x-small" class="ml-2" icon color="red" @click="deleteQuiz(item.id)">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
       </template>

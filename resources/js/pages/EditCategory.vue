@@ -2,7 +2,7 @@
   <v-container class="py-8">
     <v-card class="mx-auto" max-width="500" elevation="8">
       <v-card-title class="text-h6">
-        <v-icon icon="mdi-pencil-outline" class="mr-2" />
+        <v-icon size="x-small" icon="mdi-pencil-outline" class="mr-2" />
         Edit Category
       </v-card-title>
 
@@ -28,7 +28,7 @@
           />
 
           <v-card-actions class="justify-end">
-            <v-btn variant="outlined" color="grey" @click="goBack">
+            <v-btn color="grey" @click="goBack">
               Cancel
             </v-btn>
             <v-btn

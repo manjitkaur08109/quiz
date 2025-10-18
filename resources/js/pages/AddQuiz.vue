@@ -4,7 +4,7 @@
       <v-col cols="12">
         <v-card class="mx-auto" max-width="600" elevation="8">
           <v-card-title class="text-h6">
-            <v-icon icon="mdi-plus-circle-outline" class="mr-2" />
+            <v-icon size="x-small" icon="mdi-plus-circle-outline" class="mr-2" />
             Add New Quiz
           </v-card-title>
 
@@ -43,6 +43,7 @@
                 <v-textarea
                   v-model="q.question"
                   :label="`Question ${qIndex + 1}`"
+                  prepend-inner-icon="mdi-help-circle-outline"
                   :rules="QuestionRules"
                   rows="2"
                   auto-grow
@@ -56,8 +57,9 @@
                     :label="`Option ${oIndex + 1}`"
                     :rules="OptionRules"
                     class="flex-grow-1"
-                  />
-                  <v-icon color="red" @click="removeOption(qIndex, oIndex)">mdi-delete</v-icon>
+
+                    />
+                    <v-icon size="x-small" color="red" @click="removeOption(qIndex, oIndex)">mdi-delete</v-icon>
                 </div>
 
                 <v-btn small color="primary" @click="addOption(qIndex)">Add Option</v-btn>
@@ -92,7 +94,7 @@
                 Add Question
               </v-btn>
               <v-card-actions class="justify-end">
-                <v-btn variant="outlined" color="grey" @click="goBack">
+                <v-btn  color="grey" @click="goBack">
                   Cancel
                 </v-btn>
                 <v-btn color="primary" type="submit" class="ml-2">
@@ -113,7 +115,7 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 import axios from "axios";
 const goToAdQuiz = () => router.push("/addQuiz");
-const formRef = ref('')
+const formRef = ref('');
 const QuizTitleRules = [
     (value) => {
     if (value?.length >= 3) return true;
@@ -212,7 +214,7 @@ const handleSubmit = async () => {
       router.push("/quiz");
   } catch (error) {
     console.error("Error adding quiz:", error.response?.data || error);
-    alert("Failed to add quiz! Check console for details.");
+     alert("title name already exists");
   } finally {
     loading.value = false;
   }
