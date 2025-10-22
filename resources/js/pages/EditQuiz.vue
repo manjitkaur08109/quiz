@@ -127,7 +127,7 @@ const loading = ref(false);
 const QuizTitleRules = [
     (value) => {
     if (value?.length >= 3) return true;
-    return ' Title required|string|max:15';
+    return ' Title required|string|min:3';
   },
 ];
 const QuizDescriptionRules = [
@@ -197,7 +197,7 @@ onMounted(async () => {
     quiz.title = data.title;
     quiz.description = data.description ;
     quiz.category_id = data.category_id;
-   quiz.questions = JSON.parse(data.questions);
+   quiz.questions = data.questions;
 
   } catch (err) {
     console.error("Error loading quiz:", err);

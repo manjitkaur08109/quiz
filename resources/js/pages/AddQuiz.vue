@@ -119,7 +119,7 @@ const formRef = ref('');
 const QuizTitleRules = [
     (value) => {
     if (value?.length >= 3) return true;
-    return ' Title required|string|max:15';
+    return ' Title required|string|min:3';
   },
 ];
 const QuizDescriptionRules = [

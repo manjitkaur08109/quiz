@@ -42,7 +42,7 @@ class QuizController extends Controller {
             'title' => $request->title,
             'description' => $request->description,
             'category_id' => $request->category_id,
-            'questions' => json_encode( $request->questions ),
+            'questions' =>  $request->questions ,
         ] );
 
         return $this->actionSuccess( 'Quiz added successfully', $quiz );
@@ -77,7 +77,7 @@ class QuizController extends Controller {
             'title' => $request->title,
             'description' => $request->description,
             'category_id' => $request->category_id,
-            'questions' => json_encode( $request->questions ),
+            'questions' => $request->questions,
         ] );
 
         return $this->actionSuccess( 'Quiz updated successfully', $quiz );
