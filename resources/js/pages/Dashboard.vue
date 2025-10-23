@@ -92,7 +92,7 @@ const goToUsers = () => {
 const goToCategory = () => {
   router.push("/category");
 };
-const recentUsers = [];
+const recentUsers = ref([]);
 const totalUsers = ref(0);
 const totalCategory = ref(0);
 const totalQuiz = ref(0);
@@ -105,6 +105,10 @@ const getDashboard = async () => {
 };
 onMounted(() => {
   getDashboard();
+});
+
+onMounted(() => {
+
 });
 </script>
 

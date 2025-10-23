@@ -36,6 +36,7 @@
         link
       />
     </v-list>
+
   </v-navigation-drawer>
 </template>
 
@@ -50,10 +51,22 @@ const items = [
   { title: "Dashboard", path: "/", icon: "mdi-view-dashboard" },
   { title: "Quiz", path: "/quiz", icon: "mdi-help-circle-outline" },
   { title: "Users", path: "/users", icon: "mdi-account-group" },
-{title:"Category",path:"/category",icon:"mdi-view-grid-outline"}
-
+  {title:"Category",path:"/category",icon:"mdi-view-grid-outline"},
+  { title: "Registration", path: "/register", icon: "mdi-account-plus" },
 ];
 
-const goToProfile = () => {router.push('/profile')};
-const logout = () => alert("Logout");
+const logout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  router.push({ path: "/login", replace: true });
+};
+const goToProfile = () => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    router.push("/profile");
+  } else {
+    router.push("/login");
+  }
+};
+// const goToProfile = () => {router.push('/profile')};
 </script>

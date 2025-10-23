@@ -17,87 +17,86 @@
     </v-card-title>
 
     <v-divider></v-divider>
+
     <v-data-table
       v-model:search="search"
-      :filter-keys="['name']"
-      :items="items"
+      :filter-keys="['name', 'email']"
+      :items="users"
+      :headers="headers"
+      class="elevation-2"
     >
-      <template v-slot:header.stock>
-        <div class="text-center">Stock</div>
+      <!-- 👤 Profile image (optional) -->
+      <template #item.image="{ item }">
+        <v-avatar size="40">
+          <v-img :src="item.image || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'" />
+        </v-avatar>
       </template>
 
-      <template v-slot:item.image="{ item }">
-        <v-card class="my-2" elevation="2" rounded>
-          <v-img
-            :src="`https://cdn.vuetifyjs.com/docs/images/graphics/gpus/${item.image}`"
-            height="64"
-            cover
-          ></v-img>
-        </v-card>
-      </template>
-
-      <template v-slot:item.rating="{ item }">
-        <v-rating
-          :model-value="item.rating"
-          color="orange-darken-2"
-          density="compact"
-          size="small"
-          readonly
-        ></v-rating>
-      </template>
-
-      <template #item.stock="{ item }">
-        <div class="text-center">
-
-        <v-btn size="x-small" icon color="primary" @click="editQuiz(item.id)">
-          <v-icon >mdi-eye</v-icon>
+      <!-- 👁️ Action buttons -->
+      <template #item.actions="{ item }">
+        <v-btn size="x-small" icon color="primary" @click="viewUser(item)">
+          <v-icon>mdi-eye</v-icon>
         </v-btn>
-        </div>
+
+        <v-btn size="x-small" icon color="error" @click="deleteUser(item.id)">
+          <v-icon>mdi-delete</v-icon>
+        </v-btn>
       </template>
     </v-data-table>
   </v-card>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import axios from "axios";
 
 const search = ref("");
-const items = [
-  {
-    name: "Nebula GTX 3080",
-    image: "1.png",
-    price: 699.99,
-    rating: 5,
-    stock: true,
-  },
-  {
-    name: "Galaxy RTX 3080",
-    image: "2.png",
-    price: 799.99,
-    rating: 4,
-    stock: false,
-  },
-  {
-    name: "Orion RX 6800 XT",
-    image: "3.png",
-    price: 649.99,
-    rating: 3,
-    stock: true,
-  },
-  {
-    name: "Vortex RTX 3090",
-    image: "4.png",
-    price: 1499.99,
-    rating: 4,
-    stock: true,
-  },
-  {
-    name: "Cosmos GTX 1660 Super",
-    image: "5.png",
-    price: 299.99,
-    rating: 4,
-    stock: false,
-  },
+const users = ref([]);
+const headers = [
+  { title: "Name", key: "name" },
+  { title: "Email", key: "email" },
+  { title: "Created At", key: "created_at" },
+  { title: "Actions", key: "actions", sortable: false },
 ];
+
+// ✅ Fetch users from Laravel API
+const getUsers = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.get("/api/users", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    users.value = res.data.data; // assuming {data: users[]}
+  } catch (err) {
+    console.error("Error fetching users:", err);
+  }
+};
+
+// 👁️ View user (you can open dialog or redirect)
+const viewUser = (user) => {
+  alert(`User: ${user.name}\nEmail: ${user.email}`);
+};
+
+// 🗑️ Delete user
+const deleteUser = async (id) => {
+  if (!confirm("Are you sure you want to delete this user?")) return;
+
+  try {
+    const token = localStorage.getItem("token");
+    await axios.delete(`/api/users/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    users.value = users.value.filter((u) => u.id !== id);
+    alert("User deleted successfully!");
+  } catch (err) {
+    console.error("Delete error:", err);
+    alert("Failed to delete user!");
+  }
+};
+
+onMounted(() => {
+  getUsers();
+});
+
 </script>
 

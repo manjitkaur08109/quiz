@@ -78,6 +78,16 @@
                   Delete Question
                 </v-btn>
 
+                 <v-btn
+                  v-if="quiz.questions.length > 1"
+                  color="secondary"
+                  small
+                  class="mt-2"
+                  @click="duplicateQuestion(qIndex)"
+                >
+                  Duplicate Question
+                </v-btn>
+
                 <v-divider class="my-4"></v-divider>
               </div>
 
@@ -166,6 +176,11 @@ const addQuestion = () => {
     options: ["", ""],
     correctAnswer: "",
   });
+};
+
+const duplicateQuestion =(qIndex) =>{
+const clonedQuestion = JSON.parse(JSON.stringify(quiz.questions[qIndex]));
+quiz.questions.splice(qIndex + 1,0,clonedQuestion);
 };
 
 const removeQuestion = (qIndex) => {
