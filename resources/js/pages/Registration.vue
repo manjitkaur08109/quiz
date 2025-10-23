@@ -58,7 +58,7 @@
         </v-btn>
       </v-form>
     </v-card>
-   
+
   </v-container>
 </template>
 
@@ -96,19 +96,32 @@ const confirmPasswordRules = [
 ];
 
 const handleRegister = async () => {
+    Object.keys(errors).forEach(key => (errors[key] = []));
   const { valid } = await formRef.value.validate();
   if (!valid) return;
 
   try {
     loading.value = true;
     const res = await axios.post("/api/register", user);
+    localStorage.setItem("token", res.data.data.token);
 
     alert("Registration successful!");
     console.log(res.data);
     router.push("/login");
-  } catch (error) {
-    console.error("Registration error:", error.response?.data || error);
-    alert(error.response?.data?.message || "Something went wrong!");
+  }
+  catch (err) {
+    if (err.response && err.response.status === 422) {
+      // Validation errors from Laravel
+      const validationErrors = err.response.data.errors;
+      Object.keys(validationErrors).forEach(key => {
+        errors[key] = validationErrors[key];
+      });
+    } else {
+      alert(err.response?.data?.message || "Something went wrong!");
+    }
+//   } catch (error) {
+//     console.error("Registration error:", error.response?.data || error);
+//     alert(error.response?.data?.message || "Something went wrong!");
   } finally {
     loading.value = false;
   }
