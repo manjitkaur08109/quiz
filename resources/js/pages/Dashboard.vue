@@ -107,8 +107,16 @@ const getDashboard = async () => {
   totalQuiz.value = response.data.data.totalQuiz;
   totalUsers.value = response.data.data.totalUsers;
   recentUsers.value = response.data.data.recentUsers;
-}catch(error){
-    console.log(error);
+}
+ catch (error) {
+    if(error?.response?.status == 401){
+     localStorage.removeItem("token");
+  localStorage.removeItem("user");
+      router.push("/login");
+    }
+        if(error?.response?.status == 409){
+     alert(error?.response?.message);
+    console.log(error);}
 }finally{
     console.log("fffffffffffffff");
 
@@ -118,6 +126,5 @@ onMounted(() => {
   getDashboard();
 });
 
-onMounted(() => {});
 </script>
 

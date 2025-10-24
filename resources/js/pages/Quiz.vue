@@ -140,8 +140,20 @@ const fetchQuizzes = async () => {
         headers: { Authorization: `Bearer ${token}` },
     });
     quizzes.value = res.data.data;
-  }catch (err) {
-    console.error("Error fetching quiz:", err);
+  }
+catch (error) {
+    if(error?.response?.status == 401){
+     localStorage.removeItem("token");
+  localStorage.removeItem("user");
+      router.push("/login");
+    }
+        if(error?.response?.status == 409){
+     alert(error?.response?.message);
+    }
+    console.error("Error feching quiz:", error.response?.data || error);
+     alert("Something went wrong!");
+
+
   }
    finally {
     loading.value = false;
@@ -156,10 +168,19 @@ selectedQuiz.value = item
 const deleteQuiz = async (id) => {
   if (!confirm("Delete this quiz?")) return;
   try {
-    await axios.delete(`/api/quiz/delete/${id}`);
+    const token = localStorage.getItem('token');
+    await axios.delete(`/api/quiz/delete/${id}`,{
+        headers:{Authorization:`Bearer ${token}`}
+    });
     fetchQuizzes();
-  } catch (error) {
-    console.error("Error deleting quiz:", error);
+  } catch (error)
+   { console.error("Error deleting quiz:", error);
+   if(error?.response?.status === 401){
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    router.push("/login");
+   }
+   alert("failed to delete quiz!")
   }
 };
 onMounted(() => {

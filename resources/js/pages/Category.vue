@@ -81,8 +81,19 @@ const fetchCategories = async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
     categoryItems.value = res.data.data;
-  } catch (err) {
-    console.error("Error fetching category:", err);
+  }
+  catch (error) {
+    if(error?.response?.status == 401){
+     localStorage.removeItem("token");
+  localStorage.removeItem("user");
+      router.push("/login");
+    }
+        if(error?.response?.status == 409){
+     alert(error?.response?.message);
+    }
+    console.error("Error fetching caegory:", error.response?.data || error);
+     alert("Something went wrong!");
+
   }
    finally {
     loading.value = false;
@@ -92,12 +103,22 @@ const fetchCategories = async () => {
 const deleteCategory = async (id) => {
   if (!confirm("Delete this category?")) return;
   try {
-    await axios.delete(`/api/category/delete/${id}`);
+    const token = localStorage.getItem("token");
+    await axios.delete(`/api/category/delete/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     fetchCategories();
   } catch (error) {
-    console.error("Error deleting category:", error);
+    console.error("Error deleting category:", error.response?.data || error);
+    if (error?.response?.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      router.push("/login");
+    }
+    alert("Failed to delete category!");
   }
 };
+
 onMounted(() => {
   fetchCategories();
 });

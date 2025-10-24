@@ -238,9 +238,12 @@ const handleSubmit = async () => {
      localStorage.removeItem("token");
   localStorage.removeItem("user");
       router.push("/login");
+
     }
+
         if(error?.response?.status == 409){
      alert(error?.response?.message);
+
     }
     console.error("Error adding quiz:", error.response?.data || error);
      alert("Something went wrong!");

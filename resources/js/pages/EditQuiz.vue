@@ -101,7 +101,7 @@
 
           <v-card-actions class="justify-end">
             <v-btn color="grey" variant="outlined" @click="goBack">Cancel</v-btn>
-            <v-btn color="primary" type="submit">Update Quiz</v-btn>
+            <v-btn color="primary" type="submit" :loading="loading" >Update Quiz</v-btn>
           </v-card-actions>
         </v-form>
       </v-card-text>
@@ -202,9 +202,19 @@ onMounted(async () => {
     headers: { Authorization: `Bearer ${token}` }});
     categories.value = res.data.data;
     console.log("Categories loaded:", categories.value);
-  } catch (error) {
-    console.error("Error loading categories:", error);
   }
+  catch (error) {
+    if(error?.response?.status == 401){
+     localStorage.removeItem("token");
+  localStorage.removeItem("user");
+      router.push("/login");
+    }
+        if(error?.response?.status == 409){
+     alert(error?.response?.message);
+    }
+    console.error("Error loading ctegorirs:", error.response?.data || error);
+     alert("Something went wrong!");
+ }
 });
 
 onMounted(async () => {
@@ -219,8 +229,18 @@ onMounted(async () => {
     quiz.category_id = data.category_id;
    quiz.questions = data.questions;
 
-  } catch (err) {
-    console.error("Error loading quiz:", err);
+  }
+catch (error) {
+    if(error?.response?.status == 401){
+     localStorage.removeItem("token");
+  localStorage.removeItem("user");
+      router.push("/login");
+    }
+        if(error?.response?.status == 409){
+     alert(error?.response?.message);
+    }
+    console.error("Error loading quiz:", error.response?.data || error);
+     alert("Something went wrong!");
 }
 });
 
@@ -235,8 +255,18 @@ const updateQuiz = async () => {
         headers: { Authorization: `Bearer ${token}` }});
         alert(res.data.message || "Quiz Updated Successfully!");
     router.push("/quiz");
-  } catch (err) {
-    console.error( err);
+} catch (error) {
+    if(error?.response?.status == 401){
+     localStorage.removeItem("token");
+  localStorage.removeItem("user");
+      router.push("/login");
+    }
+        if(error?.response?.status == 409){
+     alert(error?.response?.message);
+    }
+    console.error("Error adding quiz:", error.response?.data || error);
+     alert("Something went wrong!");
+
   } finally {
     loading.value = false;
   }
@@ -246,16 +276,5 @@ const goBack = () => {
   router.push("/quiz");
 };
 
-// onMounted(() =>{
-//     getQuiz();
-// })
 
-// const getQuiz = async () => {
-//   try {
-//     const res = await axios.get("/api/quiz", {
-//     });
-//   } catch (err) {
-//     console.error("Error fetching quiz:", err);
-//   }
-// };
 </script>

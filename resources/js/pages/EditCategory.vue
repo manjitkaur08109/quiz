@@ -85,8 +85,18 @@ onMounted(async () => {
     const data = res.data.data;
     category.title = data.title;
     category.description = data.description ;
-  } catch (err) {
-    console.error("Error loading category:", err);
+  }
+catch (error) {
+    if(error?.response?.status == 401){
+     localStorage.removeItem("token");
+  localStorage.removeItem("user");
+      router.push("/login");
+    }
+        if(error?.response?.status == 409){
+     alert(error?.response?.message);
+    }
+    console.error("Error loading category:", error.response?.data || error);
+     alert("Something went wrong!");
   }
 });
 
@@ -101,8 +111,18 @@ const handleSubmit = async () => {
     });
     alert(res.data.message || "Category Updated Successfully!");
     router.push("/category");
-  } catch (err) {
-    console.error( err);
+  }
+  catch (error) {
+    if(error?.response?.status == 401){
+     localStorage.removeItem("token");
+  localStorage.removeItem("user");
+      router.push("/login");
+    }
+        if(error?.response?.status == 409){
+     alert(error?.response?.message);
+    }
+    console.error( error.response?.data || error);
+     alert("Something went wrong!");
   } finally {
     loading.value = false;
   }

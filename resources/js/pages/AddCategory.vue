@@ -31,7 +31,7 @@
             <v-btn  color="secondary" @click="goBack">
               Cancel
             </v-btn>
-            <v-btn color="primary" type="submit" class="ml-2">
+            <v-btn color="primary" :loading="loading" type="submit" class="ml-2">
               Save Category
             </v-btn>
           </v-card-actions>
@@ -84,9 +84,19 @@ const handleSubmit = async () => {
     category.description = "";
 
     router.push("/category");
-  } catch (error) {
-    alert("title name already exists")
-    console.error(error.response?.data);
+  }
+  catch (error) {
+    if(error?.response?.status == 401){
+     localStorage.removeItem("token");
+  localStorage.removeItem("user");
+      router.push("/login");
+    }
+        if(error?.response?.status == 409){
+     alert(error?.response?.message);
+    }
+    console.error("Error adding category:", error.response?.data || error);
+     alert("Something went wrong!");
+
   } finally {
     loading.value = false;
   }
