@@ -97,18 +97,27 @@ const totalUsers = ref(0);
 const totalCategory = ref(0);
 const totalQuiz = ref(0);
 const getDashboard = async () => {
-  const response = await axios.get("api/get-dashboard");
+    try{
+  const token = localStorage.getItem("token");
+
+  const response = await axios.get("api/get-dashboard", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   totalCategory.value = response.data.data.totalCategory;
   totalQuiz.value = response.data.data.totalQuiz;
   totalUsers.value = response.data.data.totalUsers;
-  recentUsers.values = response.data.data.recentUsers;
+  recentUsers.value = response.data.data.recentUsers;
+}catch(error){
+    console.log(error);
+}finally{
+    console.log("fffffffffffffff");
+
+}
 };
 onMounted(() => {
   getDashboard();
 });
 
-onMounted(() => {
-
-});
+onMounted(() => {});
 </script>
 

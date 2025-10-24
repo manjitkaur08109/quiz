@@ -71,7 +71,12 @@ const handleSubmit = async () => {
   try {
     loading.value = true;
 
-    const res = await axios.post("/api/category/store", category);
+    const token = localStorage.getItem("token");
+    const res = await axios.post("/api/category/store", category,{
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    category.value = res.data.data;
     alert(" Category Added Successfully!");
     console.log("Saved:", res.data);
 
@@ -89,4 +94,5 @@ const handleSubmit = async () => {
 const goBack = () => {
   router.push("/category");
 };
+
 </script>

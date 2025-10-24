@@ -10,7 +10,7 @@
       location="bottom end"
     >
       <template #activator="{ props }">
-        <v-btn v-bind="props" icon="mdi-account" variant="text"></v-btn>
+        <v-btn v-bind="props"  icon="mdi-account" variant="text"></v-btn>
       </template>
       <v-list>
         <v-list-item @click="goToProfile">
@@ -43,6 +43,8 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import axios from "axios";
+
 const router = useRouter();
 const drawer = ref(true);
 const menu = ref(false);
@@ -58,6 +60,7 @@ const items = [
 const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
+  delete api.defaults.headers.common["Authorization"];
   router.push({ path: "/login", replace: true });
 };
 const goToProfile = () => {

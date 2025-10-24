@@ -107,7 +107,7 @@
                 <v-btn  color="grey" @click="goBack">
                   Cancel
                 </v-btn>
-                <v-btn color="primary" type="submit" class="ml-2">
+                <v-btn color="primary" :loading="loading" type="submit" class="ml-2">
                   Save Quiz
                 </v-btn>
               </v-card-actions>
@@ -179,7 +179,10 @@ const quiz = reactive({
 const loading = ref(false);
 onMounted(async () => {
   try {
-    const res = await axios.get("/api/quiz/create");
+        const token = localStorage.getItem("token");
+    const res = await axios.get("/api/quiz/create",{
+      headers: { Authorization: `Bearer ${token}` },
+    });
     categories.value = res.data.data;
     console.log("Categories loaded:", categories.value);
   } catch (error) {
@@ -211,14 +214,19 @@ const removeOption = (qIndex, oIndex) => {
 
 
 const handleSubmit = async () => {
+
       const { valid } = await formRef.value.validate(); // ✅ validate all fields
   if (!valid) return; // stop if invalid
   console.log("Submitting quiz:", JSON.stringify(quiz));
   try {
     loading.value = true;
 
-    const res = await axios.post("/api/quiz/store", quiz);
-    alert("Quiz added successfully!");
+    const token = localStorage.getItem("token");
+    const res = await axios.post("/api/quiz/store", quiz, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    quiz.value = res.data.data;
+    alert(res?.data?.message || 'Quiz added succesfully');
     console.log("Quiz created:", res.data);
     quiz.title = "";
     quiz.description = "";
@@ -226,8 +234,16 @@ const handleSubmit = async () => {
 
       router.push("/quiz");
   } catch (error) {
+    if(error?.response?.status == 401){
+     localStorage.removeItem("token");
+  localStorage.removeItem("user");
+      router.push("/login");
+    }
+        if(error?.response?.status == 409){
+     alert(error?.response?.message);
+    }
     console.error("Error adding quiz:", error.response?.data || error);
-     alert("title name already exists");
+     alert("Something went wrong!");
   } finally {
     loading.value = false;
   }
@@ -235,4 +251,5 @@ const handleSubmit = async () => {
 const goBack = () => {
   router.push("/quiz");
 };
+
 </script>

@@ -135,10 +135,15 @@ const headers = [
 const fetchQuizzes = async () => {
   loading.value = true;
   try {
-    const res = await axios.get("/api/quiz/index");
-
+    const token = localStorage.getItem("token");
+    const res = await axios.get("/api/quiz/index",{
+        headers: { Authorization: `Bearer ${token}` },
+    });
     quizzes.value = res.data.data;
-  } finally {
+  }catch (err) {
+    console.error("Error fetching quiz:", err);
+  }
+   finally {
     loading.value = false;
   }
 };
@@ -160,6 +165,7 @@ const deleteQuiz = async (id) => {
 onMounted(() => {
   fetchQuizzes();
 });
+
 
 const goToAddQuiz = () => router.push("/addQuiz");
 const editQuiz = (id) => router.push(`/editQuiz/${id}`);

@@ -76,9 +76,15 @@ const editCategory = (id) => {
 const fetchCategories = async () => {
   loading.value = true;
   try {
-    const res = await axios.get("/api/category/index");
+      const token = localStorage.getItem("token");
+    const res = await axios.get("/api/category/index", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     categoryItems.value = res.data.data;
-  } finally {
+  } catch (err) {
+    console.error("Error fetching category:", err);
+  }
+   finally {
     loading.value = false;
   }
 };
@@ -95,6 +101,7 @@ const deleteCategory = async (id) => {
 onMounted(() => {
   fetchCategories();
 });
+
 </script>
 
 

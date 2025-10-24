@@ -77,7 +77,11 @@ const CategoryDescriptionRules = [
 
 onMounted(async () => {
   try {
-    const res = await axios.get(`/api/category/show/${categoryId}`);
+    const token = localStorage.getItem("token");
+    const res = await axios.get(`/api/category/show/${categoryId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    category.value = res.data.data;
     const data = res.data.data;
     category.title = data.title;
     category.description = data.description ;
@@ -91,7 +95,10 @@ const handleSubmit = async () => {
   if (!valid) return; // stop if invalid
   loading.value = true;
   try {
-    const res = await axios.put(`/api/category/update/${categoryId}`, category);
+        const token = localStorage.getItem("token");
+    const res = await axios.put(`/api/category/update/${categoryId}`, category,{
+        headers:{Authorization:`Bearer ${token}`},
+    });
     alert(res.data.message || "Category Updated Successfully!");
     router.push("/category");
   } catch (err) {
@@ -102,4 +109,5 @@ const handleSubmit = async () => {
 };
 
 const goBack = () => router.push("/category");
+
 </script>

@@ -197,7 +197,9 @@ const removeOption = (qIndex, oIndex) => {
 
 onMounted(async () => {
   try {
-    const res = await axios.get("/api/quiz/create");
+      const token = localStorage.getItem("token");
+    const res = await axios.get("/api/quiz/create",{
+    headers: { Authorization: `Bearer ${token}` }});
     categories.value = res.data.data;
     console.log("Categories loaded:", categories.value);
   } catch (error) {
@@ -206,8 +208,11 @@ onMounted(async () => {
 });
 
 onMounted(async () => {
-  try {
-    const res = await axios.get(`/api/quiz/show/${quizId}`);
+    try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`/api/quiz/show/${quizId}`,{
+            headers: { Authorization: `Bearer ${token}` }});
+            quiz.value = res.data.data;
     const data = res.data.data;
     quiz.title = data.title;
     quiz.description = data.description ;
@@ -216,17 +221,19 @@ onMounted(async () => {
 
   } catch (err) {
     console.error("Error loading quiz:", err);
-  }
+}
 });
 
 
 const updateQuiz = async () => {
-      const { valid } = await formRef.value.validate();
-  if (!valid) return;
-  loading.value = true;
-  try {
-    const res = await axios.put(`/api/quiz/update/${quizId}`, quiz);
-    alert(res.data.message || "Quiz Updated Successfully!");
+    const { valid } = await formRef.value.validate();
+    if (!valid) return;
+    loading.value = true;
+    try {
+        const token = localStorage.getItem("token");
+        const res = await axios.put(`/api/quiz/update/${quizId}`, quiz,{
+        headers: { Authorization: `Bearer ${token}` }});
+        alert(res.data.message || "Quiz Updated Successfully!");
     router.push("/quiz");
   } catch (err) {
     console.error( err);
@@ -238,4 +245,17 @@ const updateQuiz = async () => {
 const goBack = () => {
   router.push("/quiz");
 };
+
+// onMounted(() =>{
+//     getQuiz();
+// })
+
+// const getQuiz = async () => {
+//   try {
+//     const res = await axios.get("/api/quiz", {
+//     });
+//   } catch (err) {
+//     console.error("Error fetching quiz:", err);
+//   }
+// };
 </script>
