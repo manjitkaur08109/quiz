@@ -11,12 +11,15 @@
     <v-card class="mx-auto" max-width="500" elevation="8">
           <!-- <v-row>
             <v-col cols="12"> -->
-              <v-form fast-fail @submit.prevent>
+                <v-form ref="profileForm" fast-fail @submit.prevent="updateProfile">
+              <!-- <v-form fast-fail @submit.prevent> -->
                 <v-text-field class="mt-2"
                 variant="outlined"
                   v-model="Name"
                   :rules="NameRules"
                   label="Name"
+                   prepend-inner-icon="mdi-account"
+                   required
                 ></v-text-field>
 
                 <v-text-field class="mt-2"
@@ -24,6 +27,8 @@
                   v-model="email"
                   :rules="emailRules"
                   label="Email"
+                   prepend-inner-icon="mdi-email"
+                   required
                 ></v-text-field>
 
                 <v-text-field class="mt-2"
@@ -31,11 +36,12 @@
                   v-model="phoneNo"
                   :rules="phoneNoRules"
                   label="Phone No"
+                  prepend-inner-icon="mdi-phone"
+                  required
                 ></v-text-field>
+                  <v-btn class="mt-4" color="info" type="submit" block>Update Profile</v-btn>
               </v-form>
-            <!-- </v-col>
-          </v-row> -->
-          <v-btn class="mt-2" type="submit" color="info">Submit</v-btn>
+          <!-- <v-btn class="mt-2" type="submit" color="info">Submit</v-btn> -->
           </v-card>
         </v-container>
       </v-tabs-window-item>
@@ -44,22 +50,27 @@
     <v-card class="mx-auto" max-width="500" elevation="8">
           <!-- <v-row>
             <v-col cols="12"> -->
-              <v-form fast-fail @submit.prevent>
+                <v-form ref="passwordForm" fast-fail @submit.prevent="changePassword">
                 <v-text-field class="mt-2"
                 variant="outlined"
                   v-model="password"
                   :rules="passwordRules"
                   label="New password"
+                    prepend-inner-icon="mdi-lock-outline"
+                     type="password"
+              required
                 ></v-text-field>
 
                 <v-text-field class="mt-2"
                 variant="outlined"
                   v-model="confirmPassword"
-                  :rules="confirmpasswordRules"
+                  :v-rules="confirmpasswordRules"
                   label="Confirm password"
+                   prepend-inner-icon="mdi-lock-check"
+                    type="password"
+              required
                 ></v-text-field>
-
-                <v-btn class="mt-2" type="submit"  color="info">Submit</v-btn>
+                 <v-btn class="mt-4" color="info" type="submit" block>Change Password</v-btn>
               </v-form>
             <!-- </v-col>
           </v-row> -->
@@ -67,13 +78,20 @@
         </v-container>
       </v-tabs-window-item>
     </v-tabs-window>
+
   </v-card>
 </template>
 <script setup>
 import { ref } from "vue";
 
-const tab = ref(null);
+const tab = ref(1);
 const password = ref("");
+const confirmPassword = ref("");
+const passwordForm = ref(null);
+const Name = ref("");
+const email = ref("");
+const phoneNo = ref("");
+const profileForm = ref(null);
 const passwordRules = [
   (value) => {
     if (value?.length >= 8) return true;
@@ -81,14 +99,13 @@ const passwordRules = [
   },
 ];
 
-const confirmPassword = ref("");
+
 const confirmpasswordRules = [
   (value) => {
     if (value == password.value) return true;
     return "Confirm password mismatch.";
   },
 ];
-const Name = ref("");
 const NameRules = [
   (value) => {
     if (value?.length >= 3) return true;
@@ -96,18 +113,38 @@ const NameRules = [
   },
 ];
 
-const email = ref("");
 const emailRules = [
   (value) => {
-    if (/[^0-9]/.test(value)) return true;
-    return "Last name can not contain digits.";
+    if (!value) return "Email is required.";
+    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return pattern.test(value) || "Invalid email address.";
   },
 ];
-const phoneNo = ref("");
 const phoneNoRules = [
-  (value) => {
-    if (value?.length >= 10) return true;
-    return "Phone no must be at least 10 characters.";
-  },
+  (value) => !!value || "Phone number is required.",
+  (value) => /^[0-9]{10,15}$/.test(value) || "Enter a valid phone number.",
 ];
+
+// 🧍 Update Profile Handler
+const updateProfile = async () => {
+  const { valid } = await profileForm.value.validate();
+  if (!valid) return;
+
+  console.log("Updated Profile:", {
+    name: Name.value,
+    email: email.value,
+    phone: phoneNo.value,
+  });
+};
+
+// 🔒 Change Password Handler
+const changePassword = async () => {
+  const { valid } = await passwordForm.value.validate();
+  if (!valid) return;
+
+  console.log("Password changed:", password.value);
+  password.value = "";
+  confirmPassword.value = "";
+};
+
 </script>

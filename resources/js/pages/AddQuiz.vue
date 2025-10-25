@@ -4,7 +4,11 @@
       <v-col cols="12">
         <v-card class="mx-auto" max-width="600" elevation="8">
           <v-card-title class="text-h6">
-            <v-icon size="x-small" icon="mdi-plus-circle-outline" class="mr-2" />
+            <v-icon
+              size="x-small"
+              icon="mdi-plus-circle-outline"
+              class="mr-2"
+            />
             Add New Quiz
           </v-card-title>
 
@@ -39,7 +43,11 @@
                 required
               />
 
-               <div v-for="(q, qIndex) in quiz.questions" :key="qIndex" class="mb-4">
+              <div
+                v-for="(q, qIndex) in quiz.questions"
+                :key="qIndex"
+                class="mb-4"
+              >
                 <v-textarea
                   v-model="q.question"
                   :label="`Question ${qIndex + 1}`"
@@ -51,18 +59,28 @@
                 />
 
                 <!-- Options -->
-                <div v-for="(o, oIndex) in q.options" :key="oIndex" class="mb-2">
+                <div
+                  v-for="(o, oIndex) in q.options"
+                  :key="oIndex"
+                  class="mb-2"
+                >
                   <v-text-field
                     v-model="q.options[oIndex]"
                     :label="`Option ${oIndex + 1}`"
                     :rules="OptionRules"
                     class="flex-grow-1"
-
-                    />
-                    <v-icon size="x-small" color="red" @click="removeOption(qIndex, oIndex)">mdi-delete</v-icon>
+                  />
+                  <v-icon
+                    size="x-small"
+                    color="red"
+                    @click="removeOption(qIndex, oIndex)"
+                    >mdi-delete</v-icon
+                  >
                 </div>
 
-                <v-btn small color="primary" @click="addOption(qIndex)">Add Option</v-btn>
+                <v-btn small color="primary" @click="addOption(qIndex)"
+                  >Add Option</v-btn
+                >
 
                 <v-select
                   v-model="q.correctAnswer"
@@ -83,7 +101,7 @@
                   Delete Question
                 </v-btn>
 
-                  <v-btn
+                <v-btn
                   v-if="quiz.questions.length > 1"
                   color="secondary"
                   small
@@ -96,18 +114,17 @@
                 <v-divider class="my-4"></v-divider>
               </div>
 
-              <v-btn
-                color="secondary"
-                @click="addQuestion"
-                class="mb-4"
-              >
+              <v-btn color="secondary" @click="addQuestion" class="mb-4">
                 Add Question
               </v-btn>
               <v-card-actions class="justify-end">
-                <v-btn  color="grey" @click="goBack">
-                  Cancel
-                </v-btn>
-                <v-btn color="primary" :loading="loading" type="submit" class="ml-2">
+                <v-btn color="grey" @click="goBack"> Cancel </v-btn>
+                <v-btn
+                  color="primary"
+                  :loading="loading"
+                  type="submit"
+                  class="ml-2"
+                >
                   Save Quiz
                 </v-btn>
               </v-card-actions>
@@ -125,11 +142,11 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 import axios from "axios";
 const goToAdQuiz = () => router.push("/addQuiz");
-const formRef = ref('');
+const formRef = ref("");
 const QuizTitleRules = [
-    (value) => {
+  (value) => {
     if (value?.length >= 3) return true;
-    return ' Title required|string|min:3';
+    return " Title required|string|min:3";
   },
 ];
 const QuizDescriptionRules = [
@@ -139,35 +156,35 @@ const QuizDescriptionRules = [
   },
 ];
 const SCRules = [
-    (value) =>{
-        if(value) return true;
-        return ' Category is required';
-    },
+  (value) => {
+    if (value) return true;
+    return " Category is required";
+  },
 ];
-const QuestionRules =[
-    (value)=>{
-        if(value) return true;
-        return 'Required';
-    },
+const QuestionRules = [
+  (value) => {
+    if (value) return true;
+    return "Required";
+  },
 ];
-const OptionRules =[
-    (value)=>{
-        if(value) return true;
-        return 'Option is Required';
-    },
+const OptionRules = [
+  (value) => {
+    if (value) return true;
+    return "Option is Required";
+  },
 ];
-const SCARules =[
-    (value)=>{
-        if(value) return true;
-        return 'Required';
-    },
+const SCARules = [
+  (value) => {
+    if (value) return true;
+    return "Required";
+  },
 ];
 const categories = ref([]);
 const quiz = reactive({
   title: "",
   description: "",
   category_id: null,
-  questions:[
+  questions: [
     {
       question: "",
       options: ["", ""],
@@ -179,8 +196,8 @@ const quiz = reactive({
 const loading = ref(false);
 onMounted(async () => {
   try {
-        const token = localStorage.getItem("token");
-    const res = await axios.get("/api/quiz/create",{
+    const token = localStorage.getItem("token");
+    const res = await axios.get("/api/quiz/create", {
       headers: { Authorization: `Bearer ${token}` },
     });
     categories.value = res.data.data;
@@ -189,10 +206,25 @@ onMounted(async () => {
     console.error("Error loading categories:", error);
   }
 });
+
 const addQuestion = () => {
+  const lastQuestion = quiz.questions[quiz.questions.length - 1];
+
+  // Check karo current question complete hai ya nahi
+  const isQuestionEmpty = !lastQuestion.question.trim();
+  const isOptionEmpty = lastQuestion.options.some((opt) => !opt.trim());
+  const isAnswerEmpty = !lastQuestion.correctAnswer.trim();
+
+  if (isQuestionEmpty || isOptionEmpty || isAnswerEmpty) {
+    alert(
+      "Please fill the current question completely before adding a new one!"
+    );
+    return; // Stop adding new question
+  }
+  // Add new blank question
   quiz.questions.push({
     question: "",
-    options: ["", ""],
+    options: ["", ""], // default 2 blank options
     correctAnswer: "",
   });
 };
@@ -212,10 +244,8 @@ const removeOption = (qIndex, oIndex) => {
   quiz.questions[qIndex].options.splice(oIndex, 1);
 };
 
-
 const handleSubmit = async () => {
-
-      const { valid } = await formRef.value.validate(); // ✅ validate all fields
+  const { valid } = await formRef.value.validate(); // ✅ validate all fields
   if (!valid) return; // stop if invalid
   console.log("Submitting quiz:", JSON.stringify(quiz));
   try {
@@ -226,27 +256,25 @@ const handleSubmit = async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
     quiz.value = res.data.data;
-    alert(res?.data?.message || 'Quiz added succesfully');
+    alert(res?.data?.message || "Quiz added succesfully");
     console.log("Quiz created:", res.data);
     quiz.title = "";
     quiz.description = "";
     quiz.category_id = "";
 
-      router.push("/quiz");
+    router.push("/quiz");
   } catch (error) {
-    if(error?.response?.status == 401){
-     localStorage.removeItem("token");
-  localStorage.removeItem("user");
+    if (error?.response?.status == 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
       router.push("/login");
-
     }
 
-        if(error?.response?.status == 409){
-     alert(error?.response?.message);
-
+    if (error?.response?.status == 409) {
+      alert(error?.response?.message);
     }
     console.error("Error adding quiz:", error.response?.data || error);
-     alert("Something went wrong!");
+    alert("Something went wrong!");
   } finally {
     loading.value = false;
   }
@@ -254,5 +282,4 @@ const handleSubmit = async () => {
 const goBack = () => {
   router.push("/quiz");
 };
-
 </script>

@@ -124,10 +124,10 @@ const handleRegister = async () => {
     // 🔹 3. Set Axios header for authenticated requests
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-    alert("Registration successful! You are now logged in.");
-
     // 🔹 4. Redirect to dashboard (or home)
-    router.push("/dashboard");
+     router.push({ path: "/", replace: true }).then(() => {
+    window.location.reload();
+  });
   } catch (err) {
     if (err.response && err.response.status === 422) {
       // Laravel validation errors
@@ -142,31 +142,6 @@ const handleRegister = async () => {
     loading.value = false;
   }
 };
-//     loading.value = true;
-//     const res = await axios.post("/api/register", user);
-//     localStorage.setItem("token", res.data.data.token);
-
-//     alert("Registration successful!");
-//     console.log(res.data);
-//     router.push("/login");
-//   }
-//   catch (err) {
-//     if (err.response && err.response.status === 422) {
-//       // Validation errors from Laravel
-//       const validationErrors = err.response.data.errors;
-//       Object.keys(validationErrors).forEach(key => {
-//         errors[key] = validationErrors[key];
-//       });
-//     } else {
-//       alert(err.response?.data?.message || "Something went wrong!");
-//     }
-// //   } catch (error) {
-// //     console.error("Registration error:", error.response?.data || error);
-// //     alert(error.response?.data?.message || "Something went wrong!");
-//   } finally {
-//     loading.value = false;
-//   }
-// };
 
 const goToLogin = () => {
   router.push("/login");

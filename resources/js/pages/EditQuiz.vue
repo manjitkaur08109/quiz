@@ -170,14 +170,26 @@ const SCARules =[
         return 'Correct answer required';
     },
 ];
+
 const addQuestion = () => {
+  const lastQuestion = quiz.questions[quiz.questions.length - 1];
+
+  // Check karo current question complete hai ya nahi
+  const isQuestionEmpty = !lastQuestion.question.trim();
+  const isOptionEmpty = lastQuestion.options.some(opt => !opt.trim());
+  const isAnswerEmpty = !lastQuestion.correctAnswer.trim();
+
+  if (isQuestionEmpty || isOptionEmpty || isAnswerEmpty) {
+    alert("Please fill the current question completely before adding a new one!");
+    return; // Stop adding new question
+  }
+  // Add new blank question
   quiz.questions.push({
     question: "",
-    options: ["", ""],
+    options: ["", ""], // default 2 blank options
     correctAnswer: "",
   });
 };
-
 const duplicateQuestion =(qIndex) =>{
 const clonedQuestion = JSON.parse(JSON.stringify(quiz.questions[qIndex]));
 quiz.questions.splice(qIndex + 1,0,clonedQuestion);

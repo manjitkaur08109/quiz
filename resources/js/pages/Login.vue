@@ -1,6 +1,6 @@
 <template>
-  <v-container class=" fill-height align-center justify-center">
-
+  <v-container
+    class="d-flex align-center justify-center fill-height">
     <v-card elevation="10" class="pa-6" min-width="450">
       <v-card-title class="text-h5 text-center mb-4">
         <v-icon size="x-small" icon="mdi-login" class="mr-2" />
@@ -37,11 +37,10 @@
         </v-btn>
 
         <v-btn color="success" block class="mt-2" @click="goToRegister">
-           Register
+          Register
         </v-btn>
       </v-form>
     </v-card>
-
   </v-container>
 </template>
 
@@ -75,11 +74,13 @@ const handleLogin = async () => {
   try {
     loading.value = true;
     const res = await axios.post("/api/login", credentials);
-localStorage.setItem("user", JSON.stringify(res.data.data.user));
-localStorage.setItem("token", res.data.data.token);
+    localStorage.setItem("user", JSON.stringify(res.data.data.user));
+    localStorage.setItem("token", res.data.data.token);
 
-    alert("Login successful!");
-    router.push("/");
+    // 🔹 4. Redirect to dashboard (or home)
+    router.push({ path: "/", replace: true }).then(() => {
+      window.location.reload();
+    });
   } catch (error) {
     console.error("Login error:", error.response?.data || error);
     alert(error.response?.data?.message || "Invalid credentials");

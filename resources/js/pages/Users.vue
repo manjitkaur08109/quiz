@@ -67,8 +67,18 @@ const getUsers = async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
     users.value = res.data.data; // assuming {data: users[]}
-  } catch (err) {
-    console.error("Error fetching users:", err);
+  }
+  catch (error) {
+    if (error?.response?.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      router.push("/login");
+    } else if (error?.response?.status === 409) {
+      alert(error?.response?.message);
+    } else {
+      console.error("Error fetching users:", error.response?.data || error);
+      alert("Something went wrong!");
+    }
   }
 };
 

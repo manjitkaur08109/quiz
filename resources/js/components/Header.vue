@@ -54,22 +54,17 @@ const items = [
   { title: "Quiz", path: "/quiz", icon: "mdi-help-circle-outline" },
   { title: "Users", path: "/users", icon: "mdi-account-group" },
   {title:"Category",path:"/category",icon:"mdi-view-grid-outline"},
-  { title: "Registration", path: "/register", icon: "mdi-account-plus" },
 ];
 
 const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
-  delete api.defaults.headers.common["Authorization"];
-  router.push({ path: "/login", replace: true });
+   router.push({ path: "/login", replace: true }).then(() => {
+    window.location.reload();
+  });
 };
 const goToProfile = () => {
-  const token = localStorage.getItem("token");
-  if (token) {
     router.push("/profile");
-  } else {
-    router.push("/login");
-  }
-};
+ };
 // const goToProfile = () => {router.push('/profile')};
 </script>

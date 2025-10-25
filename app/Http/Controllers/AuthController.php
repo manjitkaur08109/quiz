@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 class AuthController extends Controller
 {
      function register(Request $request)
@@ -41,12 +42,20 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
-        $token = $user->createToken('api_token')->plainTextToken;
+           // Create token
+    $tokenResult = $user->createToken('api_token');
+    $token = $tokenResult->plainTextToken;
 
-        return $this->actionSuccess('Login successful',
-           [ 'user' => $user,
-            'token' => $token,]
-        );
-    }
+    // Manually set expiry — e.g., 1 day
+    $tokenResult->accessToken->update([
+        'expires_at' => Carbon::now()->addDay(),
+    ]);
+
+    return $this->actionSuccess('Login successful', [
+        'user' => $user,
+        'token' => $token,
+        'expires_at' => Carbon::now()->addDay()->toDateTimeString(),
+    ]);
+}
 
 }
