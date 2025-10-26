@@ -1,6 +1,5 @@
 <template>
-  <v-container
-    class="d-flex align-center justify-center fill-height">
+  <v-container class="d-flex align-center justify-center fill-height">
     <v-card elevation="10" class="pa-6" min-width="450">
       <v-card-title class="text-h5 text-center mb-4">
         <v-icon size="x-small" icon="mdi-login" class="mr-2" />
@@ -48,7 +47,9 @@
 import { ref, reactive } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
+import { inject } from "vue";
 
+const toast = inject("toast");
 const router = useRouter();
 const formRef = ref(null);
 const loading = ref(false);
@@ -78,12 +79,12 @@ const handleLogin = async () => {
     localStorage.setItem("token", res.data.data.token);
 
     // 🔹 4. Redirect to dashboard (or home)
-    router.push({ path: "/", replace: true }).then(() => {
-      window.location.reload();
-    });
+    router.push("/");
   } catch (error) {
-    console.error("Login error:", error.response?.data || error);
-    alert(error.response?.data?.message || "Invalid credentials");
+    toast.value.showToast(
+      error?.response?.data?.message || "Something went wrong!",
+      "error"
+    );
   } finally {
     loading.value = false;
   }

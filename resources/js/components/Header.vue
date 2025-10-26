@@ -44,7 +44,9 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
+import { inject } from "vue";
 
+const toast = inject("toast");
 const router = useRouter();
 const drawer = ref(true);
 const menu = ref(false);
@@ -55,14 +57,25 @@ const items = [
   { title: "Users", path: "/users", icon: "mdi-account-group" },
   {title:"Category",path:"/category",icon:"mdi-view-grid-outline"},
 ];
+const logout = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    await axios.post("/api/logout", {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
 
-const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-   router.push({ path: "/login", replace: true }).then(() => {
-    window.location.reload();
-  });
+    // Token delete from localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    router.push("/login");
+  } catch (error) {
+    console.error("Logout failed:", error);
+    toast.value.showToast("Something went wrong during logout!", "error");
+    router.push("/login");
+
+  }
 };
+
 const goToProfile = () => {
     router.push("/profile");
  };

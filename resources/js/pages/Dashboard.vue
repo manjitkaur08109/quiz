@@ -77,7 +77,9 @@
 import axios from "axios";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { inject } from "vue";
 
+const toast = inject("toast");
 const router = useRouter();
 const search = ref("");
 
@@ -97,34 +99,31 @@ const totalUsers = ref(0);
 const totalCategory = ref(0);
 const totalQuiz = ref(0);
 const getDashboard = async () => {
-    try{
-  const token = localStorage.getItem("token");
+  try {
+    const token = localStorage.getItem("token");
 
-  const response = await axios.get("api/get-dashboard", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  totalCategory.value = response.data.data.totalCategory;
-  totalQuiz.value = response.data.data.totalQuiz;
-  totalUsers.value = response.data.data.totalUsers;
-  recentUsers.value = response.data.data.recentUsers;
-}
- catch (error) {
-    if(error?.response?.status == 401){
-     localStorage.removeItem("token");
-  localStorage.removeItem("user");
+    const response = await axios.get("api/get-dashboard", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    totalCategory.value = response.data.data.totalCategory;
+    totalQuiz.value = response.data.data.totalQuiz;
+    totalUsers.value = response.data.data.totalUsers;
+    recentUsers.value = response.data.data.recentUsers;
+  } catch (error) {
+    if (error?.response?.status == 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
       router.push("/login");
     }
-        if(error?.response?.status == 409){
-     alert(error?.response?.message);
-    console.log(error);}
-}finally{
-    console.log("fffffffffffffff");
-
-}
+    toast.value.showToast(
+      error?.response?.data?.message || "Something went wrong!",
+      "error"
+    );
+  } finally {
+  }
 };
 onMounted(() => {
   getDashboard();
 });
-
 </script>
 

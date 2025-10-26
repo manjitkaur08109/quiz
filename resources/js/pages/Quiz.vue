@@ -30,7 +30,7 @@
       </template>
 
       <template #item.category="{ item }">
-        {{ item.category.title }}
+        {{ item?.category?.title }}
       </template>
       <template #item.actions="{ item }">
         <v-btn
@@ -45,67 +45,81 @@
         <v-btn size="x-small" icon color="primary" @click="editQuiz(item.id)">
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
-        <v-btn size="x-small" class="ml-2" icon color="red" @click="deleteQuiz(item.id)">
+        <v-btn
+          size="x-small"
+          class="ml-2"
+          icon
+          color="red"
+          @click="deleteQuiz(item.id)"
+        >
           <v-icon>mdi-delete</v-icon>
         </v-btn>
 
-         <!-- 📘 Quiz Info Dialog -->
-    <v-dialog v-model="infoDialog" max-width="650">
-      <v-card>
-        <v-card-title class="text-h6">Quiz Information</v-card-title>
-        <v-divider></v-divider>
+        <!-- 📘 Quiz Info Dialog -->
+        <v-dialog v-model="infoDialog" max-width="650">
+          <v-card>
+            <v-card-title class="text-h6">Quiz Information</v-card-title>
+            <v-divider></v-divider>
 
-        <v-card-text v-if="selectedQuiz">
-          <p><strong>Title:</strong> {{ selectedQuiz.title }}</p>
-          <p><strong>Description:</strong> {{ selectedQuiz.description }}</p>
-          <p><strong>Category:</strong> {{ selectedQuiz.category?.title }}</p>
-          <p><strong>Created At:</strong> {{ new Date(selectedQuiz.created_at).toLocaleString() }}</p>
+            <v-card-text v-if="selectedQuiz">
+              <p><strong>Title:</strong> {{ selectedQuiz.title }}</p>
+              <p>
+                <strong>Description:</strong> {{ selectedQuiz.description }}
+              </p>
+              <p>
+                <strong>Category:</strong> {{ selectedQuiz.category?.title }}
+              </p>
+              <p>
+                <strong>Created At:</strong>
+                {{ new Date(selectedQuiz.created_at).toLocaleString() }}
+              </p>
 
-          <v-divider class="my-3"></v-divider>
+              <v-divider class="my-3"></v-divider>
 
-          <h4 class="text-h6 mb-2">Questions</h4>
+              <h4 class="text-h6 mb-2">Questions</h4>
 
-
-          <div
-            v-for="(q, index) in selectedQuiz.questions"
-            :key="index"
-            class="mb-4 pa-3 rounded-lg border"
-            style="border: 1px solid #ccc;"
-          >
-            <p><strong>Q{{ index + 1 }}:</strong> {{ q.question }}</p>
-
-            <v-list density="compact">
-              <v-list-item
-                v-for="(opt, i) in q.options"
-                :key="i"
-                :title="opt"
+              <div
+                v-for="(q, index) in selectedQuiz.questions"
+                :key="index"
+                class="mb-4 pa-3 rounded-lg border"
+                style="border: 1px solid #ccc"
               >
-                <template #prepend>
-                  <v-icon
-                    :color="opt.id === q.correct_option?.id ? 'green' : 'grey'"
+                <p>
+                  <strong>Q{{ index + 1 }}:</strong> {{ q.question }}
+                </p>
+
+                <v-list density="compact">
+                  <v-list-item
+                    v-for="(opt, i) in q.options"
+                    :key="i"
+                    :title="opt"
                   >
-                    {{
-                      opt === q.correctAnswer
-                        ? 'mdi-check-circle'
-                        : 'mdi-circle-outline'
-                    }}
-                  </v-icon>
-                </template>
-              </v-list-item>
-            </v-list>
+                    <template #prepend>
+                      <v-icon
+                        :color="
+                          opt.id === q.correct_option?.id ? 'green' : 'grey'
+                        "
+                      >
+                        {{
+                          opt === q.correctAnswer
+                            ? "mdi-check-circle"
+                            : "mdi-circle-outline"
+                        }}
+                      </v-icon>
+                    </template>
+                  </v-list-item>
+                </v-list>
+              </div>
+            </v-card-text>
 
-          </div>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="infoDialog = false">
-            Close
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="primary" text @click="infoDialog = false">
+                Close
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
       </template>
     </v-data-table>
   </v-card>
@@ -115,7 +129,9 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
+import { inject } from "vue";
 
+const toast = inject("toast");
 const router = useRouter();
 const search = ref("");
 const quizzes = ref([]);
@@ -131,62 +147,58 @@ const headers = [
   { title: "Actions", key: "actions", sortable: false },
 ];
 
-
 const fetchQuizzes = async () => {
   loading.value = true;
   try {
     const token = localStorage.getItem("token");
-    const res = await axios.get("/api/quiz/index",{
-        headers: { Authorization: `Bearer ${token}` },
+    const res = await axios.get("/api/quiz/index", {
+      headers: { Authorization: `Bearer ${token}` },
     });
     quizzes.value = res.data.data;
-  }
-catch (error) {
-    if(error?.response?.status == 401){
-     localStorage.removeItem("token");
-  localStorage.removeItem("user");
+  } catch (error) {
+    if (error?.response?.status == 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
       router.push("/login");
     }
-        if(error?.response?.status == 409){
-     alert(error?.response?.message);
-    }
-    console.error("Error feching quiz:", error.response?.data || error);
-     alert("Something went wrong!");
-
-
-  }
-   finally {
+    toast.value.showToast(
+      error?.response?.data?.message || "Something went wrong!",
+      "error"
+    );
+  } finally {
     loading.value = false;
   }
 };
 
 const info = async (item) => {
-selectedQuiz.value = item
-    infoDialog.value = true;
-}
+  selectedQuiz.value = item;
+  infoDialog.value = true;
+};
 
 const deleteQuiz = async (id) => {
   if (!confirm("Delete this quiz?")) return;
   try {
-    const token = localStorage.getItem('token');
-    await axios.delete(`/api/quiz/delete/${id}`,{
-        headers:{Authorization:`Bearer ${token}`}
+    const token = localStorage.getItem("token");
+    await axios.delete(`/api/quiz/delete/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
     });
+     toast.value.showToast("Quiz deleted successfully",'success');
+
     fetchQuizzes();
-  } catch (error)
-   { console.error("Error deleting quiz:", error);
-   if(error?.response?.status === 401){
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    router.push("/login");
-   }
-   alert("failed to delete quiz!")
+  } catch (error) {
+    console.error("Error deleting quiz:", error);
+    if (error?.response?.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      router.push("/login");
+    }
+       toast.value.showToast(error?.response?.data?.message || "Something went wrong!",'error');
+
   }
 };
 onMounted(() => {
   fetchQuizzes();
 });
-
 
 const goToAddQuiz = () => router.push("/addQuiz");
 const editQuiz = (id) => router.push(`/editQuiz/${id}`);

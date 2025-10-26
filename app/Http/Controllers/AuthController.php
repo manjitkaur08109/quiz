@@ -27,7 +27,6 @@ class AuthController extends Controller
             'user' => $user,
             'token' => $token,
         ]);
-    return $this->actionSuccess('User registered successfully',$token);
 }
   // 🔹 Login
     public function login(Request $request)
@@ -38,7 +37,7 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($credentials)) {
-            return $this->actionSuccess('Invalid credentials');
+            return $this->actionFailure('Invalid credentials');
         }
 
         $user = Auth::user();
@@ -56,6 +55,13 @@ class AuthController extends Controller
         'token' => $token,
         'expires_at' => Carbon::now()->addDay()->toDateTimeString(),
     ]);
+}
+ function logout(Request $request)
+{
+    // Current logged-in user ka token delete karo
+    $request->user()->currentAccessToken()->delete();
+
+    return $this->actionSuccess('Logout successful');
 }
 
 }

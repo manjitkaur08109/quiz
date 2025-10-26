@@ -66,6 +66,9 @@
 import { ref, reactive } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
+import { inject } from "vue";
+
+const toast = inject("toast");
 axios.defaults.baseURL = "http://127.0.0.1:8000";
 const router = useRouter();
 const formRef = ref(null);
@@ -125,19 +128,10 @@ const handleRegister = async () => {
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
     // 🔹 4. Redirect to dashboard (or home)
-     router.push({ path: "/", replace: true }).then(() => {
-    window.location.reload();
-  });
-  } catch (err) {
-    if (err.response && err.response.status === 422) {
-      // Laravel validation errors
-      const validationErrors = err.response.data.errors;
-      Object.keys(validationErrors).forEach((key) => {
-        errors[key] = validationErrors[key];
-      });
-    } else {
-      alert(err.response?.data?.message || "Something went wrong!");
-    }
+     router.push('/');
+  } catch (error) {
+         toast.value.showToast(error?.response?.data?.message || "Something went wrong!",'error');
+
   } finally {
     loading.value = false;
   }

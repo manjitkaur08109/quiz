@@ -54,6 +54,9 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
+import { inject } from "vue";
+
+const toast = inject("toast");
 const router = useRouter();
 const search = ref("");
 const loading = ref(false);
@@ -88,11 +91,7 @@ const fetchCategories = async () => {
   localStorage.removeItem("user");
       router.push("/login");
     }
-        if(error?.response?.status == 409){
-     alert(error?.response?.message);
-    }
-    console.error("Error fetching caegory:", error.response?.data || error);
-     alert("Something went wrong!");
+     toast.value.showToast(error?.response?.data?.message || "Something went wrong!",'error');
 
   }
    finally {
@@ -107,6 +106,8 @@ const deleteCategory = async (id) => {
     await axios.delete(`/api/category/delete/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+
+     toast.value.showToast("Category deleted successfully",'success');
     fetchCategories();
   } catch (error) {
     console.error("Error deleting category:", error.response?.data || error);
@@ -115,7 +116,8 @@ const deleteCategory = async (id) => {
       localStorage.removeItem("user");
       router.push("/login");
     }
-    alert("Failed to delete category!");
+
+     toast.value.showToast(error?.response?.data?.message || "Something went wrong!",'error');
   }
 };
 

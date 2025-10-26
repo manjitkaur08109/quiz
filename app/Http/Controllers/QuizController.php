@@ -30,6 +30,7 @@ class QuizController extends Controller {
             'questions.*.question' => 'required|string',
             'questions.*.options' => 'required|array|min:2',
             'questions.*.correctAnswer' => 'required|string',
+            'questions.*.passingScore' => 'required|numeric|min:0|max:100',
 
         ] );
         $exists = QuizModel::where( 'title', $request->title )
@@ -64,6 +65,7 @@ class QuizController extends Controller {
             'questions.*.question' => 'required|string',
             'questions.*.options' => 'required|array|min:2',
             'questions.*.correctAnswer' => 'required|string',
+            'questions.*.passingScore' => 'required|numeric|min:0|max:100',
 
         ] );
         $exists = QuizModel::where( 'title', $request->title )

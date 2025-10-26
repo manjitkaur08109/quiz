@@ -28,7 +28,12 @@
       <!-- 👤 Profile image (optional) -->
       <template #item.image="{ item }">
         <v-avatar size="40">
-          <v-img :src="item.image || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'" />
+          <v-img
+            :src="
+              item.image ||
+              'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'
+            "
+          />
         </v-avatar>
       </template>
 
@@ -38,7 +43,13 @@
           <v-icon>mdi-eye</v-icon>
         </v-btn>
 
-        <v-btn size="x-small" icon color="error" @click="deleteUser(item.id)">
+        <v-btn
+          size="x-small"
+          class="ml-2"
+          icon
+          color="red"
+          @click="deleteUser(item.id)"
+        >
           <v-icon>mdi-delete</v-icon>
         </v-btn>
       </template>
@@ -49,7 +60,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import { inject } from "vue";
 
+const toast = inject("toast");
 const search = ref("");
 const users = ref([]);
 const headers = [
@@ -67,18 +80,16 @@ const getUsers = async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
     users.value = res.data.data; // assuming {data: users[]}
-  }
-  catch (error) {
+  } catch (error) {
     if (error?.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       router.push("/login");
-    } else if (error?.response?.status === 409) {
-      alert(error?.response?.message);
-    } else {
-      console.error("Error fetching users:", error.response?.data || error);
-      alert("Something went wrong!");
     }
+    toast.value.showToast(
+      error?.response?.data?.message || "Something went wrong!",
+      "error"
+    );
   }
 };
 
@@ -97,16 +108,18 @@ const deleteUser = async (id) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     users.value = users.value.filter((u) => u.id !== id);
-    alert("User deleted successfully!");
-  } catch (err) {
-    console.error("Delete error:", err);
-    alert("Failed to delete user!");
+
+    toast.value.showToast("User Deleted.", "success");
+  } catch (error) {
+    toast.value.showToast(
+      error?.response?.data?.message || "Something went wrong!",
+      "error"
+    );
   }
 };
 
 onMounted(() => {
   getUsers();
 });
-
 </script>
 

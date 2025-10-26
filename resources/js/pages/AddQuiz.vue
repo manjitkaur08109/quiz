@@ -2,7 +2,7 @@
   <v-container class="py-8">
     <v-row>
       <v-col cols="12">
-        <v-card class="mx-auto" max-width="600" elevation="8">
+        <v-card class="mx-auto" min-width="600" elevation="8">
           <v-card-title class="text-h6">
             <v-icon
               size="x-small"
@@ -16,14 +16,16 @@
 
           <v-card-text>
             <v-form ref="formRef" @submit.prevent="handleSubmit">
-              <v-text-field
-                v-model="quiz.title"
-                label="Quiz Title"
-                :rules="QuizTitleRules"
-                prepend-inner-icon="mdi-format-title"
-                required
-              />
-
+              <v-row>
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="quiz.title"
+                    label="Quiz Title"
+                    :rules="QuizTitleRules"
+                    prepend-inner-icon="mdi-format-title"
+                    required
+                  /> </v-col
+              ></v-row>
               <v-textarea
                 v-model="quiz.description"
                 label="Quiz Description"
@@ -141,6 +143,9 @@ import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
 import axios from "axios";
+import { inject } from "vue";
+
+const toast = inject("toast");
 const goToAdQuiz = () => router.push("/addQuiz");
 const formRef = ref("");
 const QuizTitleRules = [
@@ -189,6 +194,7 @@ const quiz = reactive({
       question: "",
       options: ["", ""],
       correctAnswer: "",
+      passingScore: 0,
     },
   ],
 });
@@ -216,8 +222,9 @@ const addQuestion = () => {
   const isAnswerEmpty = !lastQuestion.correctAnswer.trim();
 
   if (isQuestionEmpty || isOptionEmpty || isAnswerEmpty) {
-    alert(
-      "Please fill the current question completely before adding a new one!"
+    toast.value.showToast(
+      "Please fill the current question completely before adding a new one!",
+      "error"
     );
     return; // Stop adding new question
   }
@@ -226,6 +233,7 @@ const addQuestion = () => {
     question: "",
     options: ["", ""], // default 2 blank options
     correctAnswer: "",
+    passingScore: 0,
   });
 };
 
@@ -233,9 +241,24 @@ const removeQuestion = (qIndex) => {
   quiz.questions.splice(qIndex, 1);
 };
 const duplicateQuestion = (qIndex) => {
-  const clonedQuestion = JSON.parse(JSON.stringify(quiz.questions[qIndex]));
+  const question = quiz.questions[qIndex];
+
+  const isQuestionEmpty = !question.question.trim();
+  const isOptionEmpty = question.options.some((opt) => !opt.trim());
+  const isAnswerEmpty = !question.correctAnswer.trim();
+
+  if (isQuestionEmpty || isOptionEmpty || isAnswerEmpty) {
+    toast.value.showToast("Cannot duplicate an incomplete question!", "erorr");
+    return; // Stop duplication
+  }
+
+  const clonedQuestion = JSON.parse(JSON.stringify(question));
   quiz.questions.splice(qIndex + 1, 0, clonedQuestion);
 };
+// const duplicateQuestion = (qIndex) => {
+//   const clonedQuestion = JSON.parse(JSON.stringify(quiz.questions[qIndex]));
+//   quiz.questions.splice(qIndex + 1, 0, clonedQuestion);
+// };
 const addOption = (qIndex) => {
   quiz.questions[qIndex].options.push("");
 };
@@ -256,7 +279,8 @@ const handleSubmit = async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
     quiz.value = res.data.data;
-    alert(res?.data?.message || "Quiz added succesfully");
+    toast.value.showToast(res.data.message, "success");
+
     console.log("Quiz created:", res.data);
     quiz.title = "";
     quiz.description = "";
@@ -269,12 +293,10 @@ const handleSubmit = async () => {
       localStorage.removeItem("user");
       router.push("/login");
     }
-
-    if (error?.response?.status == 409) {
-      alert(error?.response?.message);
-    }
-    console.error("Error adding quiz:", error.response?.data || error);
-    alert("Something went wrong!");
+    toast.value.showToast(
+      error?.response?.data?.message || "Something went wrong!",
+      "error"
+    );
   } finally {
     loading.value = false;
   }

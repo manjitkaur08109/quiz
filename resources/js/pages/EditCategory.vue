@@ -28,9 +28,7 @@
           />
 
           <v-card-actions class="justify-end">
-            <v-btn color="grey" @click="goBack">
-              Cancel
-            </v-btn>
+            <v-btn color="grey" @click="goBack"> Cancel </v-btn>
             <v-btn
               color="primary"
               type="submit"
@@ -50,7 +48,9 @@
 import { reactive, ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
+import { inject } from "vue";
 
+const toast = inject("toast");
 const router = useRouter();
 const route = useRoute();
 const categoryId = route.params.id;
@@ -63,9 +63,9 @@ const loading = ref(false);
 
 const formRef = ref("");
 const CategoryTitleRules = [
-    (value) => {
+  (value) => {
     if (value?.length >= 3) return true;
-    return ' Title required|string|max:15';
+    return " Title required|string|max:15";
   },
 ];
 const CategoryDescriptionRules = [
@@ -84,50 +84,50 @@ onMounted(async () => {
     category.value = res.data.data;
     const data = res.data.data;
     category.title = data.title;
-    category.description = data.description ;
-  }
-catch (error) {
-    if(error?.response?.status == 401){
-     localStorage.removeItem("token");
-  localStorage.removeItem("user");
+    category.description = data.description;
+  } catch (error) {
+    if (error?.response?.status == 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
       router.push("/login");
     }
-        if(error?.response?.status == 409){
-     alert(error?.response?.message);
-    }
-    console.error("Error loading category:", error.response?.data || error);
-     alert("Something went wrong!");
+    toast.value.showToast(
+      error?.response?.data?.message || "Something went wrong!",
+      "error"
+    );
   }
 });
 
 const handleSubmit = async () => {
-    const { valid } = await formRef.value.validate(); // ✅ validate all fields
+  const { valid } = await formRef.value.validate(); // ✅ validate all fields
   if (!valid) return; // stop if invalid
   loading.value = true;
   try {
-        const token = localStorage.getItem("token");
-    const res = await axios.put(`/api/category/update/${categoryId}`, category,{
-        headers:{Authorization:`Bearer ${token}`},
-    });
-    alert(res.data.message || "Category Updated Successfully!");
+    const token = localStorage.getItem("token");
+    const res = await axios.put(
+      `/api/category/update/${categoryId}`,
+      category,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    toast.value.showToast(res?.data?.message, "success");
+
     router.push("/category");
-  }
-  catch (error) {
-    if(error?.response?.status == 401){
-     localStorage.removeItem("token");
-  localStorage.removeItem("user");
+  } catch (error) {
+    if (error?.response?.status == 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
       router.push("/login");
     }
-        if(error?.response?.status == 409){
-     alert(error?.response?.message);
-    }
-    console.error( error.response?.data || error);
-     alert("Something went wrong!");
+    toast.value.showToast(
+      error?.response?.data?.message || "Something went wrong!",
+      "error"
+    );
   } finally {
     loading.value = false;
   }
 };
 
 const goBack = () => router.push("/category");
-
 </script>

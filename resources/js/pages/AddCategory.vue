@@ -28,10 +28,13 @@
           />
 
           <v-card-actions class="justify-end">
-            <v-btn  color="secondary" @click="goBack">
-              Cancel
-            </v-btn>
-            <v-btn color="primary" :loading="loading" type="submit" class="ml-2">
+            <v-btn color="secondary" @click="goBack"> Cancel </v-btn>
+            <v-btn
+              color="primary"
+              :loading="loading"
+              type="submit"
+              class="ml-2"
+            >
               Save Category
             </v-btn>
           </v-card-actions>
@@ -42,9 +45,12 @@
 </template>
 
 <script setup>
-import { ref,reactive } from "vue";
+import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
+import { inject } from "vue";
+
+const toast = inject("toast");
 const router = useRouter();
 const formRef = ref(null);
 const category = reactive({
@@ -53,9 +59,9 @@ const category = reactive({
 });
 const loading = ref(false);
 const CategoryTitleRules = [
-    (value) => {
+  (value) => {
     if (value?.length >= 3) return true;
-    return ' Title required|string|max:15';
+    return " Title required|string|max:15";
   },
 ];
 const CategoryDescriptionRules = [
@@ -66,37 +72,33 @@ const CategoryDescriptionRules = [
 ];
 
 const handleSubmit = async () => {
-    const { valid } = await formRef.value.validate(); // ✅ validate all fields
+  const { valid } = await formRef.value.validate(); // ✅ validate all fields
   if (!valid) return; // stop if invalid
   try {
     loading.value = true;
 
     const token = localStorage.getItem("token");
-    const res = await axios.post("/api/category/store", category,{
+    const res = await axios.post("/api/category/store", category, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
     category.value = res.data.data;
-    alert(" Category Added Successfully!");
-    console.log("Saved:", res.data);
+    toast.value.showToast(res.data.message, "success");
 
     category.title = "";
     category.description = "";
 
     router.push("/category");
-  }
-  catch (error) {
-    if(error?.response?.status == 401){
-     localStorage.removeItem("token");
-  localStorage.removeItem("user");
+  } catch (error) {
+    if (error?.response?.status == 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
       router.push("/login");
     }
-        if(error?.response?.status == 409){
-     alert(error?.response?.message);
-    }
-    console.error("Error adding category:", error.response?.data || error);
-     alert("Something went wrong!");
-
+    toast.value.showToast(
+      error?.response?.data?.message || "Something went wrong!",
+      "error"
+    );
   } finally {
     loading.value = false;
   }
@@ -104,5 +106,4 @@ const handleSubmit = async () => {
 const goBack = () => {
   router.push("/category");
 };
-
 </script>
