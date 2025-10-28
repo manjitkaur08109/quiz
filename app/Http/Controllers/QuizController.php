@@ -10,9 +10,15 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Contracts\Service\Attribute\Required;
 
 class QuizController extends Controller {
-    function index() {
-        $data = QuizModel::latest()->with( [ 'category' ] )->get();
-        return $this->actionSuccess( 'Quiz fetch successfully', $data );
+    function index(Request $request) {
+       $query = QuizModel::latest()->with(['category']);
+
+       if ($request->has('category_id')) {
+           $query->where('category_id', $request->category_id);
+       }
+
+       $data = $query->get();
+       return $this->actionSuccess('Quiz fetch successfully', $data);
     }
 
     function create() {
@@ -24,13 +30,13 @@ class QuizController extends Controller {
 
         $request->validate( [
             'title' => 'required|string|max:255|unique:quiz,title',
+            'passingScore' => 'required|numeric|min:0|max:100',
             'description' => 'required|string',
             'category_id' => 'required|exists:category,id',
             'questions' => 'required|array',
             'questions.*.question' => 'required|string',
             'questions.*.options' => 'required|array|min:2',
             'questions.*.correctAnswer' => 'required|string',
-            'questions.*.passingScore' => 'required|numeric|min:0|max:100',
 
         ] );
         $exists = QuizModel::where( 'title', $request->title )
@@ -41,9 +47,10 @@ class QuizController extends Controller {
 
         $quiz = QuizModel::create( [
             'title' => $request->title,
+            'passing_score' => $request->passingScore,
             'description' => $request->description,
             'category_id' => $request->category_id,
-            'questions' =>  $request->questions ,
+            'questions' => $request->questions,
         ] );
 
         return $this->actionSuccess( 'Quiz added successfully', $quiz );
@@ -59,15 +66,15 @@ class QuizController extends Controller {
 
         $request->validate( [
             'title' => 'required|string|max:255',
+            'passing_score' => 'required|numeric|min:0|max:100',
             'description' => 'required|string',
             'category_id' => 'required|exists:category,id',
             'questions' => 'required|array',
             'questions.*.question' => 'required|string',
             'questions.*.options' => 'required|array|min:2',
             'questions.*.correctAnswer' => 'required|string',
-            'questions.*.passingScore' => 'required|numeric|min:0|max:100',
 
-        ] );
+            ] );
         $exists = QuizModel::where( 'title', $request->title )
         ->whereNot( 'id', $request->id )
         ->exists();
@@ -77,6 +84,7 @@ class QuizController extends Controller {
 
         $quiz->update( [
             'title' => $request->title,
+            'passing_score' => $request->passing_score,
             'description' => $request->description,
             'category_id' => $request->category_id,
             'questions' => $request->questions,
@@ -90,4 +98,8 @@ class QuizController extends Controller {
         $quiz-> delete();
         return $this->actionSuccess( 'Quiz deleted successfully' );
     }
+
+
+
+
 }

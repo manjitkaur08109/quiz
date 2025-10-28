@@ -24,8 +24,21 @@
                     :rules="QuizTitleRules"
                     prepend-inner-icon="mdi-format-title"
                     required
-                  /> </v-col
-              ></v-row>
+                  />
+                </v-col>
+                <v-col cols="6">
+                 <v-text-field
+                    v-model="quiz.passing_score"
+                    label="Passing Score (%)"
+                    type="number"
+                    :rules="PassingScoreRules"
+                    prepend-inner-icon="mdi-target"
+                    min="0"
+                    max="100"
+                    required
+                    />
+                </v-col>
+              </v-row>
               <v-textarea
                 v-model="quiz.description"
                 label="Quiz Description"
@@ -184,9 +197,17 @@ const SCARules = [
     return "Required";
   },
 ];
+const PassingScoreRules = [
+  (value) => {
+    if (value >= 0 && value <= 100) return true;
+    return "Passing score must be between 0 and 100.";
+  },
+];
+
 const categories = ref([]);
 const quiz = reactive({
   title: "",
+  passing_score: 0,
   description: "",
   category_id: null,
   questions: [
@@ -194,7 +215,6 @@ const quiz = reactive({
       question: "",
       options: ["", ""],
       correctAnswer: "",
-      passingScore: 0,
     },
   ],
 });
@@ -233,7 +253,6 @@ const addQuestion = () => {
     question: "",
     options: ["", ""], // default 2 blank options
     correctAnswer: "",
-    passingScore: 0,
   });
 };
 
@@ -283,6 +302,7 @@ const handleSubmit = async () => {
 
     console.log("Quiz created:", res.data);
     quiz.title = "";
+    quiz.passing_score = 0;
     quiz.description = "";
     quiz.category_id = "";
 

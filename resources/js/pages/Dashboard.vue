@@ -43,6 +43,7 @@
         </v-card-item>
         <v-card-text> {{ totalCategory }} </v-card-text>
       </v-card>
+
     </v-col>
   </v-row>
 
@@ -51,6 +52,7 @@
       Recent users
 
       <v-spacer></v-spacer>
+
 
       <v-text-field
         v-model="search"
@@ -72,6 +74,7 @@
     >
     </v-data-table>
   </v-card>
+  
 </template>
 <script setup>
 import axios from "axios";
@@ -94,6 +97,7 @@ const goToUsers = () => {
 const goToCategory = () => {
   router.push("/category");
 };
+
 const recentUsers = ref([]);
 const totalUsers = ref(0);
 const totalCategory = ref(0);

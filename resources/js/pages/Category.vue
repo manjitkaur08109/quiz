@@ -76,6 +76,9 @@ const goToAddCategory = () => {
 const editCategory = (id) => {
   router.push(`/editCategory/${id}`);
 };
+// 
+
+
 const fetchCategories = async () => {
   loading.value = true;
   try {

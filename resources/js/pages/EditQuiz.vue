@@ -16,6 +16,18 @@
             :rules="QuizTitleRules"
             prepend-inner-icon="mdi-format-title"
           />
+           <v-col cols="6">
+                 <v-text-field
+                    v-model="quiz.passing_score"
+                    label="Passing Score (%)"
+                    type="number"
+                    :rules="PassingScoreRules"
+                    prepend-inner-icon="mdi-target"
+                    min="0"
+                    max="100"
+                    required
+                    />
+                </v-col>
 
           <v-textarea
             v-model="quiz.description"
@@ -73,19 +85,7 @@
               required
               class="mt-2"
             />
-            <!-- Passing Score input -->
-            <v-row class="mb-2" dense>
-              <v-col cols="6">
-                <v-text-field
-                  v-model="q.passingScore"
-                  label="Passing Score"
-                  type="number"
-                  min="0"
-                  max="100"
-                  prepend-inner-icon="mdi-percent"
-                />
-              </v-col>
-            </v-row>
+            
 
             <v-btn
               v-if="quiz.questions.length > 1"
@@ -141,6 +141,7 @@ import { inject } from "vue";
 const toast = inject("toast");
 const quiz = reactive({
   title: "",
+  passing_score: 0,
   description: "",
   category_id: "",
   questions: [
@@ -148,7 +149,6 @@ const quiz = reactive({
       question: "",
       options: ["", ""],
       correctAnswer: "",
-      passingScore: 0,
     },
   ],
 });
@@ -192,6 +192,12 @@ const SCARules = [
     return "Correct answer required";
   },
 ];
+const PassingScoreRules = [
+  (value) => {
+    if (value >= 0 && value <= 100) return true;
+    return "Passing score must be between 0 and 100.";
+  },
+];
 
 const addQuestion = () => {
   const lastQuestion = quiz.questions[quiz.questions.length - 1];
@@ -212,7 +218,6 @@ const addQuestion = () => {
     question: "",
     options: ["", ""], // default 2 blank options
     correctAnswer: "",
-    passingScore: 0,
   });
 };
 const duplicateQuestion = (qIndex) => {
@@ -230,11 +235,6 @@ const duplicateQuestion = (qIndex) => {
   const clonedQuestion = JSON.parse(JSON.stringify(question));
   quiz.questions.splice(qIndex + 1, 0, clonedQuestion);
 };
-// const duplicateQuestion =(qIndex) =>{
-// const clonedQuestion = JSON.parse(JSON.stringify(quiz.questions[qIndex]));
-// quiz.questions.splice(qIndex + 1,0,clonedQuestion);
-// };
-
 const removeQuestion = (qIndex) => {
   quiz.questions.splice(qIndex, 1);
 };
@@ -275,6 +275,7 @@ onMounted(async () => {
     quiz.value = res.data.data;
     const data = res.data.data;
     quiz.title = data.title;
+    quiz.passing_score = data.passing_score;
     quiz.description = data.description;
     quiz.category_id = data.category_id;
     quiz.questions = data.questions;

@@ -10,7 +10,7 @@
       location="bottom end"
     >
       <template #activator="{ props }">
-        <v-btn v-bind="props"  icon="mdi-account" variant="text"></v-btn>
+        <v-btn v-bind="props" icon="mdi-account" variant="text"></v-btn>
       </template>
       <v-list>
         <v-list-item @click="goToProfile">
@@ -36,7 +36,6 @@
         link
       />
     </v-list>
-
   </v-navigation-drawer>
 </template>
 
@@ -55,14 +54,20 @@ const items = [
   { title: "Dashboard", path: "/", icon: "mdi-view-dashboard" },
   { title: "Quiz", path: "/quiz", icon: "mdi-help-circle-outline" },
   { title: "Users", path: "/users", icon: "mdi-account-group" },
-  {title:"Category",path:"/category",icon:"mdi-view-grid-outline"},
+  { title: "Category", path: "/category", icon: "mdi-view-grid-outline" },
+  { title: "Discover", path: "/discover", icon: "mdi-compass-outline" },
+  { title: "MyLearning", path: "/myLearning",icon: "mdi-school-outline" },
 ];
 const logout = async () => {
   try {
     const token = localStorage.getItem("token");
-    await axios.post("/api/logout", {}, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    await axios.post(
+      "/api/logout",
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
     // Token delete from localStorage
     localStorage.removeItem("token");
@@ -72,12 +77,11 @@ const logout = async () => {
     console.error("Logout failed:", error);
     toast.value.showToast("Something went wrong during logout!", "error");
     router.push("/login");
-
   }
 };
 
 const goToProfile = () => {
-    router.push("/profile");
- };
+  router.push("/profile");
+};
 // const goToProfile = () => {router.push('/profile')};
 </script>

@@ -28,7 +28,12 @@
       <template #item.sn="{ index }">
         {{ index + 1 }}
       </template>
-
+     
+      <template #item.description="{ item }">
+        {{ item.description.length > 50
+          ? item.description.slice(0, 50) + "..."
+          : item.description }}
+      </template>
       <template #item.category="{ item }">
         {{ item?.category?.title }}
       </template>

@@ -15,22 +15,24 @@ Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::get('/user', [UserController::class, 'profile']);
 
-    Route::prefix('category')->group(function(){
-        Route::get('/index', [CategoryController::class, 'index']);
-    Route::post('/store',[CategoryController::class,'store']);
-    Route::get('/show/{id}',[CategoryController::class,'show']);
-    Route::put('/update/{id}',[CategoryController::class,'update']);
-      Route::delete('/delete/{id}', [CategoryController::class, 'destroy']);
-});
 
-Route::prefix('quiz')->group(function(){
-    Route::get('/index', [QuizController::class, 'index']);
-    Route::get('/create', [QuizController::class, 'create']);
-    Route::post('/store', [QuizController::class, 'store']);
-    Route::get('/show/{id}', [QuizController::class, 'show']);
-      Route::put('/update/{id}', [QuizController::class, 'update']);
-      Route::delete('/delete/{id}', [QuizController::class, 'destroy']);
-});
+    Route::prefix('category')->group(function(){
+
+        Route::get('/index', [CategoryController::class, 'index']);
+        Route::post('/store',[CategoryController::class,'store']);
+        Route::get('/show/{id}',[CategoryController::class,'show']);
+        Route::put('/update/{id}',[CategoryController::class,'update']);
+        Route::delete('/delete/{id}', [CategoryController::class, 'destroy']);
+    });
+
+    Route::prefix('quiz')->group(function(){
+        Route::get('/index', [QuizController::class, 'index']);
+        Route::get('/create', [QuizController::class, 'create']);
+        Route::post('/store', [QuizController::class, 'store']);
+        Route::get('/show/{id}', [QuizController::class, 'show']);
+        Route::put('/update/{id}', [QuizController::class, 'update']);
+        Route::delete('/delete/{id}', [QuizController::class, 'destroy']);
+    });
 
     Route::get('/users', [UserController::class, 'index']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);

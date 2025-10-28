@@ -10,6 +10,8 @@ import AddCategory from "../pages/AddCategory.vue";
 import EditCategory from "../pages/EditCategory.vue";
 import Registration from "../pages/Registration.vue";
 import Login from "../pages/Login.vue";
+import MyLearning from "../pages/MyLearning.vue";
+import Discover from "../pages/Discover.vue";
 
 const routes = [
   { path: "/", name: "Dashboard", component: Dashboard , meta: { requiresAuth: true } },
@@ -23,6 +25,8 @@ const routes = [
   { path: "/editCategory/:id", name: "EditCategory", component: EditCategory, meta: { requiresAuth: true } },
   { path: "/register", name: "Registration", component: Registration ,meta: { guest: true }},
   { path: "/login", name: "Login", component: Login, meta: { guest: true } },
+  { path: "/discover", name: "Discover", component: Discover, meta: { requiresAuth: true } },
+  { path: "/myLearning", name: "MyLearning", component: MyLearning, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
