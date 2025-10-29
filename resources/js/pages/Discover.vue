@@ -197,18 +197,45 @@ const closeQuizDialog = () => {
   quizResult.value = null;
 };
 
-
-// ✅ Submit quiz and calculate result
-const submitQuiz = () => {
+const submitQuiz = async () => {
   if (!selectedQuiz.value) return;
+
+  // 🔹 Step 1: Calculate Result
   let correct = 0;
   selectedQuiz.value.questions.forEach((q, idx) => {
     if (userAnswers.value[idx] === q.correctAnswer) correct++;
   });
   const score = Math.round((correct / selectedQuiz.value.questions.length) * 100);
   const passed = score >= selectedQuiz.value.passing_score;
+
+  // 🔹 Step 2: Update UI result instantly
   quizResult.value = { score, passed, correct };
+
+  // 🔹 Step 3: Save Attempt to Backend
+  try {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user")); // ya jaha se tum user_id le rahe ho
+
+    await axios.post("/api/quiz-attempt/store", {
+      quiz_id: selectedQuiz.value.id,
+      score,
+      passed,
+      answers: userAnswers.value,
+    }, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    toast?.value?.showToast("✅ Quiz attempt saved!", "success");
+
+    // ✅ (Optional) Refresh quizzes to mark "attempted"
+    await fetchQuizzes(selectedCategory.value?.id);
+
+  } catch (error) {
+    console.error(" Error saving quiz attempt:", error);
+    toast?.value?.showToast("Failed to save quiz attempt", "error");
+  }
 };
+
 
 onMounted(fetchCategories);
 onMounted(() => fetchQuizzes());

@@ -152,7 +152,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
 import axios from "axios";
@@ -219,6 +219,13 @@ const quiz = reactive({
   ],
 });
 
+const apiQuiz = computed(() => {
+  return {
+    ...quiz,
+    'passing_score': quiz.passing_score,
+  };
+});
+
 const loading = ref(false);
 onMounted(async () => {
   try {
@@ -274,10 +281,7 @@ const duplicateQuestion = (qIndex) => {
   const clonedQuestion = JSON.parse(JSON.stringify(question));
   quiz.questions.splice(qIndex + 1, 0, clonedQuestion);
 };
-// const duplicateQuestion = (qIndex) => {
-//   const clonedQuestion = JSON.parse(JSON.stringify(quiz.questions[qIndex]));
-//   quiz.questions.splice(qIndex + 1, 0, clonedQuestion);
-// };
+
 const addOption = (qIndex) => {
   quiz.questions[qIndex].options.push("");
 };
@@ -289,7 +293,7 @@ const removeOption = (qIndex, oIndex) => {
 const handleSubmit = async () => {
   const { valid } = await formRef.value.validate(); // ✅ validate all fields
   if (!valid) return; // stop if invalid
-  console.log("Submitting quiz:", JSON.stringify(quiz));
+  console.log("Submitting quiz:", JSON.stringify(apiQuiz.value));
   try {
     loading.value = true;
 
@@ -320,6 +324,16 @@ const handleSubmit = async () => {
   } finally {
     loading.value = false;
   }
+};
+const saveQuizAttempt = async (quizId, score, passed) => {
+  const token = localStorage.getItem("token");
+  await axios.post("/api/quiz-attempt/store", {
+    quiz_id: quizId,
+    score: score,
+    passed: passed,
+  }, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
 };
 const goBack = () => {
   router.push("/quiz");

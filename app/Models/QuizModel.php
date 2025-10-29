@@ -5,6 +5,7 @@ namespace App\Models;
 use FFI\CData;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\QuizAttemptModel;
 
 class QuizModel extends Model {
     use HasUuids;
@@ -35,4 +36,8 @@ class QuizModel extends Model {
             'quizzes' => $quizzes
         ]);
     }
+    function attempts()
+{
+    return $this->hasMany(QuizAttemptModel::class, 'quiz_id');
+}
 }

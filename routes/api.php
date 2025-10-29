@@ -6,6 +6,8 @@ use App\Http\Controllers\QuizController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\QuizAttemptController;
+
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -26,12 +28,16 @@ Route::post('/logout', [AuthController::class, 'logout']);
     });
 
     Route::prefix('quiz')->group(function(){
+        Route::get('/mylearning', [QuizController::class, 'myLearning']);
         Route::get('/index', [QuizController::class, 'index']);
         Route::get('/create', [QuizController::class, 'create']);
         Route::post('/store', [QuizController::class, 'store']);
         Route::get('/show/{id}', [QuizController::class, 'show']);
         Route::put('/update/{id}', [QuizController::class, 'update']);
         Route::delete('/delete/{id}', [QuizController::class, 'destroy']);
+    });
+    Route::prefix('quiz-attempt')->group(function(){
+        Route::post('/store', [QuizAttemptController::class, 'store']);
     });
 
     Route::get('/users', [UserController::class, 'index']);

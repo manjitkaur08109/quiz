@@ -17,8 +17,7 @@
     </v-tabs>
     <!-- 🧠 Quizzes under Selected Category -->
     <v-row>
-      <v-col
-        v-for="quiz in quizzes"
+      <v-col v-for="quiz in quizzes"
         :key="quiz.id"
         cols="12"
         sm="6"
@@ -124,6 +123,10 @@
 <script setup>
 import { ref, computed, onMounted, inject } from "vue";
 import axios from "axios";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
 const tab = ref(null)
 const toast = inject("toast");
 const categories = ref([]);
@@ -133,6 +136,13 @@ const dialog = ref(false);
 const selectedQuiz = ref(null);
 const userAnswers = ref([]);
 const quizResult = ref(null);
+const userId = ref(localStorage.getItem('user_id'));
+
+const attemptedQuizzes = computed(() => {
+  if (!userId.value) return [];
+  // Ensure type match for user_id
+  return quizzes.value.filter(q => Array.isArray(q.attemptedBy) && q.attemptedBy.some(uid => String(uid) === String(userId.value)));
+});
 
 // ✅ Fetch all categories
 const fetchCategories = async () => {
@@ -153,7 +163,7 @@ const fetchCategories = async () => {
 const fetchQuizzes = async (categoryId = null) => {
   try {
     const token = localStorage.getItem("token");
-    const url = categoryId ? `/api/quiz/index?category_id=${categoryId}` : `/api/quiz/index`;
+    const url = categoryId ? `/api/quiz/mylearning?category_id=${categoryId}` : `/api/quiz/mylearning`;
     const res = await axios.get(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -199,7 +209,7 @@ const closeQuizDialog = () => {
 
 
 // ✅ Submit quiz and calculate result
-const submitQuiz = () => {
+const submitQuiz = async () => {
   if (!selectedQuiz.value) return;
   let correct = 0;
   selectedQuiz.value.questions.forEach((q, idx) => {
@@ -208,19 +218,33 @@ const submitQuiz = () => {
   const score = Math.round((correct / selectedQuiz.value.questions.length) * 100);
   const passed = score >= selectedQuiz.value.passing_score;
   quizResult.value = { score, passed, correct };
+
+  // ✅ Save quiz attempt to backend
+  try {
+    const token = localStorage.getItem('token');
+    await axios.post('/api/quiz-attempt/store', {
+      quiz_id: selectedQuiz.value.id,
+      user_id: userId.value,
+      score,
+      passed,
+      answers: userAnswers.value,
+    }, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    // ✅ Refresh quizzes so attemptedBy updates
+    await fetchQuizzes(selectedCategory.value?.id);
+  } catch (error) {
+    console.error('Error saving quiz attempt:', error);
+    toast?.value?.showToast('Failed to save quiz attempt', 'error');
+  }
 };
+
+
 
 onMounted(fetchCategories);
 onMounted(() => fetchQuizzes());
+
 </script>
 
-<style scoped>
-.quiz-card {
-  transition: box-shadow 0.2s, transform 0.2s;
-}
-.quiz-card:hover {
-  box-shadow: 0 8px 32px rgba(80, 0, 120, 0.15);
-  transform: scale(1.04);
-}
-</style>
+
 

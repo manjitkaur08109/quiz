@@ -85,7 +85,7 @@
               required
               class="mt-2"
             />
-            
+
 
             <v-btn
               v-if="quiz.questions.length > 1"
@@ -154,10 +154,10 @@ const quiz = reactive({
 });
 
 const categories = ref([]);
-const loading = ref(false);
 
 const QuizTitleRules = [
   (value) => {
+const loading = ref(false);
     if (value?.length >= 3) return true;
     return " Title required|string|min:3";
   },
