@@ -40,7 +40,7 @@
             </div>
             <div class="d-flex flex-wrap gap-2 mb-1">
               <v-chip color="blue" size="x-small">🧮 {{ quiz.questions ? quiz.questions.length : 0 }} Qs</v-chip>
-              <v-chip color="green" size="x-small">🎯 {{ quiz.passing_score }}% Pass</v-chip>
+              <v-chip color="green" size="x-small">🎯 {{ quiz.passing_score }} Pass</v-chip>
             </div>
           </v-card-text>
           <v-card-actions>
@@ -71,7 +71,7 @@
             </div>
             <div class="mb-1 text-caption">{{ selectedQuiz.description }}</div>
             <div class="mb-1">🧮 Total Questions: {{ selectedQuiz.questions ? selectedQuiz.questions.length : 0 }}</div>
-            <div class="mb-1">🎯 Passing Score: {{ selectedQuiz.passing_score }}%</div>
+            <div class="mb-1">🎯 Passing Score: {{ selectedQuiz.passing_score }}</div>
             <v-progress-linear :value="((userAnswers.filter(a => a !== null).length / selectedQuiz.questions.length) * 100)" height="6" color="deep-purple-accent-4" class="my-4" />
             <div class="d-flex flex-wrap gap-2 mb-2">
               <v-chip color="blue" size="small">Attempted: {{ userAnswers.filter(a => a !== null).length }}</v-chip>
@@ -101,7 +101,7 @@
             </v-row>
             <div v-if="quizResult !== null" class="mt-4">
               <v-alert :type="quizResult.passed ? 'success' : 'error'" dense>
-                You scored {{ quizResult.score }}%. {{ quizResult.passed ? 'Congratulations, you passed!' : 'Try again to pass.' }}
+                You scored {{ quizResult.score }}. {{ quizResult.passed ? 'Congratulations, you passed!' : 'Try again to pass.' }}
               </v-alert>
             </div>
           </div>
@@ -202,14 +202,35 @@ const submitQuiz = async () => {
 
   // 🔹 Step 1: Calculate Result
   let correct = 0;
-  selectedQuiz.value.questions.forEach((q, idx) => {
-    if (userAnswers.value[idx] === q.correctAnswer) correct++;
-  });
-  const score = Math.round((correct / selectedQuiz.value.questions.length) * 100);
-  const passed = score >= selectedQuiz.value.passing_score;
+  const correctAnswers = [];
 
-  // 🔹 Step 2: Update UI result instantly
-  quizResult.value = { score, passed, correct };
+
+  selectedQuiz.value.questions.forEach((q, idx) => {
+    const userAnswer = userAnswers.value[idx];
+    const isCorrect = userAnswer === q.correctAnswer;
+    if (isCorrect) correct++;
+    correctAnswers.push({
+      question: q.question,
+      selected: userAnswer,
+      correct: q.correctAnswer,
+      isCorrect,
+    });
+  });
+//   selectedQuiz.value.questions.forEach((q, idx) => {
+//       if (userAnswers.value[idx] === q.correctAnswer) {
+//           correct++;
+//           correctAnswers.push(q.correctAnswer);
+//         }
+//     });
+    const totalQuestions = selectedQuiz.value.questions.length;
+    const marksObtained = correct; // 👈 har sahi answer = 1 mark (change if needed)
+    // const score = Math.round((correct / selectedQuiz.value.questions.length) * 100);
+     const quizScore = Math.round((correct / totalQuestions) * 100);
+    const passingScore = selectedQuiz.value.passing_score || 50;
+    const passed = quizScore >= passingScore;
+
+    // 🔹 Step 2: Update UI result instantly
+  quizResult.value = { score: quizScore, passed, correct };
 
   // 🔹 Step 3: Save Attempt to Backend
   try {
@@ -218,9 +239,10 @@ const submitQuiz = async () => {
 
     await axios.post("/api/quiz-attempt/store", {
       quiz_id: selectedQuiz.value.id,
-      score,
-      passed,
-      answers: userAnswers.value,
+      score: quizScore,
+      total_questions: totalQuestions,
+        correct_answers: correctAnswers, // ✅ backend expects array (JSON)
+        marks_obtained: marksObtained, //
     }, {
       headers: { Authorization: `Bearer ${token}` },
     });

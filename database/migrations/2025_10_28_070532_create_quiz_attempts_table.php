@@ -22,8 +22,10 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
 
             $table->integer('score');
-            $table->boolean('passed');
-            $table->json('answers')->nullable();
+            $table->integer('total_questions')->default(0);
+             // ➕ Add new columns
+             $table->json('correct_answers')->nullable();
+             $table->integer('marks_obtained')->default(0);
             $table->timestamps();
 
             // ✅ Foreign Keys

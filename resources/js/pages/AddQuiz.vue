@@ -29,7 +29,7 @@
                 <v-col cols="6">
                  <v-text-field
                     v-model="quiz.passing_score"
-                    label="Passing Score (%)"
+                    label="Passing Score"
                     type="number"
                     :rules="PassingScoreRules"
                     prepend-inner-icon="mdi-target"

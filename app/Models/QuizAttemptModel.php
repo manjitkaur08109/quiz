@@ -17,18 +17,14 @@ class QuizAttemptModel extends Model
     protected $keyType = 'string';
 
     // ✅ Fillable fields
-    protected $fillable = [
-        'quiz_id',
-        'user_id',
-        'score',
-        'passed',
-        'answers', // ⚠️ ye bhi add kar (frontend se answers bhej rahe ho)
-    ];
+    protected $fillable = ['quiz_id', 'user_id','score','total_questions',
+        'correct_answers',
+        'marks_obtained',];
+
 
     // ✅ Cast JSON fields properly
     protected $casts = [
-        'answers' => 'array',
-        'passed' => 'boolean',
+        'correct_answers' => 'array',
     ];
 
     public function quiz()

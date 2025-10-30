@@ -19,7 +19,7 @@
            <v-col cols="6">
                  <v-text-field
                     v-model="quiz.passing_score"
-                    label="Passing Score (%)"
+                    label="Passing Score "
                     type="number"
                     :rules="PassingScoreRules"
                     prepend-inner-icon="mdi-target"
@@ -136,6 +136,7 @@ const formRef = ref("");
 const router = useRouter();
 const route = useRoute();
 const quizId = route.params.id;
+const loading = ref(false);
 import { inject } from "vue";
 
 const toast = inject("toast");
@@ -272,7 +273,6 @@ onMounted(async () => {
     const res = await axios.get(`/api/quiz/show/${quizId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    quiz.value = res.data.data;
     const data = res.data.data;
     quiz.title = data.title;
     quiz.passing_score = data.passing_score;
