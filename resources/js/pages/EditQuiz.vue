@@ -57,7 +57,6 @@
               class="mb-2"
             />
 
-            <!-- Options -->
             <div v-for="(o, oIndex) in q.options" :key="oIndex" class="mb-2">
               <v-text-field
                 v-model="q.options[oIndex]"
@@ -203,7 +202,6 @@ const PassingScoreRules = [
 const addQuestion = () => {
   const lastQuestion = quiz.questions[quiz.questions.length - 1];
 
-  // Check karo current question complete hai ya nahi
   const isQuestionEmpty = !lastQuestion.question.trim();
   const isOptionEmpty = lastQuestion.options.some((opt) => !opt.trim());
   const isAnswerEmpty = !lastQuestion.correctAnswer.trim();
@@ -212,12 +210,11 @@ const addQuestion = () => {
     toast.value.showToast(
       "Please fill the current question completely before adding a new one!","error"
     );
-    return; // Stop adding new question
+    return;
   }
-  // Add new blank question
   quiz.questions.push({
     question: "",
-    options: ["", ""], // default 2 blank options
+    options: ["", ""],
     correctAnswer: "",
   });
 };
@@ -230,7 +227,7 @@ const duplicateQuestion = (qIndex) => {
 
   if (isQuestionEmpty || isOptionEmpty || isAnswerEmpty) {
     toast.value.showToast("Cannot duplicate an incomplete question!","error");
-    return; // Stop duplication
+    return; 
   }
 
   const clonedQuestion = JSON.parse(JSON.stringify(question));

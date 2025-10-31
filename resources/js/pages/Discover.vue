@@ -1,8 +1,9 @@
 <template>
   <div>
-   <v-tabs class="mb-4"
+    <v-tabs
+      class="mb-4"
       v-model="tab"
-       align-tabs="end"
+      align-tabs="end"
       color="deep-purple-accent-4"
     >
       <v-tab value="all" @click="showAllCategories">All</v-tab>
@@ -33,19 +34,40 @@
           <v-card-text>
             <div class="d-flex align-center justify-space-between mb-2">
               <span class="text-h6 font-weight-bold">📘 {{ quiz.title }}</span>
-              <v-chip color="deep-purple-accent-4" text-color="white" size="small" class="ml-2">{{ quiz.category?.title }}</v-chip>
+              <v-chip
+                color="deep-purple-accent-4"
+                text-color="white"
+                size="small"
+                class="ml-2"
+                >{{ quiz.category?.title }}</v-chip
+              >
             </div>
             <div class="mb-2 text-caption text-grey-darken-1">
-              {{ quiz.description.length > 60 ? quiz.description.slice(0, 60) + '...' : quiz.description }}
+              {{
+                quiz.description.length > 60
+                  ? quiz.description.slice(0, 60) + "..."
+                  : quiz.description
+              }}
             </div>
             <div class="d-flex flex-wrap gap-2 mb-1">
-              <v-chip color="blue" size="x-small">🧮 {{ quiz.questions ? quiz.questions.length : 0 }} Qs</v-chip>
-              <v-chip color="green" size="x-small">🎯 {{ quiz.passing_score }} Pass</v-chip>
+              <v-chip color="blue" size="x-small"
+                >🧮 {{ quiz.questions ? quiz.questions.length : 0 }} Qs</v-chip
+              >
+              <v-chip color="green" size="x-small"
+                >🎯 {{ quiz.passing_score }} Pass</v-chip
+              >
             </div>
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn color="primary" variant="flat" size="small" class="float-right" @click.stop="openQuizDialog(quiz)">Start Quiz</v-btn>
+            <v-btn
+              color="primary"
+              variant="flat"
+              size="small"
+              class="float-right"
+              @click.stop="openQuizDialog(quiz)"
+              >Start Quiz</v-btn
+            >
           </v-card-actions>
         </v-card>
       </v-col>
@@ -59,6 +81,32 @@
       </v-col>
     </v-row>
 
+    <v-dialog v-model="resultDialog" max-width="600">
+      <v-card>
+        <v-card-title class="text-h6">Quiz Result</v-card-title>
+        <v-card-text>
+          <div v-if="quizResult !== null">
+            Passing Score: {{ selectedQuiz.passing_score }}.<br />
+            Correct answers: {{ quizResult.correct }}.
+            <br />
+            <v-alert :type="quizResult.passed ? 'success' : 'error'" dense>
+              You scored {{ quizResult.attemptedQuestions }}/{{
+                selectedQuiz.questions.length
+              }}.
+              {{
+                quizResult.passed
+                  ? "Congratulations, you passed!"
+                  : "Try again to pass."
+              }}
+            </v-alert>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn text @click="closeQuizDialog">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <!-- Start Quiz Dialog -->
     <v-dialog v-model="dialog" max-width="900">
       <v-card>
@@ -66,30 +114,44 @@
         <v-card-text>
           <div v-if="selectedQuiz">
             <div class="mb-2 d-flex align-center justify-space-between">
-              <span>📘 <strong>{{ selectedQuiz.title }}</strong></span>
-              <v-chip color="deep-purple-accent-4" text-color="white" size="small">{{ selectedQuiz.category?.title }}</v-chip>
+              <span
+                >📘 <strong>{{ selectedQuiz.title }}</strong></span
+              >
+              <v-chip
+                color="deep-purple-accent-4"
+                text-color="white"
+                size="small"
+                >{{ selectedQuiz.category?.title }}</v-chip
+              >
             </div>
             <div class="mb-1 text-caption">{{ selectedQuiz.description }}</div>
-            <div class="mb-1">🧮 Total Questions: {{ selectedQuiz.questions ? selectedQuiz.questions.length : 0 }}</div>
-            <div class="mb-1">🎯 Passing Score: {{ selectedQuiz.passing_score }}</div>
-            <v-progress-linear :value="((userAnswers.filter(a => a !== null).length / selectedQuiz.questions.length) * 100)" height="6" color="deep-purple-accent-4" class="my-4" />
-            <div class="d-flex flex-wrap gap-2 mb-2">
-              <v-chip color="blue" size="small">Attempted: {{ userAnswers.filter(a => a !== null).length }}</v-chip>
-              <v-chip color="green" size="small">Correct: {{ quizResult?.correct ?? '-' }}</v-chip>
-              <v-chip color="deep-purple-accent-2" size="small">Total: {{ selectedQuiz.questions.length }}</v-chip>
-              <v-chip :color="quizResult ? (quizResult.passed ? 'green' : 'red') : 'grey'" size="small">
-                {{ quizResult ? (quizResult.passed ? 'Pass' : 'Fail') : 'Result' }}
-              </v-chip>
+            <div class="mb-1">
+              🧮 Total Questions:
+              {{ selectedQuiz.questions ? selectedQuiz.questions.length : 0 }}
+            </div>
+            <div class="mb-1">
+              🎯 Passing Score: {{ selectedQuiz.passing_score }}
             </div>
             <div class="mt-2 text-subtle">Answer all questions below:</div>
             <v-row>
-              <v-col v-for="(question, idx) in selectedQuiz.questions" :key="idx" cols="12" md="12">
-                <div class=" pa-4 rounded-lg" style="background:#f8f8ff;">
-                  <div class="font-weight-bold mb-2">Q{{ idx + 1 }}. {{ question.question }}</div>
-                  <v-radio-group v-model="userAnswers[idx]" :mandatory="true" class="ml-2">
+              <v-col
+                v-for="(question, index) in selectedQuiz.questions"
+                :key="index"
+                cols="12"
+                md="12"
+              >
+                <div class="pa-4 rounded-lg" style="background: #f8f8ff">
+                  <div class="font-weight-bold mb-2">
+                    Q{{ index + 1 }}. {{ question.question }}
+                  </div>
+                  <v-radio-group
+                    v-model="userAnswers[index]"
+                    :mandatory="true"
+                    class="ml-2"
+                  >
                     <v-radio
-                      v-for="(option, oIdx) in question.options"
-                      :key="oIdx"
+                      v-for="(option, oindex) in question.options"
+                      :key="oindex"
                       :label="option"
                       :value="option"
                       color="deep-purple-accent-4"
@@ -99,11 +161,6 @@
                 </div>
               </v-col>
             </v-row>
-            <div v-if="quizResult !== null" class="mt-4">
-              <v-alert :type="quizResult.passed ? 'success' : 'error'" dense>
-                You scored {{ quizResult.score }}. {{ quizResult.passed ? 'Congratulations, you passed!' : 'Try again to pass.' }}
-              </v-alert>
-            </div>
           </div>
           <div v-else>
             <v-progress-circular indeterminate color="deep-purple-accent-4" />
@@ -113,23 +170,23 @@
         <v-card-actions>
           <v-spacer />
           <v-btn text @click="closeQuizDialog">Cancel</v-btn>
-          <v-btn color="primary" @click="submitQuiz" >Submit</v-btn>
+          <v-btn color="primary" @click="submitQuiz">Submit</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, inject } from "vue";
 import axios from "axios";
-const tab = ref(null)
+const tab = ref(null);
 const toast = inject("toast");
 const categories = ref([]);
 const quizzes = ref([]);
 const selectedCategory = ref(null);
 const dialog = ref(false);
+const resultDialog = ref(false);
 const selectedQuiz = ref(null);
 const userAnswers = ref([]);
 const quizResult = ref(null);
@@ -142,7 +199,7 @@ const fetchCategories = async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = res.data.data || res.data;
-    categories.value =  data;
+    categories.value = data;
   } catch (error) {
     console.error("Error fetching categories:", error);
     toast?.value?.showToast("Failed to load categories", "error");
@@ -153,19 +210,20 @@ const fetchCategories = async () => {
 const fetchQuizzes = async (categoryId = null) => {
   try {
     const token = localStorage.getItem("token");
-    const url = categoryId ? `/api/quiz/index?category_id=${categoryId}` : `/api/quiz/index`;
+    const url = categoryId
+      ? `/api/quiz/index?category_id=${categoryId}`
+      : `/api/quiz/index`;
     const res = await axios.get(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = res.data.data || res.data;
-    quizzes.value =  data ;
+    quizzes.value = data;
   } catch (error) {
     console.error("Error fetching quizzes:", error);
     toast?.value?.showToast("Failed to load quizzes", "error");
     quizzes.value = [];
   }
 };
-
 
 // ✅ Select category and load quizzes (accepts full category object)
 const selectCategory = async (category) => {
@@ -180,12 +238,10 @@ const showAllCategories = async () => {
   await fetchQuizzes();
 };
 
-
 // ✅ Open dialog for quiz
 const openQuizDialog = (quiz) => {
   selectedQuiz.value = quiz;
   dialog.value = true;
-  userAnswers.value = Array(quiz.questions.length).fill(null);
   quizResult.value = null;
 };
 
@@ -195,6 +251,7 @@ const closeQuizDialog = () => {
   selectedQuiz.value = null;
   userAnswers.value = [];
   quizResult.value = null;
+  resultDialog.value = false;
 };
 
 const submitQuiz = async () => {
@@ -202,74 +259,53 @@ const submitQuiz = async () => {
 
   // 🔹 Step 1: Calculate Result
   let correct = 0;
-  const correctAnswers = [];
-
-
-  selectedQuiz.value.questions.forEach((q, idx) => {
-    const userAnswer = userAnswers.value[idx];
+  const attemptedAnswers = [];
+  selectedQuiz.value.questions.forEach((q, index) => {
+    const userAnswer = userAnswers.value[index];
     const isCorrect = userAnswer === q.correctAnswer;
-    if (isCorrect) correct++;
-    correctAnswers.push({
-      question: q.question,
-      selected: userAnswer,
-      correct: q.correctAnswer,
-      isCorrect,
-    });
+    if (isCorrect) {
+      correct++;
+    }
+    q.attempted = userAnswer ?? "";
+    q.isCorrect = isCorrect;
+    attemptedAnswers.push(q);
   });
-//   selectedQuiz.value.questions.forEach((q, idx) => {
-//       if (userAnswers.value[idx] === q.correctAnswer) {
-//           correct++;
-//           correctAnswers.push(q.correctAnswer);
-//         }
-//     });
-    const totalQuestions = selectedQuiz.value.questions.length;
-    const marksObtained = correct; // 👈 har sahi answer = 1 mark (change if needed)
-    // const score = Math.round((correct / selectedQuiz.value.questions.length) * 100);
-     const quizScore = Math.round((correct / totalQuestions) * 100);
-    const passingScore = selectedQuiz.value.passing_score || 50;
-    const passed = quizScore >= passingScore;
+  const attemptedQuestions = userAnswers.value.filter((a) => a !== null).length;
+  const passed = correct >= selectedQuiz.value.passing_score;
 
-    // 🔹 Step 2: Update UI result instantly
-  quizResult.value = { score: quizScore, passed, correct };
+  // 🔹 Step 2: Update UI result instantly
+  quizResult.value = { passed, correct, attemptedQuestions };
 
   // 🔹 Step 3: Save Attempt to Backend
   try {
     const token = localStorage.getItem("token");
-    const user = JSON.parse(localStorage.getItem("user")); // ya jaha se tum user_id le rahe ho
-
-    await axios.post("/api/quiz-attempt/store", {
-      quiz_id: selectedQuiz.value.id,
-      score: quizScore,
-      total_questions: totalQuestions,
-        correct_answers: correctAnswers, // ✅ backend expects array (JSON)
-        marks_obtained: marksObtained, //
-    }, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await axios.post(
+      "/api/quiz-attempt/store",
+      {
+        quiz_id: selectedQuiz.value.id,
+        score: correct,
+        passing_score: selectedQuiz.value.passing_score,
+        total_questions: selectedQuiz.value.questions.length,
+        marks_obtained: attemptedQuestions,
+        attempted_answers: attemptedAnswers,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
     toast?.value?.showToast("✅ Quiz attempt saved!", "success");
-
-    // ✅ (Optional) Refresh quizzes to mark "attempted"
-    await fetchQuizzes(selectedCategory.value?.id);
-
+    dialog.value = false;
+    resultDialog.value = true;
   } catch (error) {
     console.error(" Error saving quiz attempt:", error);
     toast?.value?.showToast("Failed to save quiz attempt", "error");
   }
 };
 
-
 onMounted(fetchCategories);
 onMounted(() => fetchQuizzes());
 </script>
 
-<style scoped>
-.quiz-card {
-  transition: box-shadow 0.2s, transform 0.2s;
-}
-.quiz-card:hover {
-  box-shadow: 0 8px 32px rgba(80, 0, 120, 0.15);
-  transform: scale(1.04);
-}
-</style>
+
 

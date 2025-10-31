@@ -8,14 +8,14 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 
 class QuizAttemptController extends Controller {
-    // Store a new quiz attempt
 
     public function store( Request $request ) {
         $validated = $request->validate( [
             'quiz_id' => 'required|uuid',
             'score' => 'required|integer',
+            'passing_score' => 'required|integer',
             'total_questions' => 'required|integer',
-            'correct_answers' => 'nullable|array',
+            'attempted_answers' => 'nullable|array',
             'marks_obtained' => 'required|integer',
         ] );
 
@@ -23,17 +23,26 @@ class QuizAttemptController extends Controller {
             'quiz_id' => $request->quiz_id,
             'user_id' => Auth::id(),
             'score' => $request->score,
+            'passing_score' => $request->passing_score,
             'total_questions' => $request->total_questions,
-            'correct_answers' => $request->correct_answers ?? [],
+            'attempted_answers' => $request->attempted_answers ?? [],
             'marks_obtained' => $request->marks_obtained,
         ] );
         return response()->json( [ 'message' => 'Attempt saved', 'data' => $attempt ] );
     }
 
-    // List all attempts for the authenticated user
-
     public function index( Request $request ) {
-        $attempts = QuizAttemptModel::where( 'user_id', Auth::id() )->get();
+        $attempts = QuizAttemptModel::with( 'quiz:id,title,description')
+        ->where( 'user_id', Auth::id() )
+        ->latest();
+        if ( $request->filled( 'category_id' ) ) {
+            $attempts->whereHas( 'quiz', function ( $q ) use ( $request ) {
+                $q->where( 'category_id', $request->category_id );
+            } );
+        }
+        $attempts = $attempts->get();
+
         return response()->json( [ 'data' => $attempts ] );
     }
+
 }

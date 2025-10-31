@@ -73,7 +73,6 @@
                   class="mb-2"
                 />
 
-                <!-- Options -->
                 <div
                   v-for="(o, oIndex) in q.options"
                   :key="oIndex"
@@ -243,7 +242,6 @@ onMounted(async () => {
 const addQuestion = () => {
   const lastQuestion = quiz.questions[quiz.questions.length - 1];
 
-  // Check karo current question complete hai ya nahi
   const isQuestionEmpty = !lastQuestion.question.trim();
   const isOptionEmpty = lastQuestion.options.some((opt) => !opt.trim());
   const isAnswerEmpty = !lastQuestion.correctAnswer.trim();
@@ -253,12 +251,11 @@ const addQuestion = () => {
       "Please fill the current question completely before adding a new one!",
       "error"
     );
-    return; // Stop adding new question
+    return;
   }
-  // Add new blank question
   quiz.questions.push({
     question: "",
-    options: ["", ""], // default 2 blank options
+    options: ["", ""],
     correctAnswer: "",
   });
 };
@@ -275,7 +272,7 @@ const duplicateQuestion = (qIndex) => {
 
   if (isQuestionEmpty || isOptionEmpty || isAnswerEmpty) {
     toast.value.showToast("Cannot duplicate an incomplete question!", "erorr");
-    return; // Stop duplication
+    return;
   }
 
   const clonedQuestion = JSON.parse(JSON.stringify(question));
@@ -291,8 +288,8 @@ const removeOption = (qIndex, oIndex) => {
 };
 
 const handleSubmit = async () => {
-  const { valid } = await formRef.value.validate(); // ✅ validate all fields
-  if (!valid) return; // stop if invalid
+  const { valid } = await formRef.value.validate();
+  if (!valid) return; 
   console.log("Submitting quiz:", JSON.stringify(apiQuiz.value));
   try {
     loading.value = true;

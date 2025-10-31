@@ -78,7 +78,6 @@ const handleLogin = async () => {
     localStorage.setItem("user", JSON.stringify(res.data.data.user));
     localStorage.setItem("token", res.data.data.token);
 
-    // 🔹 4. Redirect to dashboard (or home)
     router.push("/");
   } catch (error) {
     toast.value.showToast(

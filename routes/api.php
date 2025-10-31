@@ -28,7 +28,6 @@ Route::post('/logout', [AuthController::class, 'logout']);
     });
 
     Route::prefix('quiz')->group(function(){
-        Route::get('/mylearning', [QuizController::class, 'myLearning']);
         Route::get('/index', [QuizController::class, 'index']);
         Route::get('/create', [QuizController::class, 'create']);
         Route::post('/store', [QuizController::class, 'store']);
@@ -38,6 +37,7 @@ Route::post('/logout', [AuthController::class, 'logout']);
     });
     Route::prefix('quiz-attempt')->group(function(){
         Route::post('/store', [QuizAttemptController::class, 'store']);
+        Route::get('/index', [QuizAttemptController::class, 'index']);
     });
 
     Route::get('/users', [UserController::class, 'index']);

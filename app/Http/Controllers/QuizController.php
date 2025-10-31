@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CategoryModel;
+use App\Models\QuizAttemptModel;
 use App\Models\QuizModel;
 use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\Request;
@@ -11,16 +12,16 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Contracts\Service\Attribute\Required;
 
 class QuizController extends Controller {
-    function index(Request $request) {
-        $query = QuizModel::with(['category', 'attempts'])->latest();
-        if ($request->has('category_id')) {
-            $query->where('category_id', $request->category_id);
+    function index( Request $request ) {
+        $query = QuizModel::with( [ 'category', 'attempts' ] )->latest();
+        if ( $request->has( 'category_id' ) ) {
+            $query->where( 'category_id', $request->category_id );
         }
         $quizzes = $query->get();
-        foreach ($quizzes as $quiz) {
-            $quiz->attemptedBy = $quiz->attempts->pluck('user_id')->toArray();
+        foreach ( $quizzes as $quiz ) {
+            $quiz->attemptedBy = $quiz->attempts->pluck( 'user_id' )->toArray();
         }
-        return $this->actionSuccess('Quiz fetch successfully', $quizzes);
+        return $this->actionSuccess( 'Quiz fetch successfully', $quizzes );
     }
 
     function create() {
@@ -76,7 +77,7 @@ class QuizController extends Controller {
             'questions.*.options' => 'required|array|min:2',
             'questions.*.correctAnswer' => 'required|string',
 
-            ] );
+        ] );
         $exists = QuizModel::where( 'title', $request->title )
         ->whereNot( 'id', $request->id )
         ->exists();
@@ -100,29 +101,7 @@ class QuizController extends Controller {
         $quiz-> delete();
         return $this->actionSuccess( 'Quiz deleted successfully' );
     }
-    public function myLearning(Request $request)
-{
-    $userId = Auth::id(); // 👤 Get logged-in user ID
 
-    // Build query: only quizzes that this user has attempted
-    $query = QuizModel::with(['category', 'attempts' => function ($q) use ($userId) {
-        $q->where('user_id', $userId);
-    }])
-    ->whereHas('attempts', function ($q) use ($userId) {
-        $q->where('user_id', $userId);
-    })
-    ->latest();
-
-    // Optional category filter
-    if ($request->filled('category_id')) {
-        $query->where('category_id', $request->category_id);
-    }
-
-    // Fetch all matched quizzes
-    $quizzes = $query->get();
-
-    // Return response
-    return $this->actionSuccess('My Learning quizzes fetched successfully', $quizzes);
-}
+     
 
 }
