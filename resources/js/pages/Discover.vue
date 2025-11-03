@@ -16,7 +16,6 @@
         {{ category.title }}
       </v-tab>
     </v-tabs>
-    <!-- 🧠 Quizzes under Selected Category -->
     <v-row>
       <v-col
         v-for="quiz in quizzes"
@@ -49,6 +48,7 @@
                   : quiz.description
               }}
             </div>
+
             <div class="d-flex flex-wrap gap-2 mb-1">
               <v-chip color="blue" size="x-small"
                 >🧮 {{ quiz.questions ? quiz.questions.length : 0 }} Qs</v-chip
@@ -178,7 +178,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, inject } from "vue";
+import { ref, onMounted, inject } from "vue";
 import axios from "axios";
 const tab = ref(null);
 const toast = inject("toast");
@@ -191,7 +191,6 @@ const selectedQuiz = ref(null);
 const userAnswers = ref([]);
 const quizResult = ref(null);
 
-// ✅ Fetch all categories
 const fetchCategories = async () => {
   try {
     const token = localStorage.getItem("token");
@@ -206,7 +205,6 @@ const fetchCategories = async () => {
   }
 };
 
-// ✅ Fetch quizzes; if categoryId provided, include it as a query param to filter by category
 const fetchQuizzes = async (categoryId = null) => {
   try {
     const token = localStorage.getItem("token");
@@ -225,27 +223,21 @@ const fetchQuizzes = async (categoryId = null) => {
   }
 };
 
-// ✅ Select category and load quizzes (accepts full category object)
 const selectCategory = async (category) => {
   selectedCategory.value = category;
   await fetchQuizzes(category.id);
 };
 
-// ✅ Show all categories (reset)
 const showAllCategories = async () => {
-  quizzes.value = [];
   selectedCategory.value = null;
   await fetchQuizzes();
 };
 
-// ✅ Open dialog for quiz
 const openQuizDialog = (quiz) => {
   selectedQuiz.value = quiz;
   dialog.value = true;
-  quizResult.value = null;
 };
 
-// ✅ Close quiz dialog
 const closeQuizDialog = () => {
   dialog.value = false;
   selectedQuiz.value = null;
@@ -257,7 +249,6 @@ const closeQuizDialog = () => {
 const submitQuiz = async () => {
   if (!selectedQuiz.value) return;
 
-  // 🔹 Step 1: Calculate Result
   let correct = 0;
   const attemptedAnswers = [];
   selectedQuiz.value.questions.forEach((q, index) => {
@@ -273,10 +264,8 @@ const submitQuiz = async () => {
   const attemptedQuestions = userAnswers.value.filter((a) => a !== null).length;
   const passed = correct >= selectedQuiz.value.passing_score;
 
-  // 🔹 Step 2: Update UI result instantly
   quizResult.value = { passed, correct, attemptedQuestions };
 
-  // 🔹 Step 3: Save Attempt to Backend
   try {
     const token = localStorage.getItem("token");
     await axios.post(

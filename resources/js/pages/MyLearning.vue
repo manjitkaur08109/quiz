@@ -16,7 +16,7 @@
         {{ category.title }}
       </v-tab>
     </v-tabs>
-    <!-- 🧠 Quizzes under Selected Category -->
+
     <v-row>
       <v-col
         v-for="attempted in quizzes"
@@ -55,7 +55,12 @@
             <div class="d-flex flex-wrap gap-2 mb-1">
               <v-chip color="blue" size="x-small"
                 >🧮
-                {{ attempted.questions ? attempted.questions.length : 0 }}
+                {{
+                  attempted.attempted_answers?.length ||
+                  attempted.quiz?.questions?.length ||
+                  0
+                }}
+                <!-- {{ attempted.questions ? attempted.questions.length : 0 }} -->
                 Qs</v-chip
               >
               <v-chip color="green" size="x-small"
@@ -125,7 +130,7 @@
                 >
                   <template #prepend>
                     <v-icon
-                    v-if="q.attempted && opt === q.attempted"
+                      v-if="q.attempted && opt === q.attempted"
                       :color="q.attempted === q.correctAnswer ? 'green' : 'red'"
                     >
                       {{
@@ -192,18 +197,7 @@ const quizzes = ref([]);
 const selectedCategory = ref(null);
 const dialog = ref(false);
 const selectedQuiz = ref(null);
-const userAnswers = ref([]);
-const quizResult = ref(null);
-const userId = ref(localStorage.getItem("user_id"));
 
-const attemptedQuizzes = computed(() => {
-  if (!userId.value) return [];
-  return quizzes.value.filter(
-    (q) =>
-      Array.isArray(q.attemptedBy) &&
-      q.attemptedBy.some((uid) => String(uid) === String(userId.value))
-  );
-});
 
 const fetchCategories = async () => {
   try {
@@ -251,64 +245,6 @@ const showAllCategories = async () => {
 const openQuizDialog = async (quiz) => {
   selectedQuiz.value = quiz;
   dialog.value = true;
-};
-
-const closeQuizDialog = () => {
-  dialog.value = false;
-  selectedQuiz.value = null;
-  userAnswers.value = [];
-  quizResult.value = null;
-};
-
-const submitQuiz = async () => {
-  if (!selectedQuiz.value) return;
-  let correct = 0;
-  const correctAnswers = [];
-
-  selectedQuiz.value.questions.forEach((q, idx) => {
-    const userAnswer = userAnswers.value[idx];
-    const isCorrect = userAnswer === q.correctAnswer;
-    if (isCorrect) correct++;
-    correctAnswers.push({
-      question: q.question,
-      selected: userAnswer,
-      correct: q.correctAnswer,
-      isCorrect,
-    });
-  });
-
-  const totalQuestions = selectedQuiz.value.questions.length;
-  const marksObtained = correct;
-  const quizScore = Math.round((correct / totalQuestions) * 100);
-  const passingScore = selectedQuiz.value.passing_score || 50;
-  const passed = quizScore >= passingScore;
-
-  try {
-    const token = localStorage.getItem("token");
-    await axios.post(
-      "/api/quiz-attempt/store",
-      {
-        quiz_id: selectedQuiz.value.id,
-        score: quizScore,
-        total_questions: totalQuestions,
-        correct_answers: correctAnswers,
-        marks_obtained: marksObtained,
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    await fetchQuizzes(selectedCategory.value?.id);
-    await fetchUserAttempts();
-  } catch (error) {
-    console.error("Error saving quiz attempt:", error);
-    toast?.value?.showToast("Failed to save quiz attempt", "error");
-  }
-};
-
-const attempts = ref([]);
-const userAttemptsForQuiz = (quizId) => {
-  return attempts.value.filter((a) => a.quiz_id === quizId);
 };
 
 onMounted(fetchCategories);

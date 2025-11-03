@@ -32,7 +32,7 @@ class QuizAttemptController extends Controller {
     }
 
     public function index( Request $request ) {
-        $attempts = QuizAttemptModel::with( 'quiz:id,title,description')
+        $attempts = QuizAttemptModel::with( 'quiz.category:id,title')
         ->where( 'user_id', Auth::id() )
         ->latest();
         if ( $request->filled( 'category_id' ) ) {
@@ -44,5 +44,6 @@ class QuizAttemptController extends Controller {
 
         return response()->json( [ 'data' => $attempts ] );
     }
+    
 
 }
