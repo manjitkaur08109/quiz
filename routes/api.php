@@ -7,19 +7,19 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QuizAttemptController;
+use App\Http\Controllers\ProfileController;
 
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/users', [UserController::class, 'index']);
+    Route::delete('/users/{id}', [UserController::class, 'destroy']);
     Route::get('/get-dashboard',[DashboardController::class,'getDashboard']);
-Route::post('/logout', [AuthController::class, 'logout']);
-
-    Route::get('/user', [UserController::class, 'profile']);
-
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/profile', [UserController::class, 'profile']);
 
     Route::prefix('category')->group(function(){
-
         Route::get('/index', [CategoryController::class, 'index']);
         Route::post('/store',[CategoryController::class,'store']);
         Route::get('/show/{id}',[CategoryController::class,'show']);
@@ -40,6 +40,7 @@ Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/index', [QuizAttemptController::class, 'index']);
     });
 
-    Route::get('/users', [UserController::class, 'index']);
-    Route::delete('/users/{id}', [UserController::class, 'destroy']);
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::put('/profile', [ProfileController::class, 'update']);
+    Route::put('/profile/password', [ProfileController::class, 'changePassword']);
 });

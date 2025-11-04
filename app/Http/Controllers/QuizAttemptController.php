@@ -28,7 +28,7 @@ class QuizAttemptController extends Controller {
             'attempted_answers' => $request->attempted_answers ?? [],
             'marks_obtained' => $request->marks_obtained,
         ] );
-        return response()->json( [ 'message' => 'Attempt saved', 'data' => $attempt ] );
+        return $this->actionSuccess( 'Attempt saved', $attempt );
     }
 
     public function index( Request $request ) {
@@ -41,9 +41,9 @@ class QuizAttemptController extends Controller {
             } );
         }
         $attempts = $attempts->get();
+        return $this->actionSuccess( 'Quiz updated successfully', $attempts );
 
-        return response()->json( [ 'data' => $attempts ] );
     }
-    
+
 
 }

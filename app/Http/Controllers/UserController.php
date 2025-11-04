@@ -5,24 +5,31 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class UserController extends Controller
-{
+class UserController extends Controller {
+    public function index( Request $request ) {
+        $user = $request->user();
 
-    public function index()
-    {
-        return response()->json([
-            'status' => 200,
-            'data' => User::latest()->get(),
-        ]);
+        if ( !$user ) {
+            return $this->actionFailure( 'Unauthorized', 401 );
+        }
+        return $this->actionSuccess(
+            200,
+            \App\Models\User::latest()->get()
+        );
     }
-
-    public function destroy($id)
-    {
-        $user = User::find($id);
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+    public function destroy( $id ) {
+        $user = User::find( $id );
+        if ( !$user ) {
+            return $this->actionFailure( 'User not found', 404 );
         }
         $user->delete();
-        return response()->json(['message' => 'User deleted']);
+        return $this->actionSuccess( 'User deleted' );
+    }
+
+    public function profile( Request $request ) {
+        return $this->actionSuccess(
+            200,
+            $request->user()
+        );
     }
 }
