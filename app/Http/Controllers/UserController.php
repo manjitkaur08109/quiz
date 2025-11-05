@@ -7,16 +7,13 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller {
     public function index( Request $request ) {
-        $user = $request->user();
 
-        if ( !$user ) {
-            return $this->actionFailure( 'Unauthorized', 401 );
-        }
         return $this->actionSuccess(
-            200,
-            \App\Models\User::latest()->get()
+            "Success",
+            User::where('account_type' , 'user')->latest()->get()
         );
     }
+
     public function destroy( $id ) {
         $user = User::find( $id );
         if ( !$user ) {
@@ -28,7 +25,7 @@ class UserController extends Controller {
 
     public function profile( Request $request ) {
         return $this->actionSuccess(
-            200,
+            "Success",
             $request->user()
         );
     }

@@ -11,7 +11,6 @@ class ProfileController extends Controller
     public function show(Request $request)
     {
         return $this->actionSuccess(
-         200,
              $request->user(),
         );
     }
@@ -23,19 +22,16 @@ class ProfileController extends Controller
         // Validation
         $request->validate([
             'name' => 'required|string|min:3',
-            'email' => 'required|email|unique:users,email,' . $user->id,
             'phone_no' => 'nullable|integer',
         ]);
 
         // Update kar do
         $user->update([
             'name' => $request->name,
-            'email' => $request->email,
             'phone_no' => $request->phone_no,
         ]);
 
         return $this->actionSuccess(
-            200,
             'Profile updated successfully!',
             $user
         );
@@ -55,7 +51,6 @@ class ProfileController extends Controller
         ]);
 
         return $this->actionSuccess(
-            200,
             'Password changed successfully!'
         );
     }

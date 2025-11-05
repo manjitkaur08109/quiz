@@ -63,9 +63,19 @@
                 <!-- {{ attempted.questions ? attempted.questions.length : 0 }} -->
                 Qs</v-chip
               >
-              <v-chip color="green" size="x-small"
-                >🎯 {{ attempted.passing_score }} Pass</v-chip
+
+              <v-chip color="green" size="x-small">
+                🎯 {{ attempted.passing_score }} Pass
+              </v-chip>
+
+              <!-- ✅ New Pass/Fail status chip -->
+              <v-chip
+                :color="attempted.passed ? 'green' : 'red'"
+                text-color="white"
+                size="x-small"
               >
+                {{ attempted.passed ? "Passed" : "Failed" }}
+              </v-chip>
             </div>
           </v-card-text>
           <v-card-actions>
@@ -110,6 +120,55 @@
 
             <v-divider class="my-3"></v-divider>
 
+            <!-- 🧮 Quiz Summary -->
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              <v-chip color="blue" size="small">
+                🧮 Total Questions:
+                {{
+                  selectedQuiz.quiz.questions?.length ||
+                  selectedQuiz.attempted_answers?.length ||
+                  0
+                }}
+              </v-chip>
+
+              <!-- Attempted Questions -->
+              <v-chip color="orange" size="small">
+                ✏️ Attempted:
+                {{
+                  selectedQuiz.attempted_answers?.filter(
+                    (q) => q.attempted && q.attempted !== ""
+                  ).length || 0
+                }}
+              </v-chip>
+
+              <v-chip color="green" size="small">
+                🎯 Passing Score: {{ selectedQuiz.passing_score }}
+              </v-chip>
+
+              <v-chip
+                color="deep-purple-accent-4"
+                text-color="white"
+                size="small"
+              >
+                ✅ Correct Answers:
+                {{
+                  selectedQuiz.attempted_answers?.filter(
+                    (q) => q.attempted === q.correctAnswer
+                  ).length || 0
+                }}
+              </v-chip>
+
+              <v-chip
+                :color="selectedQuiz.passed ? 'green' : 'red'"
+                text-color="white"
+                size="small"
+              >
+                {{ selectedQuiz.passed ? "Passed 🎉" : "Failed ❌" }}
+              </v-chip>
+            </div>
+
+            <v-divider class="my-3"></v-divider>
+
             <h4 class="text-h6 mb-2">Questions</h4>
 
             <div
@@ -127,6 +186,10 @@
                   v-for="(opt, i) in q.options"
                   :key="i"
                   :title="opt"
+                   :class="{
+    'bg-green-lighten-5': opt === q.correctAnswer,
+    'bg-red-lighten-5': opt === q.attempted && opt !== q.correctAnswer
+  }"
                 >
                   <template #prepend>
                     <v-icon
@@ -166,6 +229,9 @@
                       }}
                     </v-icon>
                   </template> -->
+
+
+
                 </v-list-item>
                 <v-list-item class="text-caption">
                   Correct Answer: {{ q.correctAnswer }}
@@ -198,7 +264,6 @@ const selectedCategory = ref(null);
 const dialog = ref(false);
 const selectedQuiz = ref(null);
 
-
 const fetchCategories = async () => {
   try {
     const token = localStorage.getItem("token");
@@ -223,6 +288,21 @@ const fetchQuizzes = async (categoryId = null) => {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = res.data.data || res.data;
+
+    data.forEach((quiz) => {
+      if (quiz.score !== undefined && quiz.passing_score !== undefined) {
+        quiz.passed = quiz.score >= quiz.passing_score;
+      } else if (quiz.attempted_answers) {
+        const correctCount = quiz.attempted_answers.filter(
+          (q) => q.attempted === q.correctAnswer
+        ).length;
+        quiz.passed = correctCount >= quiz.passing_score;
+        quiz.score = correctCount;
+      } else {
+        quiz.passed = false;
+      }
+    });
+
     quizzes.value = data;
   } catch (error) {
     console.error("Error fetching quizzes:", error);

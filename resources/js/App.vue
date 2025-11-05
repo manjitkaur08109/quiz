@@ -25,6 +25,7 @@ const isLoggedIn = ref(localStorage.getItem("token"));
 const route = useRoute();
 watch(route, (to) => {
   isLoggedIn.value = localStorage.getItem("token");
+  
 });
 
 const toastRef = ref(null);

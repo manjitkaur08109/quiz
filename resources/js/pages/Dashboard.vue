@@ -1,4 +1,6 @@
   <template>
+    <div>
+      <div v-if="isAdmin">
   <v-row>
     <v-col cols="3">
       <v-card
@@ -74,11 +76,13 @@
     >
     </v-data-table>
   </v-card>
-  
+</div>
+
+  </div>
 </template>
 <script setup>
 import axios from "axios";
-import { onMounted, ref } from "vue";
+import { onMounted, ref , computed } from "vue";
 import { useRouter } from "vue-router";
 import { inject } from "vue";
 
@@ -98,10 +102,19 @@ const goToCategory = () => {
   router.push("/category");
 };
 
+// // 🟢 For user dashboard
+// const goToDiscover = () => router.push("/discover");
+// const goToMyLearning = () => router.push("/myLearning");
+
 const recentUsers = ref([]);
 const totalUsers = ref(0);
 const totalCategory = ref(0);
 const totalQuiz = ref(0);
+
+// ✅ Get current user info from localStorage
+const user = JSON.parse(localStorage.getItem("user") || "{}");
+const isAdmin = computed(() => user.account_type === "admin");
+
 const getDashboard = async () => {
   try {
     const token = localStorage.getItem("token");
@@ -127,7 +140,14 @@ const getDashboard = async () => {
   }
 };
 onMounted(() => {
-  getDashboard();
+     if (!user || !user.account_type) {
+    router.push("/login");
+    return;
+  }
+
+  if (isAdmin.value) {
+    getDashboard();
+  }
 });
 </script>
 

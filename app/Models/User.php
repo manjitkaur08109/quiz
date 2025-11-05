@@ -47,20 +47,4 @@ class User extends Authenticatable {
             'password' => 'hashed',
         ];
     }
-
-    public function isAdmin() {
-        return $this->account_type === 'admin';
-    }
-
-    public function isTeacher() {
-        return $this->account_type === 'teacher';
-    }
-
-    public function isStudent() {
-        return $this->account_type === 'student';
-    }
-
-    public function hasType( $type ) {
-        return $this->account_type === $type;
-    }
 }

@@ -28,7 +28,7 @@
   <v-navigation-drawer v-model="drawer" app permanent>
     <v-list>
       <v-list-item
-        v-for="item in items"
+        v-for="item in filteredItems"
         :key="item.title"
         :title="item.title"
         :prepend-icon="item.icon"
@@ -40,7 +40,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { inject } from "vue";
@@ -58,6 +58,21 @@ const items = [
   { title: "Discover", path: "/discover", icon: "mdi-compass-outline" },
   { title: "MyLearning", path: "/myLearning",icon: "mdi-school-outline" },
 ];
+
+
+const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+const filteredItems = computed(() => {
+  if (user?.account_type === "admin") {
+    return items;
+  } else {
+    return items.filter(
+      (item) =>
+        item.title === "Discover" || item.title === "MyLearning"
+    );
+  }
+});
+
 const logout = async () => {
   try {
     const token = localStorage.getItem("token");

@@ -20,7 +20,7 @@ class CategoryController extends Controller {
         $exists = CategoryModel::where( 'title', $request->title )
         ->exists();
         if ( $exists ) {
-            return $this->actionSuccess( 'This category title already exists!' );
+            return $this->actionFailure( 'This category title already exists!' );
         }
 
         $category = CategoryModel::create( $validated );
@@ -38,7 +38,7 @@ class CategoryController extends Controller {
         ->whereNot( 'id', $request->id )
         ->exists();
         if ( $exists ) {
-            return $this->actionSuccess( 'This category title already exists.' );
+            return $this->actionFailure( 'This category title already exists.' );
         }
         $category->update( $request->only( [ 'title', 'description' ] ) );
         return $this->actionSuccess( 'Category updated successfully', $category );

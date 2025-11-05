@@ -82,7 +82,7 @@ class QuizController extends Controller {
         ->whereNot( 'id', $request->id )
         ->exists();
         if ( $exists ) {
-            return $this->actionSuccess( 'This quiz title already exists.' );
+            return $this->actionFailure( 'This quiz title already exists.' );
         }
 
         $quiz->update( [
@@ -101,7 +101,5 @@ class QuizController extends Controller {
         $quiz-> delete();
         return $this->actionSuccess( 'Quiz deleted successfully' );
     }
-
-     
 
 }

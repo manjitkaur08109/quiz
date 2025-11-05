@@ -18,24 +18,7 @@ class QuizModel extends Model {
     function category() {
         return $this->hasOne( CategoryModel::class, 'id', 'category_id' );
     }
-    function getByCategory($categoryId)
-    {
-        $category = CategoryModel::findOrFail($categoryId);
-
-        $quizzes = QuizModel::where('category_id', $categoryId)
-            ->get()
-            ->map(function ($quiz) {
-                $quiz->total_questions = is_array($quiz->questions)
-                    ? count($quiz->questions)
-                    : 0;
-                return $quiz;
-            });
-
-        return response()->json([
-            'categoryTitle' => $category->title,
-            'quizzes' => $quizzes
-        ]);
-    }
+  
     function attempts()
 {
     return $this->hasMany(QuizAttemptModel::class, 'quiz_id');

@@ -10,9 +10,9 @@ use Illuminate\Http\Request;
 class DashboardController extends Controller {
     function getDashboard( Request $request ) {
         $totalQuiz = QuizModel::count();
-        $totalUsers = User::count();
+        $totalUsers = User::where('account_type' , 'user')->count();
         $totalCategory = CategoryModel::count();
-        $recentUsers = User::query()->limit( 5 )->latest()->get();
+        $recentUsers = User::where('account_type' , 'user')->limit( 5 )->latest()->get();
         $data = [
             'totalQuiz' => $totalQuiz,
             'totalUsers' => $totalUsers,

@@ -28,7 +28,7 @@
               :rules="emailRules"
               label="Email"
               prepend-inner-icon="mdi-email"
-              required
+               readonly
             ></v-text-field>
 
             <v-text-field
@@ -48,7 +48,7 @@
     </v-tabs-window-item>
     <v-tabs-window-item :value="2">
       <v-container class="py-8">
-        <v-card class="mx-auto" min-width="500" elevation="8">
+        <v-card class="mx-auto" max-width="500" elevation="8">
           <!-- <v-row>
                       <v-col cols="12"> -->
           <v-form ref="passwordForm" fast-fail @submit.prevent="changePassword">
@@ -137,7 +137,7 @@ const NameRules = [
 
 const emailRules = [
   (value) => {
-    if (!value) return "Email is required.";
+    if (!value) return ;
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return pattern.test(value) || "Invalid email address.";
   },
@@ -176,7 +176,7 @@ const updateProfile = async () => {
     const token = localStorage.getItem("token");
     await axios.put(
       "/api/profile",
-      { name: Name.value, email: email.value, phone_no: phoneNo.value },
+      { name: Name.value, phone_no: phoneNo.value },
       { headers: { Authorization: `Bearer ${token}` } }
     );
     toast?.value?.showToast("Profile updated successfully!", "success");
