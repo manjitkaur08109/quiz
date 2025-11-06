@@ -18,6 +18,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/get-dashboard',[DashboardController::class,'getDashboard']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [UserController::class, 'profile']);
+    Route::post('/impersonate', [UserController::class, 'impersonate']);
 
     Route::prefix('category')->group(function(){
         Route::get('/index', [CategoryController::class, 'index']);

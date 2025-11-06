@@ -10,7 +10,7 @@ class ProfileController extends Controller
      // ✅ Get logged-in user profile
     public function show(Request $request)
     {
-        return $this->actionSuccess(
+        return $this->actionSuccess('success',
              $request->user(),
         );
     }

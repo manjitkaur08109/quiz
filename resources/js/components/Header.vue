@@ -90,7 +90,9 @@ const logout = async () => {
     router.push("/login");
   } catch (error) {
     console.error("Logout failed:", error);
-    toast.value.showToast("Something went wrong during logout!", "error");
+    // toast.value.showToast("Something went wrong during logout!", "error");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     router.push("/login");
   }
 };

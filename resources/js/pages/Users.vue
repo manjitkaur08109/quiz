@@ -52,6 +52,10 @@
         >
           <v-icon>mdi-delete</v-icon>
         </v-btn>
+
+          <v-btn icon color="success" class="ml-2" size="x-small" @click="impersonateUser(item)">
+            <v-icon left>mdi-account-switch</v-icon>
+    </v-btn>
       </template>
     </v-data-table>
   </v-card>
@@ -61,6 +65,9 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 import { inject } from "vue";
+import { useRouter, useRoute } from "vue-router";
+const router = useRouter();
+const route = useRoute();
 
 const toast = inject("toast");
 const search = ref("");
@@ -117,6 +124,36 @@ const deleteUser = async (id) => {
     );
   }
 };
+
+const impersonateUser = async (userToImpersonate) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await axios.post(
+      "api/impersonate", // 👈 yeh endpoint backend pe banana padega
+      { user_id: userToImpersonate.id },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    // response se naya token milega (user ka)
+    const newToken = response.data.data.token;
+    const newUser = response.data.data.user;
+
+    // Replace localStorage data
+    localStorage.setItem("token", newToken);
+    localStorage.setItem("user", JSON.stringify(newUser));
+
+    toast.value.showToast(`Logged in as ${newUser.name}`, "success");
+    router.push("/myLearning"); // ya koi user page jahan redirect karna ho
+  } catch (error) {
+    console.error(error);
+    toast.value.showToast(
+      error?.response?.data?.message || "Impersonation failed!",
+      "error"
+    );
+  }
+};
+
 
 onMounted(() => {
   getUsers();

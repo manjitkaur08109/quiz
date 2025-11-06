@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller {
     public function index( Request $request ) {
@@ -29,4 +31,31 @@ class UserController extends Controller {
             $request->user()
         );
     }
+
+    public function impersonate(Request $request)
+{
+    $user = Auth::user();
+
+    if ($user->account_type !== 'admin') {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
+
+    $targetUser = User::findOrFail($request->user_id);
+           // Create token
+    $tokenResult = $targetUser->createToken('api_token');
+    $token = $tokenResult->plainTextToken;
+
+    // Manually set expiry — e.g., 1 day
+    $tokenResult->accessToken->update([
+        'expires_at' => Carbon::now()->addDay(),
+    ]);
+
+    return $this->actionSuccess('Login successful', [
+        'user' => $targetUser,
+        'token' => $token,
+        'expires_at' => Carbon::now()->addDay()->toDateTimeString(),
+    ]);
+
+}
+
 }
