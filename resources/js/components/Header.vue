@@ -17,6 +17,11 @@
           <v-list-item-title>My Profile</v-list-item-title>
         </v-list-item>
         <v-divider></v-divider>
+
+        <v-list-item v-if="isImpersonating" @click="revertToAdmin">
+            <v-list-item-title>Return to Admin</v-list-item-title>
+        </v-list-item>
+        <v-divider></v-divider>
         <v-list-item @click="logout">
           <v-list-item-title>Logout</v-list-item-title>
         </v-list-item>
@@ -40,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed,onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { inject } from "vue";
@@ -59,8 +64,16 @@ const items = [
   { title: "MyLearning", path: "/myLearning",icon: "mdi-school-outline" },
 ];
 
+// const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-const user = JSON.parse(localStorage.getItem("user") || "{}");
+let user = {};
+try {
+  const storedUser = localStorage.getItem("user");
+  user = storedUser ? JSON.parse(storedUser) : {};
+} catch (e) {
+  console.error("Invalid user JSON:", e);
+  user = {};
+}
 
 const filteredItems = computed(() => {
   if (user?.account_type === "admin") {
@@ -72,12 +85,17 @@ const filteredItems = computed(() => {
     );
   }
 });
+// Check impersonation mode
+const isImpersonating = computed(() => {
+  return !!localStorage.getItem("adminBackupToken");
+});
+
 
 const logout = async () => {
   try {
     const token = localStorage.getItem("token");
     await axios.post(
-      "/api/logout",
+        "/api/logout",
       {},
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -88,17 +106,47 @@ const logout = async () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     router.push("/login");
-  } catch (error) {
+} catch (error) {
     console.error("Logout failed:", error);
     // toast.value.showToast("Something went wrong during logout!", "error");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     router.push("/login");
+}
+};
+
+const revertToAdmin = async () => {
+  const adminToken = localStorage.getItem("adminBackupToken");
+  if (!adminToken)
+    return toast.value.showToast("No admin session found", "error");
+
+  // 🔹 Admin token wapas set karo
+  localStorage.setItem("token", adminToken);
+  localStorage.removeItem("adminBackupToken");
+
+  // 🔹 Admin user data dobara fetch karo
+  try {
+    const { data } = await axios.get("/api/profile", {
+      headers: { Authorization: `Bearer ${adminToken}` },
+    });
+    localStorage.setItem("user", JSON.stringify(data.data));
+    user.value = data.data;
+  } catch (e) {
+    console.error("Admin user reload failed", e);
   }
+
+  // 🔹 Success message dikhao
+  toast.value.showToast("Returned to Admin account", "success");
+
+  // 🔹 Page reload karo taaki naya admin data apply ho jaaye
+  setTimeout(() => {
+    window.location.href = "/"; // ya "/dashboard"
+  }, 1000);
+
+
 };
 
 const goToProfile = () => {
   router.push("/profile");
 };
-// const goToProfile = () => {router.push('/profile')};
 </script>

@@ -57,5 +57,26 @@ class UserController extends Controller {
     ]);
 
 }
+public function currentUser(Request $request)
+    {
+        return $this->actionSuccess("Success", $request->user());
+    }
 
+  
+    public function stopImpersonation(Request $request)
+    {
+        $admin = Auth::user();
+
+        if (!$admin || $admin->account_type !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Create a fresh token for the admin to restore access
+        $token = $admin->createToken('admin_token')->plainTextToken;
+
+        return $this->actionSuccess('Impersonation stopped', [
+            'user' => $admin,
+            'token' => $token,
+        ]);
+    }
 }

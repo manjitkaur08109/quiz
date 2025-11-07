@@ -129,11 +129,13 @@ const impersonateUser = async (userToImpersonate) => {
   try {
     const token = localStorage.getItem("token");
 
+
     const response = await axios.post(
-      "api/impersonate", // 👈 yeh endpoint backend pe banana padega
-      { user_id: userToImpersonate.id },
-      { headers: { Authorization: `Bearer ${token}` } }
+        "api/impersonate", // 👈 yeh endpoint backend pe banana padega
+        { user_id: userToImpersonate.id },
+        { headers: { Authorization: `Bearer ${token}` } }
     );
+    localStorage.setItem("adminBackupToken", token);
 
     // response se naya token milega (user ka)
     const newToken = response.data.data.token;
@@ -144,7 +146,11 @@ const impersonateUser = async (userToImpersonate) => {
     localStorage.setItem("user", JSON.stringify(newUser));
 
     toast.value.showToast(`Logged in as ${newUser.name}`, "success");
-    router.push("/myLearning"); // ya koi user page jahan redirect karna ho
+      // 🔹 Page reload karo taaki naya admin data apply ho jaaye
+  setTimeout(() => {
+      window.location.href = "/myLearning"; // ya "/dashboard"
+    }, 1000);
+
   } catch (error) {
     console.error(error);
     toast.value.showToast(
