@@ -60,7 +60,6 @@
                   attempted.quiz?.questions?.length ||
                   0
                 }}
-                <!-- {{ attempted.questions ? attempted.questions.length : 0 }} -->
                 Qs</v-chip
               >
 
@@ -68,7 +67,6 @@
                 🎯 {{ attempted.passing_score }} Pass
               </v-chip>
 
-              <!-- ✅ New Pass/Fail status chip -->
               <v-chip
                 :color="attempted.passed ? 'green' : 'red'"
                 text-color="white"
@@ -120,7 +118,6 @@
 
             <v-divider class="my-3"></v-divider>
 
-            <!-- 🧮 Quiz Summary -->
             <div class="d-flex flex-wrap gap-2 mb-2">
               <v-chip color="blue" size="small">
                 🧮 Total Questions:
@@ -131,7 +128,6 @@
                 }}
               </v-chip>
 
-              <!-- Attempted Questions -->
               <v-chip color="orange" size="small">
                 ✏️ Attempted:
                 {{
@@ -207,30 +203,6 @@
                       mdi-circle-outline
                     </v-icon>
                   </template>
-
-                  <!-- <template #prepend>
-                    <v-icon
-                      :color="
-                        q.attempted
-                          ? opt === q.correctAnswer
-                            ? 'green'
-                            : opt === q.attempted
-                            ? 'red'
-                            : 'grey'
-                          : 'grey'
-                      "
-                    >
-                      {{
-                        !q.attempted
-                          ? "mdi-circle-outline"
-                          : (q.attempted === q.correctAnswer
-                          ? "mdi-check-circle-outline"
-                          : "mdi-close-circle-outline")
-                      }}
-                    </v-icon>
-                  </template> -->
-
-
 
                 </v-list-item>
                 <v-list-item class="text-caption">

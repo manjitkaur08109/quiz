@@ -107,7 +107,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <!-- Start Quiz Dialog -->
     <v-dialog v-model="dialog" max-width="900">
       <v-card>
         <v-card-title class="text-h6">Start Quiz</v-card-title>

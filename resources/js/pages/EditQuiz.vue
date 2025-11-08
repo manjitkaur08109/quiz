@@ -16,18 +16,18 @@
             :rules="QuizTitleRules"
             prepend-inner-icon="mdi-format-title"
           />
-           <v-col cols="6">
-                 <v-text-field
-                    v-model="quiz.passing_score"
-                    label="Passing Score "
-                    type="number"
-                    :rules="PassingScoreRules"
-                    prepend-inner-icon="mdi-target"
-                    min="0"
-                    max="100"
-                    required
-                    />
-                </v-col>
+          <v-col cols="6">
+            <v-text-field
+              v-model="quiz.passing_score"
+              label="Passing Score "
+              type="number"
+              :rules="PassingScoreRules"
+              prepend-inner-icon="mdi-target"
+              min="0"
+              max="100"
+              required
+            />
+          </v-col>
 
           <v-textarea
             v-model="quiz.description"
@@ -84,7 +84,6 @@
               required
               class="mt-2"
             />
-
 
             <v-btn
               v-if="quiz.questions.length > 1"
@@ -157,7 +156,7 @@ const categories = ref([]);
 
 const QuizTitleRules = [
   (value) => {
-const loading = ref(false);
+    const loading = ref(false);
     if (value?.length >= 3) return true;
     return " Title required|string|min:3";
   },
@@ -208,7 +207,8 @@ const addQuestion = () => {
 
   if (isQuestionEmpty || isOptionEmpty || isAnswerEmpty) {
     toast.value.showToast(
-      "Please fill the current question completely before adding a new one!","error"
+      "Please fill the current question completely before adding a new one!",
+      "error"
     );
     return;
   }
@@ -226,8 +226,8 @@ const duplicateQuestion = (qIndex) => {
   const isAnswerEmpty = !question.correctAnswer.trim();
 
   if (isQuestionEmpty || isOptionEmpty || isAnswerEmpty) {
-    toast.value.showToast("Cannot duplicate an incomplete question!","error");
-    return; 
+    toast.value.showToast("Cannot duplicate an incomplete question!", "error");
+    return;
   }
 
   const clonedQuestion = JSON.parse(JSON.stringify(question));
@@ -259,8 +259,10 @@ onMounted(async () => {
       localStorage.removeItem("user");
       router.push("/login");
     }
-     toast.value.showToast(error?.response?.data?.message || "Something went wrong!",'error');
-
+    toast.value.showToast(
+      error?.response?.data?.message || "Something went wrong!",
+      "error"
+    );
   }
 });
 
@@ -282,8 +284,10 @@ onMounted(async () => {
       localStorage.removeItem("user");
       router.push("/login");
     }
-         toast.value.showToast(error?.response?.data?.message || "Something went wrong!",'error');
-
+    toast.value.showToast(
+      error?.response?.data?.message || "Something went wrong!",
+      "error"
+    );
   }
 });
 
@@ -296,7 +300,10 @@ const updateQuiz = async () => {
     const res = await axios.put(`/api/quiz/update/${quizId}`, quiz, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    toast.value.showToast(res.data.message || "Quiz Updated Successfully!","success");
+    toast.value.showToast(
+      res.data.message || "Quiz Updated Successfully!",
+      "success"
+    );
     router.push("/quiz");
   } catch (error) {
     if (error?.response?.status == 401) {
@@ -304,8 +311,10 @@ const updateQuiz = async () => {
       localStorage.removeItem("user");
       router.push("/login");
     }
-         toast.value.showToast(error?.response?.data?.message || "Something went wrong!",'error');
-
+    toast.value.showToast(
+      error?.response?.data?.message || "Something went wrong!",
+      "error"
+    );
   } finally {
     loading.value = false;
   }

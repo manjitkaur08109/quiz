@@ -1,15 +1,12 @@
 <template>
   <v-app>
-    <!-- Header content -->
     <Header v-if="isLoggedIn" />
-    <!-- Main content -->
     <v-main>
       <v-container fluid>
         <router-view />
          <Toast ref="toastRef" />
       </v-container>
     </v-main>
-    <!-- Footer content -->
     <Footer v-if="isLoggedIn"/>
   </v-app>
 </template>
@@ -25,7 +22,7 @@ const isLoggedIn = ref(localStorage.getItem("token"));
 const route = useRoute();
 watch(route, (to) => {
   isLoggedIn.value = localStorage.getItem("token");
-  
+
 });
 
 const toastRef = ref(null);

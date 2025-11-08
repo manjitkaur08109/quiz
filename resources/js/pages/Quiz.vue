@@ -28,7 +28,7 @@
       <template #item.sn="{ index }">
         {{ index + 1 }}
       </template>
-     
+
       <template #item.description="{ item }">
         {{ item.description.length > 50
           ? item.description.slice(0, 50) + "..."
@@ -60,7 +60,6 @@
           <v-icon>mdi-delete</v-icon>
         </v-btn>
 
-        <!-- 📘 Quiz Info Dialog -->
         <v-dialog v-model="infoDialog" max-width="650">
           <v-card>
             <v-card-title class="text-h6">Quiz Information</v-card-title>

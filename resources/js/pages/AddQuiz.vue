@@ -27,7 +27,7 @@
                   />
                 </v-col>
                 <v-col cols="6">
-                 <v-text-field
+                  <v-text-field
                     v-model="quiz.passing_score"
                     label="Passing Score"
                     type="number"
@@ -36,7 +36,7 @@
                     min="0"
                     max="100"
                     required
-                    />
+                  />
                 </v-col>
               </v-row>
               <v-textarea
@@ -221,7 +221,7 @@ const quiz = reactive({
 const apiQuiz = computed(() => {
   return {
     ...quiz,
-    'passing_score': quiz.passing_score,
+    passing_score: quiz.passing_score,
   };
 });
 
@@ -289,7 +289,7 @@ const removeOption = (qIndex, oIndex) => {
 
 const handleSubmit = async () => {
   const { valid } = await formRef.value.validate();
-  if (!valid) return; 
+  if (!valid) return;
   console.log("Submitting quiz:", JSON.stringify(apiQuiz.value));
   try {
     loading.value = true;
@@ -324,13 +324,17 @@ const handleSubmit = async () => {
 };
 const saveQuizAttempt = async (quizId, score, passed) => {
   const token = localStorage.getItem("token");
-  await axios.post("/api/quiz-attempt/store", {
-    quiz_id: quizId,
-    score: score,
-    passed: passed,
-  }, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  await axios.post(
+    "/api/quiz-attempt/store",
+    {
+      quiz_id: quizId,
+      score: score,
+      passed: passed,
+    },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
 };
 const goBack = () => {
   router.push("/quiz");

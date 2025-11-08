@@ -25,7 +25,6 @@
       :headers="headers"
       class="elevation-2"
     >
-      <!-- 👤 Profile image (optional) -->
       <template #item.image="{ item }">
         <v-avatar size="40">
           <v-img
@@ -37,7 +36,6 @@
         </v-avatar>
       </template>
 
-      <!-- 👁️ Action buttons -->
       <template #item.actions="{ item }">
         <v-btn size="x-small" icon color="primary" @click="viewUser(item)">
           <v-icon>mdi-eye</v-icon>
@@ -79,14 +77,13 @@ const headers = [
   { title: "Actions", key: "actions", sortable: false },
 ];
 
-// ✅ Fetch users from Laravel API
 const getUsers = async () => {
   try {
     const token = localStorage.getItem("token");
     const res = await axios.get("/api/users", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    users.value = res.data.data; // assuming {data: users[]}
+    users.value = res.data.data;
   } catch (error) {
     if (error?.response?.status === 401) {
       localStorage.removeItem("token");
@@ -100,12 +97,10 @@ const getUsers = async () => {
   }
 };
 
-// 👁️ View user (you can open dialog or redirect)
 const viewUser = (user) => {
   alert(`User: ${user.name}\nEmail: ${user.email}`);
 };
 
-// 🗑️ Delete user
 const deleteUser = async (id) => {
   if (!confirm("Are you sure you want to delete this user?")) return;
 
@@ -131,24 +126,21 @@ const impersonateUser = async (userToImpersonate) => {
 
 
     const response = await axios.post(
-        "api/impersonate", // 👈 yeh endpoint backend pe banana padega
+        "api/impersonate",
         { user_id: userToImpersonate.id },
         { headers: { Authorization: `Bearer ${token}` } }
     );
     localStorage.setItem("adminBackupToken", token);
 
-    // response se naya token milega (user ka)
     const newToken = response.data.data.token;
     const newUser = response.data.data.user;
 
-    // Replace localStorage data
     localStorage.setItem("token", newToken);
     localStorage.setItem("user", JSON.stringify(newUser));
 
     toast.value.showToast(`Logged in as ${newUser.name}`, "success");
-      // 🔹 Page reload karo taaki naya admin data apply ho jaaye
   setTimeout(() => {
-      window.location.href = "/myLearning"; // ya "/dashboard"
+      window.location.href = "/myLearning"; 
     }, 1000);
 
   } catch (error) {

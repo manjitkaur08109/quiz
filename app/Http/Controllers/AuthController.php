@@ -28,7 +28,6 @@ class AuthController extends Controller
             'token' => $token,
         ]);
 }
-  // 🔹 Login
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -41,11 +40,9 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
-           // Create token
     $tokenResult = $user->createToken('api_token');
     $token = $tokenResult->plainTextToken;
 
-    // Manually set expiry — e.g., 1 day
     $tokenResult->accessToken->update([
         'expires_at' => Carbon::now()->addDay(),
     ]);
@@ -58,7 +55,6 @@ class AuthController extends Controller
 }
  function logout(Request $request)
 {
-    // Current logged-in user ka token delete karo
     $request->user()->currentAccessToken()->delete();
 
     return $this->actionSuccess('Logout successful');

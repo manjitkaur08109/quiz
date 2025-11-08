@@ -41,11 +41,9 @@ class UserController extends Controller {
     }
 
     $targetUser = User::findOrFail($request->user_id);
-           // Create token
     $tokenResult = $targetUser->createToken('api_token');
     $token = $tokenResult->plainTextToken;
 
-    // Manually set expiry — e.g., 1 day
     $tokenResult->accessToken->update([
         'expires_at' => Carbon::now()->addDay(),
     ]);
@@ -62,7 +60,7 @@ public function currentUser(Request $request)
         return $this->actionSuccess("Success", $request->user());
     }
 
-  
+
     public function stopImpersonation(Request $request)
     {
         $admin = Auth::user();
@@ -71,7 +69,6 @@ public function currentUser(Request $request)
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        // Create a fresh token for the admin to restore access
         $token = $admin->createToken('admin_token')->plainTextToken;
 
         return $this->actionSuccess('Impersonation stopped', [

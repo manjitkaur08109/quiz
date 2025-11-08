@@ -6,26 +6,21 @@ use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
-    //
-     // ✅ Get logged-in user profile
     public function show(Request $request)
     {
         return $this->actionSuccess('success',
              $request->user(),
         );
     }
-     // ✅ Update profile details (name, email, phone)
     public function update(Request $request)
     {
         $user = $request->user();
 
-        // Validation
         $request->validate([
             'name' => 'required|string|min:3',
             'phone_no' => 'nullable|integer',
         ]);
 
-        // Update kar do
         $user->update([
             'name' => $request->name,
             'phone_no' => $request->phone_no,
@@ -37,13 +32,12 @@ class ProfileController extends Controller
         );
     }
 
-    // ✅ Change password
     public function changePassword(Request $request)
     {
         $user = $request->user();
 
         $request->validate([
-            'password' => 'required|min:6|confirmed', // password_confirmation field aani chahiye
+            'password' => 'required|min:6|confirmed', 
         ]);
 
         $user->update([

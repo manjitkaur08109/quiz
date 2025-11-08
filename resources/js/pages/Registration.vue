@@ -114,20 +114,16 @@ const handleRegister = async () => {
 
     loading.value = true;
 
-    // 🔹 1. Register user
     const registerRes = await axios.post("/api/register", user);
 
     const token = registerRes.data.data.token;
     const userData = registerRes.data.data.user;
 
-    // 🔹 2. Save token to localStorage (auto login)
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(userData));
 
-    // 🔹 3. Set Axios header for authenticated requests
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-    // 🔹 4. Redirect to dashboard (or home)
      router.push('/');
   } catch (error) {
          toast.value.showToast(error?.response?.data?.message || "Something went wrong!",'error');

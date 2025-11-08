@@ -38,26 +38,12 @@ router.beforeEach((to, from, next) => {
   const token = localStorage.getItem("token");
 
   if (to.meta.requiresAuth && !token) {
-    // Agar protected page aur login nahi hai
     next("/login");
   } else if (to.meta.guest && token) {
-    // Agar login ho aur login/register page open karna hai
     next("/");
   } else {
     next();
   }
 });
-// router.beforeEach((to, from, next) => {
-//   const token = localStorage.getItem("token");
-
-//   if (to.meta.requiresAuth && !token) {
-//     if (to.path !== "/login") next("/login");
-//     else next();
-//   } else if ((to.path === "/login" || to.path === "/register") && token) {
-//     next("/");
-//   } else {
-//     next();
-//   }
-// });
 
 export default router;

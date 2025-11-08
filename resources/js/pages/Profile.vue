@@ -1,5 +1,4 @@
 <template>
-  <!-- <v-card v-if="loaded" class="mx-auto" min-width="500" elevation="8"> -->
   <v-tabs v-model="tab" align-tabs="center" color="deep-purple-accent-4">
     <v-tab :value="1">Overview</v-tab>
     <v-tab :value="2">Change password</v-tab>
@@ -9,10 +8,7 @@
     <v-tabs-window-item :value="1">
       <v-container class="py-8">
         <v-card class="mx-auto" max-width="500" elevation="8">
-          <!-- <v-row>
-            <v-col cols="12"> -->
           <v-form ref="profileForm" fast-fail @submit.prevent="updateProfile">
-            <!-- <v-form fast-fail @submit.prevent> -->
             <v-text-field
               class="mt-2"
               v-model="Name"
@@ -49,8 +45,6 @@
     <v-tabs-window-item :value="2">
       <v-container class="py-8">
         <v-card class="mx-auto" max-width="500" elevation="8">
-          <!-- <v-row>
-                      <v-col cols="12"> -->
           <v-form ref="passwordForm" fast-fail @submit.prevent="changePassword">
             <v-text-field
               class="mt-2"
@@ -84,13 +78,10 @@
               >Change Password</v-btn
             >
           </v-form>
-          <!-- </v-col>
-          </v-row> -->
         </v-card>
       </v-container>
     </v-tabs-window-item>
   </v-tabs-window>
-  <!-- </v-card> -->
 </template>
 <script setup>
 import { ref, inject, onMounted, onBeforeUnmount } from "vue";
@@ -99,7 +90,7 @@ import axios from "axios";
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 const togglePassword = (e) => {
-  e.stopPropagation(); // 👈 prevent extra bubbling
+  e.stopPropagation();
   showPassword.value = !showPassword.value;
 };
 let isMounted = true;
@@ -147,14 +138,13 @@ const phoneNoRules = [
   (value) => /^[0-9]{10,15}$/.test(value) || "Enter a valid phone number.",
 ];
 const loaded = ref(false);
-// ✅ Fetch logged-in user info
 onMounted(async () => {
   try {
     const token = localStorage.getItem("token");
     const res = await axios.get("http://127.0.0.1:8000/api/profile", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    console.log("Profile response:", res.data); // 👈 check structure
+    console.log("Profile response:", res.data);
     if (!isMounted) return;
     const data = res.data.data || res.data;
     Name.value = data.name;
@@ -167,7 +157,6 @@ onMounted(async () => {
   }
 });
 
-// 🧍 Update Profile Handler
 const updateProfile = async () => {
   const { valid } = await profileForm.value.validate();
   if (!valid) return;
@@ -188,7 +177,6 @@ const updateProfile = async () => {
   }
 };
 
-// 🔒 Change Password Handler
 const changePassword = async () => {
   const { valid } = await passwordForm.value.validate();
   if (!valid) return;

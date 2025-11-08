@@ -102,16 +102,12 @@ const goToCategory = () => {
   router.push("/category");
 };
 
-// // 🟢 For user dashboard
-// const goToDiscover = () => router.push("/discover");
-// const goToMyLearning = () => router.push("/myLearning");
 
 const recentUsers = ref([]);
 const totalUsers = ref(0);
 const totalCategory = ref(0);
 const totalQuiz = ref(0);
 
-// ✅ Get current user info from localStorage
 const user = JSON.parse(localStorage.getItem("user") || "{}");
 const isAdmin = computed(() => user.account_type === "admin");
 
