@@ -144,8 +144,7 @@ onMounted(async () => {
     const res = await axios.get("http://127.0.0.1:8000/api/profile", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    console.log("Profile response:", res.data);
-    if (!isMounted) return;
+  
     const data = res.data.data || res.data;
     Name.value = data.name;
     email.value = data.email;

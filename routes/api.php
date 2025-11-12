@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QuizAttemptController;
@@ -30,7 +31,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::prefix('quiz')->group(function(){
         Route::get('/index', [QuizController::class, 'index']);
-        Route::get('/create', [QuizController::class, 'create']);
         Route::post('/store', [QuizController::class, 'store']);
         Route::get('/show/{id}', [QuizController::class, 'show']);
         Route::put('/update/{id}', [QuizController::class, 'update']);
@@ -44,4 +44,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::put('/profile', [ProfileController::class, 'update']);
     Route::put('/profile/password', [ProfileController::class, 'changePassword']);
+
+    Route::prefix("products")->group(function(){
+        Route::get('/index',[ProductController::class,"index"]);
+        Route::delete('/delete/{id}',[ProductController::class,"delete"]);
+        Route::post('/store',[ProductController::class,"store"]);
+        Route::get('/show/{id}',[ProductController::class,"show"]);
+        Route::put('/update/{id}',[ProductController::class,"update"]);
+
+    });
 });

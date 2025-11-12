@@ -248,7 +248,7 @@ const removeOption = (qIndex, oIndex) => {
 onMounted(async () => {
   try {
     const token = localStorage.getItem("token");
-    const res = await axios.get("/api/quiz/create", {
+    const res = await axios.get("/api/category/index", {
       headers: { Authorization: `Bearer ${token}` },
     });
     categories.value = res.data.data;
@@ -272,12 +272,7 @@ onMounted(async () => {
     const res = await axios.get(`/api/quiz/show/${quizId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    const data = res.data.data;
-    quiz.title = data.title;
-    quiz.passing_score = data.passing_score;
-    quiz.description = data.description;
-    quiz.category_id = data.category_id;
-    quiz.questions = data.questions;
+    quiz = res.data.data;
   } catch (error) {
     if (error?.response?.status == 401) {
       localStorage.removeItem("token");

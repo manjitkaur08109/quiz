@@ -229,7 +229,7 @@ const loading = ref(false);
 onMounted(async () => {
   try {
     const token = localStorage.getItem("token");
-    const res = await axios.get("/api/quiz/create", {
+    const res = await axios.get("/api/category/index", {
       headers: { Authorization: `Bearer ${token}` },
     });
     categories.value = res.data.data;
@@ -298,15 +298,7 @@ const handleSubmit = async () => {
     const res = await axios.post("/api/quiz/store", quiz, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    quiz.value = res.data.data;
     toast.value.showToast(res.data.message, "success");
-
-    console.log("Quiz created:", res.data);
-    quiz.title = "";
-    quiz.passing_score = 0;
-    quiz.description = "";
-    quiz.category_id = "";
-
     router.push("/quiz");
   } catch (error) {
     if (error?.response?.status == 401) {
@@ -321,20 +313,6 @@ const handleSubmit = async () => {
   } finally {
     loading.value = false;
   }
-};
-const saveQuizAttempt = async (quizId, score, passed) => {
-  const token = localStorage.getItem("token");
-  await axios.post(
-    "/api/quiz-attempt/store",
-    {
-      quiz_id: quizId,
-      score: score,
-      passed: passed,
-    },
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
 };
 const goBack = () => {
   router.push("/quiz");

@@ -19,7 +19,7 @@
         <v-divider></v-divider>
 
         <v-list-item v-if="isImpersonating" @click="revertToAdmin">
-            <v-list-item-title>Return to Admin</v-list-item-title>
+          <v-list-item-title>Return to Admin</v-list-item-title>
         </v-list-item>
         <v-divider></v-divider>
         <v-list-item @click="logout">
@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref, computed,onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { inject } from "vue";
@@ -61,7 +61,8 @@ const items = [
   { title: "Users", path: "/users", icon: "mdi-account-group" },
   { title: "Category", path: "/category", icon: "mdi-view-grid-outline" },
   { title: "Discover", path: "/discover", icon: "mdi-compass-outline" },
-  { title: "MyLearning", path: "/myLearning",icon: "mdi-school-outline" },
+  { title: "MyLearning", path: "/myLearning", icon: "mdi-school-outline" },
+  { title: "Products", path: "/products", icon: "mdi-school-outline" },
 ];
 
 // const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -80,8 +81,7 @@ const filteredItems = computed(() => {
     return items;
   } else {
     return items.filter(
-      (item) =>
-        item.title === "Discover" || item.title === "MyLearning"
+      (item) => item.title === "Discover" || item.title === "MyLearning"
     );
   }
 });
@@ -90,12 +90,11 @@ const isImpersonating = computed(() => {
   return !!localStorage.getItem("adminBackupToken");
 });
 
-
 const logout = async () => {
   try {
     const token = localStorage.getItem("token");
     await axios.post(
-        "/api/logout",
+      "/api/logout",
       {},
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -106,13 +105,13 @@ const logout = async () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     router.push("/login");
-} catch (error) {
+  } catch (error) {
     console.error("Logout failed:", error);
     // toast.value.showToast("Something went wrong during logout!", "error");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     router.push("/login");
-}
+  }
 };
 
 const revertToAdmin = async () => {
@@ -142,8 +141,6 @@ const revertToAdmin = async () => {
   setTimeout(() => {
     window.location.href = "/"; // ya "/dashboard"
   }, 1000);
-
-
 };
 
 const goToProfile = () => {

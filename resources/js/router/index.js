@@ -12,6 +12,9 @@ import Registration from "../pages/Registration.vue";
 import Login from "../pages/Login.vue";
 import MyLearning from "../pages/MyLearning.vue";
 import Discover from "../pages/Discover.vue";
+import Product from "../pages/Product.vue";
+import AddProduct from "../pages/AddProduct.vue";
+import EditProduct from "../pages/EditProduct.vue";
 
 const routes = [
   { path: "/", name: "Dashboard", component: Dashboard , meta: { requiresAuth: true } },
@@ -27,6 +30,9 @@ const routes = [
   { path: "/login", name: "Login", component: Login, meta: { guest: true } },
   { path: "/discover", name: "Discover", component: Discover, meta: { requiresAuth: true } },
   { path: "/myLearning", name: "MyLearning", component: MyLearning, meta: { requiresAuth: true } },
+  { path: "/products", name: "Product", component: Product, meta: { requiresAuth: true } },
+  { path: "/addProduct", name: "AddProduct", component: AddProduct, meta: { requiresAuth: true } },
+  { path: "/editProduct/:id", name: "EditProduct", component: EditProduct, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({

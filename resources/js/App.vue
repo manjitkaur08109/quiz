@@ -7,7 +7,7 @@
          <Toast ref="toastRef" />
       </v-container>
     </v-main>
-    <Footer v-if="isLoggedIn"/>
+    <!-- <Footer v-if="isLoggedIn"/> -->
   </v-app>
 </template>
 

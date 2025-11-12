@@ -82,12 +82,7 @@ const handleSubmit = async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    category.value = res.data.data;
     toast.value.showToast(res.data.message, "success");
-
-    category.title = "";
-    category.description = "";
-
     router.push("/category");
   } catch (error) {
     if (error?.response?.status == 401) {

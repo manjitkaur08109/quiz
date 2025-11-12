@@ -24,10 +24,7 @@ class QuizController extends Controller {
         return $this->actionSuccess( 'Quiz fetch successfully', $quizzes );
     }
 
-    function create() {
-        $categories = CategoryModel::all( [ 'id', 'title' ] );
-        return $this->actionSuccess( 'quiz create', $categories );
-    }
+
 
     function store( Request $request ) {
 

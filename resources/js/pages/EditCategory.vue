@@ -82,9 +82,7 @@ onMounted(async () => {
       headers: { Authorization: `Bearer ${token}` },
     });
     category.value = res.data.data;
-    const data = res.data.data;
-    category.title = data.title;
-    category.description = data.description;
+    
   } catch (error) {
     if (error?.response?.status == 401) {
       localStorage.removeItem("token");
