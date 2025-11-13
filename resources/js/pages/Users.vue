@@ -37,10 +37,7 @@
       </template>
 
       <template #item.actions="{ item }">
-        <v-btn size="x-small" icon color="primary" @click="viewUser(item)">
-          <v-icon>mdi-eye</v-icon>
-        </v-btn>
-
+      
         <v-btn
           size="x-small"
           class="ml-2"
@@ -61,12 +58,11 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
 import { inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
 const router = useRouter();
 const route = useRoute();
-
+const api = inject("api");
 const toast = inject("toast");
 const search = ref("");
 const users = ref([]);
@@ -79,17 +75,10 @@ const headers = [
 
 const getUsers = async () => {
   try {
-    const token = localStorage.getItem("token");
-    const res = await axios.get("/api/users", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.get("/users");
     users.value = res.data.data;
   } catch (error) {
-    if (error?.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      router.push("/login");
-    }
+
     toast.value.showToast(
       error?.response?.data?.message || "Something went wrong!",
       "error"
@@ -97,18 +86,11 @@ const getUsers = async () => {
   }
 };
 
-const viewUser = (user) => {
-  alert(`User: ${user.name}\nEmail: ${user.email}`);
-};
-
 const deleteUser = async (id) => {
   if (!confirm("Are you sure you want to delete this user?")) return;
 
   try {
-    const token = localStorage.getItem("token");
-    await axios.delete(`/api/users/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await api.delete(`/users/${id}`);
     users.value = users.value.filter((u) => u.id !== id);
 
     toast.value.showToast("User Deleted.", "success");
@@ -125,10 +107,9 @@ const impersonateUser = async (userToImpersonate) => {
     const token = localStorage.getItem("token");
 
 
-    const response = await axios.post(
-        "api/impersonate",
-        { user_id: userToImpersonate.id },
-        { headers: { Authorization: `Bearer ${token}` } }
+    const response = await api.post(
+        "impersonate",
+        { user_id: userToImpersonate.id }
     );
     localStorage.setItem("adminBackupToken", token);
 
@@ -140,7 +121,7 @@ const impersonateUser = async (userToImpersonate) => {
 
     toast.value.showToast(`Logged in as ${newUser.name}`, "success");
   setTimeout(() => {
-      window.location.href = "/myLearning"; 
+      window.location.href = "/myLearning";
     }, 1000);
 
   } catch (error) {

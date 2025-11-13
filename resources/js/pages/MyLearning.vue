@@ -223,9 +223,8 @@
 
 <script setup>
 import { ref, computed, onMounted, inject } from "vue";
-import axios from "axios";
 import { useRouter } from "vue-router";
-import { nextTick } from "vue";
+const api = inject("api");
 const router = useRouter();
 
 const tab = ref(null);
@@ -238,10 +237,7 @@ const selectedQuiz = ref(null);
 
 const fetchCategories = async () => {
   try {
-    const token = localStorage.getItem("token");
-    const res = await axios.get("/api/category/index", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.get("/category/index");
     const data = res.data.data || res.data;
     categories.value = data;
   } catch (error) {
@@ -254,11 +250,9 @@ const fetchQuizzes = async (categoryId = null) => {
   try {
     const token = localStorage.getItem("token");
     const url = categoryId
-      ? `/api/quiz-attempt/index?category_id=${categoryId}`
-      : `/api/quiz-attempt/index`;
-    const res = await axios.get(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      ? `/quiz-attempt/index?category_id=${categoryId}`
+      : `/quiz-attempt/index`;
+    const res = await api.get(url);
     const data = res.data.data || res.data;
 
     data.forEach((quiz) => {

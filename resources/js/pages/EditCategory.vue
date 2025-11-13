@@ -47,15 +47,14 @@
 <script setup>
 import { reactive, ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
 import { inject } from "vue";
-
+const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
 const route = useRoute();
 const categoryId = route.params.id;
 
-const category = reactive({
+const category = ref({
   title: "",
   description: "",
 });
@@ -77,18 +76,12 @@ const CategoryDescriptionRules = [
 
 onMounted(async () => {
   try {
-    const token = localStorage.getItem("token");
-    const res = await axios.get(`/api/category/show/${categoryId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    category.value = res.data.data;
-    
+    const res = await api.get(`/category/show/${categoryId}`);
+    const data = res.data.data;
+    category.value.title = data.title;
+    category.value.description = data.description;
   } catch (error) {
-    if (error?.response?.status == 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      router.push("/login");
-    }
+
     toast.value.showToast(
       error?.response?.data?.message || "Something went wrong!",
       "error"
@@ -101,23 +94,12 @@ const handleSubmit = async () => {
   if (!valid) return; // stop if invalid
   loading.value = true;
   try {
-    const token = localStorage.getItem("token");
-    const res = await axios.put(
-      `/api/category/update/${categoryId}`,
-      category,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    toast.value.showToast(res?.data?.message, "success");
+    const res = await api.put(`/category/update/${categoryId}`, category.value);
 
+    toast.value.showToast(res?.data?.message || "Category updated!", "success");
     router.push("/category");
   } catch (error) {
-    if (error?.response?.status == 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      router.push("/login");
-    }
+    
     toast.value.showToast(
       error?.response?.data?.message || "Something went wrong!",
       "error"

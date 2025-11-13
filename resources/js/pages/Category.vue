@@ -53,9 +53,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
 import { inject } from "vue";
-
+const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
 const search = ref("");
@@ -82,19 +81,11 @@ const editCategory = (id) => {
 const fetchCategories = async () => {
   loading.value = true;
   try {
-      const token = localStorage.getItem("token");
-    const res = await axios.get("/api/category/index", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.get("/category/index");
     categoryItems.value = res.data.data;
-  }
-  catch (error) {
-    if(error?.response?.status == 401){
-     localStorage.removeItem("token");
-  localStorage.removeItem("user");
-      router.push("/login");
-    }
-     toast.value.showToast(error?.response?.data?.message || "Something went wrong!",'error');
+  } catch (error) {
+
+    toast.value.showToast(error?.response?.data?.message || "Something went wrong!", 'error');
 
   }
    finally {
@@ -105,20 +96,13 @@ const fetchCategories = async () => {
 const deleteCategory = async (id) => {
   if (!confirm("Delete this category?")) return;
   try {
-    const token = localStorage.getItem("token");
-    await axios.delete(`/api/category/delete/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await api.delete(`/category/delete/${id}`);
 
-     toast.value.showToast("Category deleted successfully",'success');
+    toast.value.showToast("Category deleted successfully", 'success');
     fetchCategories();
   } catch (error) {
     console.error("Error deleting category:", error.response?.data || error);
-    if (error?.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      router.push("/login");
-    }
+   
 
      toast.value.showToast(error?.response?.data?.message || "Something went wrong!",'error');
   }

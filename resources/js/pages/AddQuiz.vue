@@ -154,9 +154,8 @@
 import { ref, reactive, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
-import axios from "axios";
 import { inject } from "vue";
-
+const api = inject("api");
 const toast = inject("toast");
 const goToAdQuiz = () => router.push("/addQuiz");
 const formRef = ref("");
@@ -228,10 +227,7 @@ const apiQuiz = computed(() => {
 const loading = ref(false);
 onMounted(async () => {
   try {
-    const token = localStorage.getItem("token");
-    const res = await axios.get("/api/category/index", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.get("/category/index");
     categories.value = res.data.data;
     console.log("Categories loaded:", categories.value);
   } catch (error) {
@@ -295,17 +291,13 @@ const handleSubmit = async () => {
     loading.value = true;
 
     const token = localStorage.getItem("token");
-    const res = await axios.post("/api/quiz/store", quiz, {
+    const res = await api.post("/quiz/store", quiz, {
       headers: { Authorization: `Bearer ${token}` },
     });
     toast.value.showToast(res.data.message, "success");
     router.push("/quiz");
   } catch (error) {
-    if (error?.response?.status == 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      router.push("/login");
-    }
+    
     toast.value.showToast(
       error?.response?.data?.message || "Something went wrong!",
       "error"

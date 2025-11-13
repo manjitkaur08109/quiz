@@ -9,17 +9,20 @@ import router from "./router";
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
 import '@mdi/font/css/materialdesignicons.css'
 
+import api from "./plugins/api";
+import Toast from "./components/Toast.vue"; // or your toast store
 const vuetify = createVuetify({
-  components,
-  directives,
-  icons: {
-    defaultSet: 'mdi',
-    aliases,
-    sets: { mdi },
-  },
+    components,
+    directives,
+    icons: {
+        defaultSet: 'mdi',
+        aliases,
+        sets: { mdi },
+    },
 })
 
 createApp(App)
-  .use(vuetify)
-  .use(router)
-  .mount('#app');
+    .provide("api", api)
+    .use(vuetify)
+    .use(router)
+    .mount('#app');

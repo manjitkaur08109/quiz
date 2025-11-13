@@ -47,9 +47,8 @@
 <script setup>
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
 import { inject } from "vue";
-
+const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
 const formRef = ref(null);
@@ -77,19 +76,12 @@ const handleSubmit = async () => {
   try {
     loading.value = true;
 
-    const token = localStorage.getItem("token");
-    const res = await axios.post("/api/category/store", category, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.post("/category/store", category);
 
     toast.value.showToast(res.data.message, "success");
     router.push("/category");
   } catch (error) {
-    if (error?.response?.status == 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      router.push("/login");
-    }
+    
     toast.value.showToast(
       error?.response?.data?.message || "Something went wrong!",
       "error"

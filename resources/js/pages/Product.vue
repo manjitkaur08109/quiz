@@ -41,11 +41,10 @@
   </v-card>
 </template>
 <script setup>
-import axios from "axios";
 import { inject, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
-
+const api = inject("api");
 const toast = inject("toast");
 const productitems = ref([
   {
@@ -72,10 +71,7 @@ const headers = [
 
 onMounted(async () => {
   try {
-    const token = localStorage.getItem("token");
-    const res = await axios.get("/api/products/index", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.get("/products/index");
     // toast.value.showToast("Product fetch successfully ");
     productitems.value = res.data.data;
   } catch (error){
@@ -86,10 +82,7 @@ onMounted(async () => {
 
 const deleteProduct = async (id) => {
   try {
-    const token = localStorage.getItem("token");
-    const res = await axios.delete("/api/products/delete/"+id, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.delete("/products/delete/"+id);
     toast.value.showToast(res.data.message,"success")
     productitems.value = res.data.data;
   } catch (error) {

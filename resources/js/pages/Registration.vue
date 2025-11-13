@@ -64,12 +64,10 @@
 
 <script setup>
 import { ref, reactive } from "vue";
-import axios from "axios";
 import { useRouter } from "vue-router";
 import { inject } from "vue";
-
+const api = inject("api");
 const toast = inject("toast");
-axios.defaults.baseURL = "http://127.0.0.1:8000";
 const router = useRouter();
 const formRef = ref(null);
 const loading = ref(false);
@@ -114,7 +112,7 @@ const handleRegister = async () => {
 
     loading.value = true;
 
-    const registerRes = await axios.post("/api/register", user);
+    const registerRes = await api.post("/register", user);
 
     const token = registerRes.data.data.token;
     const userData = registerRes.data.data.user;
@@ -122,7 +120,7 @@ const handleRegister = async () => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(userData));
 
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
      router.push('/');
   } catch (error) {

@@ -132,9 +132,9 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
 import { inject } from "vue";
 
+const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
 const search = ref("");
@@ -154,17 +154,10 @@ const headers = [
 const fetchQuizzes = async () => {
   loading.value = true;
   try {
-    const token = localStorage.getItem("token");
-    const res = await axios.get("/api/quiz/index", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.get("/quiz/index");
     quizzes.value = res.data.data;
   } catch (error) {
-    if (error?.response?.status == 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      router.push("/login");
-    }
+
     toast.value.showToast(
       error?.response?.data?.message || "Something went wrong!",
       "error"
@@ -182,20 +175,13 @@ const info = async (item) => {
 const deleteQuiz = async (id) => {
   if (!confirm("Delete this quiz?")) return;
   try {
-    const token = localStorage.getItem("token");
-    await axios.delete(`/api/quiz/delete/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-     toast.value.showToast("Quiz deleted successfully",'success');
+    await api.delete(`/quiz/delete/${id}`);
+    toast.value.showToast("Quiz deleted successfully", 'success');
 
     fetchQuizzes();
   } catch (error) {
     console.error("Error deleting quiz:", error);
-    if (error?.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      router.push("/login");
-    }
+   
        toast.value.showToast(error?.response?.data?.message || "Something went wrong!",'error');
 
   }

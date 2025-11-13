@@ -178,7 +178,8 @@
 
 <script setup>
 import { ref, onMounted, inject } from "vue";
-import axios from "axios";
+
+const api = inject("api");
 const tab = ref(null);
 const toast = inject("toast");
 const categories = ref([]);
@@ -206,13 +207,10 @@ const fetchCategories = async () => {
 
 const fetchQuizzes = async (categoryId = null) => {
   try {
-    const token = localStorage.getItem("token");
     const url = categoryId
-      ? `/api/quiz/index?category_id=${categoryId}`
-      : `/api/quiz/index`;
-    const res = await axios.get(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      ? `/quiz/index?category_id=${categoryId}`
+      : `/quiz/index`;
+    const res = await api.get(url);
     const data = res.data.data || res.data;
     quizzes.value = data;
   } catch (error) {
@@ -266,9 +264,8 @@ const submitQuiz = async () => {
   quizResult.value = { passed, correct, attemptedQuestions };
 
   try {
-    const token = localStorage.getItem("token");
-    await axios.post(
-      "/api/quiz-attempt/store",
+    await api.post(
+      "/quiz-attempt/store",
       {
         quiz_id: selectedQuiz.value.id,
         score: correct,
@@ -276,15 +273,10 @@ const submitQuiz = async () => {
         total_questions: selectedQuiz.value.questions.length,
         marks_obtained: attemptedQuestions,
         attempted_answers: attemptedAnswers,
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` },
       }
     );
 
     toast?.value?.showToast("✅ Quiz attempt saved!", "success");
-    dialog.value = false;
-    resultDialog.value = true;
   } catch (error) {
     console.error(" Error saving quiz attempt:", error);
     toast?.value?.showToast("Failed to save quiz attempt", "error");

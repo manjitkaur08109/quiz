@@ -45,9 +45,9 @@
 
 <script setup>
 import { ref, reactive } from "vue";
-import axios from "axios";
 import { useRouter } from "vue-router";
 import { inject } from "vue";
+const api = inject("api");
 
 const toast = inject("toast");
 const router = useRouter();
@@ -74,7 +74,7 @@ const handleLogin = async () => {
 
   try {
     loading.value = true;
-    const res = await axios.post("/api/login", credentials);
+    const res = await api.post("/login", credentials);
     localStorage.setItem("user", JSON.stringify(res.data.data.user));
     localStorage.setItem("token", res.data.data.token);
 

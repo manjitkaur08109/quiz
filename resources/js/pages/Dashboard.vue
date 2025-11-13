@@ -81,11 +81,11 @@
   </div>
 </template>
 <script setup>
-import axios from "axios";
 import { onMounted, ref , computed } from "vue";
 import { useRouter } from "vue-router";
 import { inject } from "vue";
 
+const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
 const search = ref("");
@@ -113,25 +113,18 @@ const isAdmin = computed(() => user.account_type === "admin");
 
 const getDashboard = async () => {
   try {
-    const token = localStorage.getItem("token");
 
-    const response = await axios.get("api/get-dashboard", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await api.get("/get-dashboard");
     totalCategory.value = response.data.data.totalCategory;
     totalQuiz.value = response.data.data.totalQuiz;
     totalUsers.value = response.data.data.totalUsers;
     recentUsers.value = response.data.data.recentUsers;
   } catch (error) {
-    if (error?.response?.status == 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      router.push("/login");
-    }
-    toast.value.showToast(
+  toast.value.showToast(
       error?.response?.data?.message || "Something went wrong!",
       "error"
     );
+
   } finally {
   }
 };

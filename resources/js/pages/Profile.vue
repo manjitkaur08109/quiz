@@ -85,8 +85,7 @@
 </template>
 <script setup>
 import { ref, inject, onMounted, onBeforeUnmount } from "vue";
-import axios from "axios";
-
+const api = inject("api");
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 const togglePassword = (e) => {
@@ -140,11 +139,8 @@ const phoneNoRules = [
 const loaded = ref(false);
 onMounted(async () => {
   try {
-    const token = localStorage.getItem("token");
-    const res = await axios.get("http://127.0.0.1:8000/api/profile", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-  
+    const res = await api.get("/profile");
+
     const data = res.data.data || res.data;
     Name.value = data.name;
     email.value = data.email;
@@ -161,11 +157,9 @@ const updateProfile = async () => {
   if (!valid) return;
 
   try {
-    const token = localStorage.getItem("token");
-    await axios.put(
-      "/api/profile",
-      { name: Name.value, phone_no: phoneNo.value },
-      { headers: { Authorization: `Bearer ${token}` } }
+    await api.put(
+      "/profile",
+      { name: Name.value, phone_no: phoneNo.value }
     );
     toast?.value?.showToast("Profile updated successfully!", "success");
   } catch (error) {
@@ -180,14 +174,12 @@ const changePassword = async () => {
   const { valid } = await passwordForm.value.validate();
   if (!valid) return;
   try {
-    const token = localStorage.getItem("token");
-    await axios.put(
-      "/api/profile/password",
+    await api.put(
+      "/profile/password",
       {
         password: password.value,
         password_confirmation: confirmPassword.value,
-      },
-      { headers: { Authorization: `Bearer ${token}` } }
+      }
     );
     toast?.value?.showToast("Password changed successfully!", "success");
     password.value = "";

@@ -57,6 +57,7 @@ import axios from "axios";
 import { inject, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
+const api = inject("api");
 const route = useRoute();
 const toast = inject("toast");
 const router = useRouter();
@@ -104,10 +105,7 @@ const back = () => {
 const productId = route.params.id;
 onMounted(async () => {
   try {
-    const token = localStorage.getItem("token");
-    const response = await axios.get(`/api/products/show/${productId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await api.get(`/products/show/${productId}`);
     toast.value.showToast("Product show", "success");
     product.value = response.data.data;
   } catch (error) {
@@ -123,10 +121,7 @@ const submit = async () => {
   const { valid } = await formRef.value.validate();
   if (!valid) return;
   try {
-    const token = localStorage.getItem("token");
-    const response = await axios.put(`/api/products/update/${productId}`, product.value, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await api.put(`/products/update/${productId}`, product.value);
     product.value = response.data.data;
 
     toast.value.showToast(response.data.message, "success");
@@ -141,10 +136,7 @@ const submit = async () => {
 
 onMounted(async () => {
   try {
-    const token = localStorage.getItem("token");
-    const response = await axios.get("/api/category/index", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await api.get("/category/index");
     categories.value = response.data.data;
     toast.value.showToast("categories loaded ", categories.value);
   } catch (error) {

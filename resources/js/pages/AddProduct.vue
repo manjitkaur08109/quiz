@@ -56,6 +56,7 @@ import axios from "axios";
 import { inject, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 
+const api = inject('api');
 const toast = inject('toast');
 const router = useRouter();
 const product = ref({
@@ -102,20 +103,14 @@ const submit = async () => {
     const {valid} = await formRef.value.validate();
     if (!valid) return;
 
-    const token = localStorage.getItem('token');
-    const response = await axios.post('/api/products/store',product.value,{
-        headers:{ Authorization:`Bearer ${token}`}
-    });
+    const response = await api.post('/api/products/store',product.value);
     toast.value.showToast(response.data.message, 'success');
     back();
 };
 const categories = ref([]);
 onMounted (async()=>{
     try{
-    const token = localStorage.getItem('token');
-    const response = await axios.get('/api/category/index',{
-        headers:{Authorization:`Bearer ${token}`}
-    });
+    const response = await api.get('/category/index');
     categories.value = response.data.data;
 }catch(error){
     console.log('Error loaded categories');
