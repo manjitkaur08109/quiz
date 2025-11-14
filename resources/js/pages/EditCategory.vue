@@ -13,7 +13,7 @@
           <v-text-field
             v-model="category.title"
             label="Category Title"
-            :rules="CategoryTitleRules"
+            :rules="validateMaxLength('Category Title', 100)"
             prepend-inner-icon="mdi-shape-outline"
             required
           />
@@ -21,7 +21,7 @@
           <v-textarea
             v-model="category.description"
             label="Category Description"
-            :rules="CategoryDescriptionRules"
+            :rules="validateMaxLength('Category Description', 200)"
             prepend-inner-icon="mdi-text-box-outline"
             rows="3"
             auto-grow
@@ -48,6 +48,10 @@
 import { reactive, ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { inject } from "vue";
+
+import {
+    validateMaxLength
+} from "@/utils/validationRules.js";
 const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
@@ -61,18 +65,6 @@ const category = ref({
 const loading = ref(false);
 
 const formRef = ref("");
-const CategoryTitleRules = [
-  (value) => {
-    if (value?.length >= 3) return true;
-    return " Title required|string|max:15";
-  },
-];
-const CategoryDescriptionRules = [
-  (value) => {
-    if (value?.length >= 10) return true;
-    return "Description must be at least 10 characters.";
-  },
-];
 
 onMounted(async () => {
   try {
@@ -99,7 +91,7 @@ const handleSubmit = async () => {
     toast.value.showToast(res?.data?.message || "Category updated!", "success");
     router.push("/category");
   } catch (error) {
-    
+
     toast.value.showToast(
       error?.response?.data?.message || "Something went wrong!",
       "error"

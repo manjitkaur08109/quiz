@@ -13,7 +13,7 @@
           <v-text-field
             v-model="quiz.title"
             label="Quiz Title"
-            :rules="QuizTitleRules"
+            :rules="validateMaxLength('quiz title',20)"
             prepend-inner-icon="mdi-format-title"
           />
           <v-col cols="6">
@@ -21,7 +21,7 @@
               v-model="quiz.passing_score"
               label="Passing Score "
               type="number"
-              :rules="PassingScoreRules"
+              :rules="validatePassingScore(100)"
               prepend-inner-icon="mdi-target"
               min="0"
               max="100"
@@ -33,7 +33,7 @@
             v-model="quiz.description"
             label="Description"
             prepend-inner-icon="mdi-text-box-outline"
-            :rules="QuizDescriptionRules"
+            :rules="validateMaxLength('quiz description', 200)"
           />
 
           <v-select
@@ -43,7 +43,7 @@
             item-value="id"
             label="Select Category"
             prepend-inner-icon="mdi-shape-outline"
-            :rules="SCRules"
+            :rules="validateRequired('Category')"
           />
 
           <div v-for="(q, qIndex) in quiz.questions" :key="qIndex" class="mb-4">
@@ -51,7 +51,7 @@
               v-model="q.question"
               :label="`Question ${qIndex + 1}`"
               prepend-inner-icon="mdi-help-circle-outline"
-              :rules="QuestionRules"
+              :rules="validateMaxLength('question', 200)"
               rows="2"
               auto-grow
               class="mb-2"
@@ -61,7 +61,7 @@
               <v-text-field
                 v-model="q.options[oIndex]"
                 :label="`Option ${oIndex + 1}`"
-                :rules="OptionRules"
+                :rules="validateRequired(`Option ${oIndex + 1}`)"
                 class="flex-grow-1"
               />
               <v-icon
@@ -80,7 +80,8 @@
               v-model="q.correctAnswer"
               :items="q.options"
               label="Select Correct Answer"
-              :rules="SCARules"
+              :rules="validateRequired('Correct Answer')"
+              prepend-inner-icon="mdi-check-circle-outline"
               required
               class="mt-2"
             />
@@ -137,6 +138,8 @@ const quizId = route.params.id;
 const loading = ref(false);
 import { inject } from "vue";
 
+import { validateMaxLength, validateRequired, validatePassingScore } from "../utils/validationRules";
+
 const toast = inject("toast");
 
 const quiz = reactive({
@@ -149,49 +152,6 @@ const quiz = reactive({
 
 const categories = ref([]);
 
-const QuizTitleRules = [
-  (value) => {
-    const loading = ref(false);
-    if (value?.length >= 3) return true;
-    return " Title required|string|min:3";
-  },
-];
-const QuizDescriptionRules = [
-  (value) => {
-    if (value?.length >= 10) return true;
-    return "Description must be at least 10 characters.|nullable";
-  },
-];
-const SCRules = [
-  (value) => {
-    if (value) return true;
-    return " Category is required";
-  },
-];
-const QuestionRules = [
-  (value) => {
-    if (value) return true;
-    return "Question is required";
-  },
-];
-const OptionRules = [
-  (value) => {
-    if (value) return true;
-    return "Option is Required";
-  },
-];
-const SCARules = [
-  (value) => {
-    if (value) return true;
-    return "Correct answer required";
-  },
-];
-const PassingScoreRules = [
-  (value) => {
-    if (value >= 0 && value <= 100) return true;
-    return "Passing score must be between 0 and 100.";
-  },
-];
 
 const addQuestion = () => {
   const lastQuestion = quiz.questions[quiz.questions.length - 1];
@@ -288,7 +248,7 @@ const updateQuiz = async () => {
     );
     router.push("/quiz");
   } catch (error) {
-    
+
 
   } finally {
     loading.value = false;

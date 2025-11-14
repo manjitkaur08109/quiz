@@ -21,7 +21,7 @@
                   <v-text-field
                     v-model="quiz.title"
                     label="Quiz Title"
-                    :rules="QuizTitleRules"
+                    :rules="validateMaxLength('Quiz Title',20)"
                     prepend-inner-icon="mdi-format-title"
                     required
                   />
@@ -31,7 +31,7 @@
                     v-model="quiz.passing_score"
                     label="Passing Score"
                     type="number"
-                    :rules="PassingScoreRules"
+                    :rules="validatePassingScore(100)"
                     prepend-inner-icon="mdi-target"
                     min="0"
                     max="100"
@@ -42,7 +42,7 @@
               <v-textarea
                 v-model="quiz.description"
                 label="Quiz Description"
-                :rules="QuizDescriptionRules"
+                :rules="validateMaxLength('Quiz Description', 200)"
                 prepend-inner-icon="mdi-text-box-outline"
                 rows="3"
                 auto-grow
@@ -53,7 +53,7 @@
                 item-title="title"
                 item-value="id"
                 label="Select Category"
-                :rules="SCRules"
+                :rules="validateRequired('Category')"
                 prepend-inner-icon="mdi-shape-outline"
                 required
               />
@@ -67,7 +67,7 @@
                   v-model="q.question"
                   :label="`Question ${qIndex + 1}`"
                   prepend-inner-icon="mdi-help-circle-outline"
-                  :rules="QuestionRules"
+                  :rules="validateMaxLength('question', 200)"
                   rows="2"
                   auto-grow
                   class="mb-2"
@@ -81,7 +81,7 @@
                   <v-text-field
                     v-model="q.options[oIndex]"
                     :label="`Option ${oIndex + 1}`"
-                    :rules="OptionRules"
+                    :rules="validateRequired(`Option ${oIndex + 1}`)"
                     class="flex-grow-1"
                   />
                   <v-icon
@@ -100,7 +100,7 @@
                   v-model="q.correctAnswer"
                   :items="q.options"
                   label="Select Correct Answer"
-                  :rules="SCARules"
+                  :rules="validateRequired(`Correct Answer for Question ${qIndex + 1}`)"
                   required
                   class="mt-2"
                 />
@@ -153,54 +153,18 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
-const router = useRouter();
 import { inject } from "vue";
+
+import {
+    validateRequired,
+    validatePassingScore,
+    validateMaxLength
+} from "@/utils/validationRules.js";
+const router = useRouter();
 const api = inject("api");
 const toast = inject("toast");
 const goToAdQuiz = () => router.push("/addQuiz");
 const formRef = ref("");
-const QuizTitleRules = [
-  (value) => {
-    if (value?.length >= 3) return true;
-    return " Title required|string|min:3";
-  },
-];
-const QuizDescriptionRules = [
-  (value) => {
-    if (value?.length >= 10) return true;
-    return "Description must be at least 10 characters.|nullable";
-  },
-];
-const SCRules = [
-  (value) => {
-    if (value) return true;
-    return " Category is required";
-  },
-];
-const QuestionRules = [
-  (value) => {
-    if (value) return true;
-    return "Required";
-  },
-];
-const OptionRules = [
-  (value) => {
-    if (value) return true;
-    return "Option is Required";
-  },
-];
-const SCARules = [
-  (value) => {
-    if (value) return true;
-    return "Required";
-  },
-];
-const PassingScoreRules = [
-  (value) => {
-    if (value >= 0 && value <= 100) return true;
-    return "Passing score must be between 0 and 100.";
-  },
-];
 
 const categories = ref([]);
 const quiz = reactive({
@@ -297,7 +261,7 @@ const handleSubmit = async () => {
     toast.value.showToast(res.data.message, "success");
     router.push("/quiz");
   } catch (error) {
-    
+
     toast.value.showToast(
       error?.response?.data?.message || "Something went wrong!",
       "error"

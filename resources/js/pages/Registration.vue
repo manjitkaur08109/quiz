@@ -12,7 +12,7 @@
           v-model="user.name"
           label="Full Name"
           prepend-inner-icon="mdi-account"
-          :rules="nameRules"
+          :rules="validateRequired('Name')"
           required
         />
 
@@ -21,7 +21,7 @@
           label="Email Address"
           prepend-inner-icon="mdi-email"
           type="email"
-          :rules="emailRules"
+          :rules="validateEmail('Email')"
           required
         />
 
@@ -30,7 +30,7 @@
           label="Password"
           prepend-inner-icon="mdi-lock"
           type="password"
-          :rules="passwordRules"
+          :rules="validateRequired('Password')"
           required
         />
 
@@ -39,7 +39,7 @@
           label="Confirm Password"
           prepend-inner-icon="mdi-lock-check"
           type="password"
-          :rules="confirmPasswordRules"
+          :rules="validateConfirmPassword('password_confirmation')"
           required
         />
 
@@ -66,6 +66,7 @@
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { inject } from "vue";
+import { validateConfirmPassword, validateRequired, validateEmail } from "../utils/validationRules";
 const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
@@ -86,22 +87,7 @@ const errors = reactive({
   password_confirmation: [],
 });
 
-const nameRules = [
-  (v) => !!v || "Name is required",
-  (v) => v.length >= 3 || "Name must be at least 3 characters",
-];
-const emailRules = [
-  (v) => !!v || "Email is required",
-  (v) => /.+@.+\..+/.test(v) || "Email must be valid",
-];
-const passwordRules = [
-  (v) => !!v || "Password is required",
-  (v) => v.length >= 6 || "Password must be at least 6 characters",
-];
-const confirmPasswordRules = [
-  (v) => !!v || "Confirm password is required",
-  (v) => v === user.password || "Passwords do not match",
-];
+
 
 const handleRegister = async () => {
     Object.keys(errors).forEach(key => (errors[key] = []));

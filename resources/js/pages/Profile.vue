@@ -12,7 +12,7 @@
             <v-text-field
               class="mt-2"
               v-model="Name"
-              :rules="NameRules"
+              :rules="validateRequired('Name')"
               label="Name"
               prepend-inner-icon="mdi-account"
               required
@@ -21,7 +21,7 @@
             <v-text-field
               class="mt-2"
               v-model="email"
-              :rules="emailRules"
+              :rules="validateEmail()"
               label="Email"
               prepend-inner-icon="mdi-email"
                readonly
@@ -30,7 +30,7 @@
             <v-text-field
               class="mt-2"
               v-model="phoneNo"
-              :rules="phoneNoRules"
+              :rules="validatePhoneNo()"
               label="Phone No"
               prepend-inner-icon="mdi-phone"
               required
@@ -49,7 +49,7 @@
             <v-text-field
               class="mt-2"
               v-model="password"
-              :v-rules="passwordRules"
+              :v-rules="validatePassword()"
               label="New password"
               prepend-inner-icon="mdi-lock-outline"
               :append-inner-icon="
@@ -63,7 +63,7 @@
             <v-text-field
               class="mt-2"
               v-model="confirmPassword"
-              :v-rules="confirmpasswordRules"
+              :v-rules="validateConfirmPassword(password)"
               label="Confirm password"
               prepend-inner-icon="mdi-lock-check"
 
@@ -105,37 +105,12 @@ const Name = ref("");
 const email = ref("");
 const phoneNo = ref("");
 const profileForm = ref(null);
-const passwordRules = [
-  (value) => {
-    if (value?.length >= 6) return true;
-    return "Password must be at least 6 characters.";
-  },
-];
 
-const confirmpasswordRules = [
-  (value) => {
-    if (value == password.value) return true;
-    return "Confirm password mismatch.";
-  },
-];
-const NameRules = [
-  (value) => {
-    if (value?.length >= 3) return true;
-    return " Name must be at least 3 characters.";
-  },
-];
+import {
 
-const emailRules = [
-  (value) => {
-    if (!value) return ;
-    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return pattern.test(value) || "Invalid email address.";
-  },
-];
-const phoneNoRules = [
-  (value) => !!value || "Phone number is required.",
-  (value) => /^[0-9]{10,15}$/.test(value) || "Enter a valid phone number.",
-];
+} from "@/utils/validationRules.js";
+import { validateRequired } from "../utils/validationRules";
+
 const loaded = ref(false);
 onMounted(async () => {
   try {
