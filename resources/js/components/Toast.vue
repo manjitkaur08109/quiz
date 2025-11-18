@@ -26,7 +26,6 @@ const icon = ref("mdi-check-circle");
 const timeout = ref(3000);
 
 function showToast(text, type = "success") {
-    alert(text);
   message.value = text;
   color.value = type === "error" ? "error" : type === "warning" ? "warning" : "success";
   icon.value =

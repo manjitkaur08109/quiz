@@ -37,7 +37,7 @@
       </template>
 
       <template #item.actions="{ item }">
-      
+
         <v-btn
           size="x-small"
           class="ml-2"
@@ -118,8 +118,6 @@ const impersonateUser = async (userToImpersonate) => {
 
     localStorage.setItem("token", newToken);
     localStorage.setItem("user", JSON.stringify(newUser));
-
-    toast.value.showToast(`Logged in as ${newUser.name}`, "success");
   setTimeout(() => {
       window.location.href = "/myLearning";
     }, 1000);

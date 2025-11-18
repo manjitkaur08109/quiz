@@ -1,15 +1,16 @@
 <template>
-  <!-- App Bar -->
-  <v-app-bar color="primary">
-    <v-app-bar-nav-icon @click="drawer = !drawer" />
-    <v-toolbar-title>Quiz</v-toolbar-title>
-    <v-spacer></v-spacer>
+    <v-app-bar color="primary">
+
+        <v-app-bar-nav-icon @click="drawer = !drawer" />
+        <v-toolbar-title>Quiz</v-toolbar-title>
+        <v-spacer></v-spacer>
+
     <v-menu
       v-model="menu"
       :close-on-content-click="false"
       location="bottom end"
     >
-      <template #activator="{ props }">
+    <template #activator="{ props }">
         <v-btn v-bind="props" icon="mdi-account" variant="text"></v-btn>
       </template>
       <v-list>
@@ -18,30 +19,31 @@
         </v-list-item>
         <v-divider></v-divider>
 
-        <v-list-item v-if="isImpersonating" @click="revertToAdmin">
+        <!-- <v-list-item v-if="isImpersonating" @click="revertToAdmin">
           <v-list-item-title>Return to Admin</v-list-item-title>
-        </v-list-item>
+        </v-list-item> -->
         <v-divider></v-divider>
         <v-list-item @click="logout">
           <v-list-item-title>Logout</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-menu>
-  </v-app-bar>
+</v-app-bar>
 
   <!-- Navigation Drawer -->
   <v-navigation-drawer v-model="drawer" app permanent>
     <v-list>
-      <v-list-item
+        <v-list-item
         v-for="item in filteredItems"
         :key="item.title"
         :title="item.title"
         :prepend-icon="item.icon"
         :to="item.path"
         link
-      />
+        />
     </v-list>
   </v-navigation-drawer>
+
 </template>
 
 <script setup>
@@ -50,7 +52,7 @@ import { useRouter } from "vue-router";
 import axios from "axios";
 import { inject } from "vue";
 
-const toast = inject("toast");
+const api = inject("api");
 const router = useRouter();
 const drawer = ref(true);
 const menu = ref(false);
@@ -62,7 +64,6 @@ const items = [
   { title: "Category", path: "/category", icon: "mdi-view-grid-outline" },
   { title: "Discover", path: "/discover", icon: "mdi-compass-outline" },
   { title: "MyLearning", path: "/myLearning", icon: "mdi-school-outline" },
-  { title: "Products", path: "/products", icon: "mdi-school-outline" },
 ];
 
 // const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -85,20 +86,13 @@ const filteredItems = computed(() => {
     );
   }
 });
-// Check impersonation mode
-const isImpersonating = computed(() => {
-  return !!localStorage.getItem("adminBackupToken");
-});
 
 const logout = async () => {
   try {
-    const token = localStorage.getItem("token");
-    await axios.post(
-      "/api/logout",
+    await api.post(
+      "/logout",
       {},
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
+
     );
 
     // Token delete from localStorage
@@ -114,34 +108,6 @@ const logout = async () => {
   }
 };
 
-const revertToAdmin = async () => {
-  const adminToken = localStorage.getItem("adminBackupToken");
-  if (!adminToken)
-    return toast.value.showToast("No admin session found", "error");
-
-  // 🔹 Admin token wapas set karo
-  localStorage.setItem("token", adminToken);
-  localStorage.removeItem("adminBackupToken");
-
-  // 🔹 Admin user data dobara fetch karo
-  try {
-    const { data } = await axios.get("/api/profile", {
-      headers: { Authorization: `Bearer ${adminToken}` },
-    });
-    localStorage.setItem("user", JSON.stringify(data.data));
-    user.value = data.data;
-  } catch (e) {
-    console.error("Admin user reload failed", e);
-  }
-
-  // 🔹 Success message dikhao
-  toast.value.showToast("Returned to Admin account", "success");
-
-  // 🔹 Page reload karo taaki naya admin data apply ho jaaye
-  setTimeout(() => {
-    window.location.href = "/"; // ya "/dashboard"
-  }, 1000);
-};
 
 const goToProfile = () => {
   router.push("/profile");

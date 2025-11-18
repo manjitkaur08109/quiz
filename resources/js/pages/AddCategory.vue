@@ -18,14 +18,17 @@
             required
           />
 
-          <v-textarea
+            <!-- ⭐⭐ VUE EDITOR FOR DESCRIPTION ⭐⭐ -->
+          <label class="mb-2 font-weight-medium">Category Description</label>
+          <vue-editor v-model="category.description"></vue-editor>
+          <!-- <v-textarea
             v-model="category.description"
             label="Category Description"
             :rules="validateMaxLength('Description', 200)"
             prepend-inner-icon="mdi-text-box-outline"
             rows="3"
             auto-grow
-          />
+          /> -->
 
           <v-card-actions class="justify-end">
             <v-btn color="secondary" @click="goBack"> Cancel </v-btn>
@@ -49,6 +52,7 @@ import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { inject } from "vue";
 
+import { VueEditor } from "vue3-editor";
 import { validateMaxLength } from "@/utils/validationRules.js";
 const api = inject("api");
 const toast = inject("toast");

@@ -193,10 +193,8 @@ const quizResult = ref(null);
 
 const fetchCategories = async () => {
   try {
-    const token = localStorage.getItem("token");
-    const res = await axios.get("/api/category/index", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await api.get("/category/index",
+    );
     const data = res.data.data || res.data;
     categories.value = data;
   } catch (error) {

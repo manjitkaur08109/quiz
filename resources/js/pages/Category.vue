@@ -34,6 +34,9 @@
       <template #item.sn="{ index }">
         {{ index + 1 }}
       </template>
+      <template #item.description="{ item }">
+        <span v-html="item.description"></span>
+      </template>
 
 
 
@@ -102,7 +105,7 @@ const deleteCategory = async (id) => {
     fetchCategories();
   } catch (error) {
     console.error("Error deleting category:", error.response?.data || error);
-   
+
 
      toast.value.showToast(error?.response?.data?.message || "Something went wrong!",'error');
   }
