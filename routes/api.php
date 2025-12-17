@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QuizAttemptController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PaymentController;
 
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -31,6 +32,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::prefix('quiz')->group(function(){
         Route::get('/index', [QuizController::class, 'index']);
+        Route::get('/payment/create', [QuizController::class, 'create']);
         Route::post('/store', [QuizController::class, 'store']);
         Route::get('/show/{id}', [QuizController::class, 'show']);
         Route::put('/update/{id}', [QuizController::class, 'update']);
@@ -53,4 +55,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/update/{id}',[ProductController::class,"update"]);
 
     });
+    Route::post('/checkout', [PaymentController::class, 'checkout']);
 });
+

@@ -16,6 +16,19 @@
             :rules="validateMaxLength('quiz title',20)"
             prepend-inner-icon="mdi-format-title"
           />
+
+          <v-col cols="6">
+            <v-text-field
+              v-model="quiz.price"
+              label="Quiz Price (₹)"
+              type="number"
+              min="1"
+              :rules="validateRequired('Quiz Price')"
+              prepend-inner-icon="mdi-currency-inr"
+              required
+            />
+          </v-col>
+          
           <v-col cols="6">
             <v-text-field
               v-model="quiz.passing_score"
