@@ -12,6 +12,11 @@ use App\Models\PaymentModel;
 
 class PaymentController extends Controller
 {
+    public function index(Request $request) {
+
+        $data = PaymentModel::with('user:id,name','quiz:id,title')->latest()->get();
+        return $this->actionSuccess('payment fetch successfully', $data);
+    }
     public function checkout(Request $request)
     {
         $quiz = QuizModel::findOrFail($request->quiz_id);
@@ -63,7 +68,10 @@ public function paymentSuccess(Request $request)
             'quiz_id' => $quizId,
         ],
         [
-            'status' => 'paid',
+            
+            'amount' => $session->amount_total/100, 
+            'transaction_id' => $session->payment_intent,
+            'status' => PaymentModel::PAID,
         ]);
         return redirect('/quiz');
 }

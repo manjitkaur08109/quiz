@@ -64,6 +64,7 @@ const items = [
   { title: "Category", path: "/category", icon: "mdi-view-grid-outline" },
   { title: "Discover", path: "/discover", icon: "mdi-compass-outline" },
   { title: "MyLearning", path: "/myLearning", icon: "mdi-school-outline" },
+  {title: "Payments", path: "/payments", icon: "mdi-cash-multiple", }
 ];
 
 // const user = JSON.parse(localStorage.getItem("user") || "{}");

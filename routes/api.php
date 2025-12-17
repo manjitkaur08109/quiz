@@ -56,5 +56,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     });
     Route::post('/checkout', [PaymentController::class, 'checkout']);
+
+Route::get('/payments/index', [PaymentController::class, 'index']);
 });
 
