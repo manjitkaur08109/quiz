@@ -13,6 +13,7 @@ import Login from "../pages/Login.vue";
 import MyLearning from "../pages/MyLearning.vue";
 import Discover from "../pages/Discover.vue";
 import Payments from "../pages/Payments.vue";
+import Notifications from "../pages/Notifications.vue";
 
 const routes = [
   { path: "/", name: "Dashboard", component: Dashboard , meta: { requiresAuth: true } },
@@ -29,6 +30,7 @@ const routes = [
   { path: "/discover", name: "Discover", component: Discover, meta: { requiresAuth: true } },
   { path: "/myLearning", name: "MyLearning", component: MyLearning, meta: { requiresAuth: true } },
   {path:"/payments",name:"Payments",component:Payments, meta: { requiresAuth: true } },
+  {path:"/notifications",name:"Notifications",component:Notifications, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({

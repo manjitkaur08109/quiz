@@ -39,7 +39,6 @@
           label="Confirm Password"
           prepend-inner-icon="mdi-lock-check"
           type="password"
-          :rules="validateConfirmPassword('password_confirmation')"
           required
         />
 

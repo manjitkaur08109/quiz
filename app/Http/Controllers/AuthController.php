@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Notifications\UserNotification;
+
 class AuthController extends Controller
 {
      function register(Request $request)
@@ -22,6 +24,20 @@ class AuthController extends Controller
         'password' =>bcrypt($request->password),
     ]);
 
+    $user->notify(new UserNotification(
+        'welcome',
+        'Welcome to our app',
+        'user'
+    ));
+
+    $admin = User::where('account_type', 'admin')->first();
+    if ($admin) {
+        $admin->notify(new UserNotification(
+            'new_user',
+            'A new user has registered',
+            'admin'
+        ));
+    }
      $token = $user->createToken('api_token')->plainTextToken;
         return $this->actionSuccess('User registered successfully', [
             'user' => $user,

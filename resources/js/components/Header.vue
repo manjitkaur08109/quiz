@@ -10,6 +10,9 @@
       :close-on-content-click="false"
       location="bottom end"
     >
+    <template>
+      <v-btn icon="mdi-bell-outline"></v-btn>
+    </template>
     <template #activator="{ props }">
         <v-btn v-bind="props" icon="mdi-account" variant="text"></v-btn>
       </template>
@@ -19,9 +22,6 @@
         </v-list-item>
         <v-divider></v-divider>
 
-        <!-- <v-list-item v-if="isImpersonating" @click="revertToAdmin">
-          <v-list-item-title>Return to Admin</v-list-item-title>
-        </v-list-item> -->
         <v-divider></v-divider>
         <v-list-item @click="logout">
           <v-list-item-title>Logout</v-list-item-title>
@@ -64,10 +64,9 @@ const items = [
   { title: "Category", path: "/category", icon: "mdi-view-grid-outline" },
   { title: "Discover", path: "/discover", icon: "mdi-compass-outline" },
   { title: "MyLearning", path: "/myLearning", icon: "mdi-school-outline" },
-  {title: "Payments", path: "/payments", icon: "mdi-cash-multiple", }
+  {title: "Payments", path: "/payments", icon: "mdi-cash-multiple", },
+  {title: "Notifications", path: "/notifications", icon: "mdi-bell-outline", }
 ];
-
-// const user = JSON.parse(localStorage.getItem("user") || "{}");
 
 let user = {};
 try {

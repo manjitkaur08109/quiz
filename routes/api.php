@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QuizAttemptController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\NotificationController;
 
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -47,16 +48,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/profile', [ProfileController::class, 'update']);
     Route::put('/profile/password', [ProfileController::class, 'changePassword']);
 
-    Route::prefix("products")->group(function(){
-        Route::get('/index',[ProductController::class,"index"]);
-        Route::delete('/delete/{id}',[ProductController::class,"delete"]);
-        Route::post('/store',[ProductController::class,"store"]);
-        Route::get('/show/{id}',[ProductController::class,"show"]);
-        Route::put('/update/{id}',[ProductController::class,"update"]);
-
-    });
     Route::post('/checkout', [PaymentController::class, 'checkout']);
 
 Route::get('/payments/index', [PaymentController::class, 'index']);
+
+
+Route::prefix('notifications')->group(function () {
+    Route::get('/index', [NotificationController::class, 'index']);
+    Route::get('/show/{id}', [NotificationController::class, 'show']);
+    Route::post('/markAsRead/{id}', [NotificationController::class, 'markAsRead']);
+    Route::delete('/destroy/{id}', [NotificationController::class, 'destroy']);
+    Route::delete('/destroyAll', [NotificationController::class, 'destroyAll']);
 });
+
+});
+
+
 

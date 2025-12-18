@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\CategoryModel;
 use App\Models\QuizAttemptModel;
 use App\Models\QuizModel;
+use App\Models\User;
 use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Contracts\Service\Attribute\Required;
 use App\Models\PaymentModel;
+use App\Notifications\UserNotification;
 
 class QuizController extends Controller {
     function index( Request $request ) {
@@ -60,6 +62,15 @@ class QuizController extends Controller {
             'price' => $request->price,
             'questions' => $request->questions,
         ] );
+
+        $users = User::where('account_type', 'user')->get();
+        foreach($users as $user){
+            $user->notify(new UserNotification('New Quiz Added', 
+                        "A new quiz '{$quiz->title}' is available now!",
+             'quiz'));
+        }
+        
+        
 
         return $this->actionSuccess( 'Quiz added successfully', $quiz );
     }

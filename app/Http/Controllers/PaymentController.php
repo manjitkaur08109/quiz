@@ -7,6 +7,8 @@ use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use App\Models\QuizModel;
 use App\Models\PaymentModel;
+use App\Models\User;
+use App\notifications\UserNotification;
 
 
 
@@ -73,6 +75,16 @@ public function paymentSuccess(Request $request)
             'transaction_id' => $session->payment_intent,
             'status' => PaymentModel::PAID,
         ]);
+
+        $admin = User::where('account_type', 'admin')->first();
+        if ($admin) {
+            $admin->notify(new UserNotification(
+                'New payment',
+                'A new payment has been made by a user',
+                'payment'
+            ));
+        }
+        
         return redirect('/quiz');
 }
 
