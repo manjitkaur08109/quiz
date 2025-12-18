@@ -157,6 +157,7 @@ const toast = inject("toast");
 
 const quiz = reactive({
   title: "",
+  price:"",
   passing_score: 0,
   description: "",
   category_id: "",
@@ -233,6 +234,7 @@ onMounted(async () => {
     const data = res.data.data;
 
     quiz.title = data.title;
+    quiz.price = data.price;
     quiz.passing_score = data.passing_score;
     quiz.description = data.description;
     quiz.category_id = data.category_id;

@@ -17,24 +17,21 @@ class CategorySeeder extends Seeder
             [
                 'title' => 'Programming',
                 'description' => 'Programming related quizzes',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'title' => 'Mathematics',
                 'description' => 'Math quizzes',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'title' => 'Science',
                 'description' => 'Science quizzes',
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
         ];
         foreach($data as $d){
-            CategoryModel::create($d);
+            CategoryModel::updateOrCreate(
+                ["title" => $d['title']],
+                $d
+        );
         }
     }
 }
