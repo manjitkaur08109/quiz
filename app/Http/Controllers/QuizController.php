@@ -65,14 +65,14 @@ class QuizController extends Controller {
 
         $users = User::where('account_type', 'user')->get();
         foreach($users as $user){
-            $user->notify(new UserNotification('New Quiz Added', 
+            $user->notify(new UserNotification('New Quiz Added',
                         "A new quiz '{$quiz->title}' is available now!",
              'quiz',
              $user->id
             ));
         }
-        
-        
+
+
 
         return $this->actionSuccess( 'Quiz added successfully', $quiz );
     }
@@ -112,6 +112,15 @@ class QuizController extends Controller {
             'price' => $request->price,
             'questions' => $request->questions,
         ] );
+
+        $users = User::where('account_type', 'user')->get();
+        foreach($users as $user){
+            $user->notify(new UserNotification('Quiz Updated',
+                        "Quiz '{$request->title}' has been updated!",
+             'quiz',
+             $user->id
+            ));
+        }
 
         return $this->actionSuccess( 'Quiz updated successfully', $quiz );
     }

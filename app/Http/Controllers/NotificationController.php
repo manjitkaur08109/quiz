@@ -34,7 +34,7 @@ public function markAsRead($id)
         $notification->markAsRead();
     }
 
-    return $this-> actionSuccess('Notification marked as read');
+    return $this->actionSuccess('Notification marked as read');
 }
 
 public function destroy($id)

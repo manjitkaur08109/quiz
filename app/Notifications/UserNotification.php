@@ -6,10 +6,10 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 
-class UserNotification extends Notification implements ShouldBroadcast
+class UserNotification extends Notification implements ShouldBroadcastNow
 {
     use Queueable;
      public $title;
@@ -46,7 +46,7 @@ class UserNotification extends Notification implements ShouldBroadcast
             'type' => $this->type,
         ];
     }
-    
+
     public function toBroadcast($notifiable)
     {
         return new BroadcastMessage([
@@ -63,6 +63,14 @@ class UserNotification extends Notification implements ShouldBroadcast
     {
         // Private channel for the user
         return new \Illuminate\Broadcasting\PrivateChannel('App.Models.User.' . $this->user_id);
+    }
+
+    /**
+     * Get the broadcast channel name for the notification.
+     */
+    public function broadcastAs()
+    {
+        return 'notification.created';
     }
 
     /**
@@ -84,7 +92,7 @@ class UserNotification extends Notification implements ShouldBroadcast
     public function toArray(object $notifiable): array
     {
         return [
-            
+
         ];
     }
 }
