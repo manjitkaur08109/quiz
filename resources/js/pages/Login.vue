@@ -78,6 +78,11 @@ const handleLogin = async () => {
     localStorage.setItem("user", JSON.stringify(res.data.data.user));
     localStorage.setItem("token", res.data.data.token);
 
+    // Reconnect Echo with new token after login
+    if (window.reconnectEcho) {
+      window.reconnectEcho();
+    }
+
     router.push("/");
   } catch (error) {
     toast.value.showToast(

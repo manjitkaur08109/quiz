@@ -193,21 +193,65 @@ const fetchHeaderNotifications = async () => {
 
 onMounted(() => {
   fetchHeaderNotifications();
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-   if (window.Echo && user.id) {
-    window.Echo.private(`App.Models.User.${user.id}`)
-      .notification((notification) => {
-        console.log('New notification:', notification);
-        fetchHeaderNotifications();
-      });
-  
-  }
-
+  window.addEventListener("notifications-updated", updateUnreadCount);
   window.addEventListener("notifications-updated", fetchHeaderNotifications);
+  
+  // Set up Echo listener for real-time notifications
+  const setupEchoListener = () => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const token = localStorage.getItem('token');
+    
+    if (window.Echo && user.id && token) {
+      // Disconnect any existing connection
+      try {
+        window.Echo.leave(`App.Models.User.${user.id}`);
+      } catch (e) {
+        console.log('No existing connection to leave');
+      }
+      
+      // Listen for notifications on user's private channel
+      window.Echo.private(`App.Models.User.${user.id}`)
+        .notification((notification) => {
+          console.log('New notification received:', notification);
+          // Refresh notifications
+          fetchHeaderNotifications();
+          // Update unread count
+          updateUnreadCount();
+          // Dispatch event for other components
+          window.dispatchEvent(new Event("notifications-updated"));
+        });
+    }
+  };
+  
+  // Setup immediately if user is logged in
+  setupEchoListener();
+  
+  // Also setup when token is set (for login scenarios)
+  const checkInterval = setInterval(() => {
+    const token = localStorage.getItem('token');
+    if (token && window.Echo) {
+      setupEchoListener();
+      clearInterval(checkInterval);
+    }
+  }, 1000);
+  
+  // Cleanup interval after 10 seconds
+  setTimeout(() => clearInterval(checkInterval), 10000);
 });
 
 onUnmounted(() => {
+  window.removeEventListener("notifications-updated", updateUnreadCount);
   window.removeEventListener("notifications-updated", fetchHeaderNotifications);
+  
+  // Clean up Echo listener
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  if (window.Echo && user.id) {
+    try {
+      window.Echo.leave(`App.Models.User.${user.id}`);
+    } catch (e) {
+      console.log('Error leaving channel:', e);
+    }
+  }
 });
 
 </script>

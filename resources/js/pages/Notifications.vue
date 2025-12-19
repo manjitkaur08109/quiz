@@ -196,6 +196,49 @@ const deleteAllNotifications = async () => {
 
 onMounted(() => {
   fetchNotifications();
+  
+  // Set up Echo listener for real-time notifications
+  const setupEchoListener = () => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const token = localStorage.getItem('token');
+    
+    if (window.Echo && user.id && token) {
+      // Listen for notifications on user's private channel
+      window.Echo.private(`App.Models.User.${user.id}`)
+        .notification((notification) => {
+          console.log('New notification received:', notification);
+          // Refresh notifications list
+          fetchNotifications();
+        });
+    }
+  };
+  
+  // Setup immediately if user is logged in
+  setupEchoListener();
+  
+  // Also setup when token is set (for login scenarios)
+  const checkInterval = setInterval(() => {
+    const token = localStorage.getItem('token');
+    if (token && window.Echo) {
+      setupEchoListener();
+      clearInterval(checkInterval);
+    }
+  }, 1000);
+  
+  // Cleanup interval after 10 seconds
+  setTimeout(() => clearInterval(checkInterval), 10000);
+});
+
+onUnmounted(() => {
+  // Clean up Echo listener
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  if (window.Echo && user.id) {
+    try {
+      window.Echo.leave(`App.Models.User.${user.id}`);
+    } catch (e) {
+      console.log('Error leaving channel:', e);
+    }
+  }
 });
 
 </script>
