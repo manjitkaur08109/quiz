@@ -72,23 +72,15 @@
 
       <v-spacer></v-spacer>
 
-
-      <v-text-field
-        v-model="search"
-        density="compact"
-        label="Search"
-        prepend-inner-icon="mdi-magnify"
-        variant="solo-filled"
-        flat
-        hide-details
-        single-line
-      ></v-text-field>
     </v-card-title>
 
     <v-divider></v-divider>
     <v-data-table
+  class="bordered-table"
     :headers="headers"
+    density="compact"
     v-model:search="search"
+    hide-default-footer
     :filter-keys="['name', 'email']"
     :items="recentUsers"
     >
@@ -106,7 +98,10 @@
     
     <v-data-table
     :headers="paymentHeaders"
+    class="bordered-table"
     v-model:search="search"
+    density="compact"
+    hide-default-footer
     :items="recentPayments"
     >
       <template #item.sn="{ index }">
@@ -121,6 +116,10 @@
           {{ item.status }}
         </v-chip>
       </template>
+      
+            <template #item.created_at="{ item }">
+                {{ moment(item.created_at).format("DD MMM YYYY, hh:mm A") }}
+            </template>
     </v-data-table>
   </v-card>
 </v-col>
@@ -134,6 +133,7 @@
 import { onMounted, ref , computed } from "vue";
 import { useRouter } from "vue-router";
 import { inject } from "vue";
+import moment from "moment";
 
 const api = inject("api");
 const toast = inject("toast");
@@ -160,7 +160,6 @@ const headers = [
   { title: "S.No", key: "sn" },
   { title: "Name", key: "name" },
   { title: "Email", key: "email" },
-  // {title:"Phone.No",key:"phone_no"},
 ];
 const paymentHeaders = [
   { title: "S.No", key: "sn" },
@@ -211,4 +210,14 @@ onMounted(() => {
   }
 });
 </script>
+<style>
+.bordered-table {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+
+</style>
+
 

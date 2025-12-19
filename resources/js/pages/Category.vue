@@ -29,6 +29,8 @@
       v-model:search="search"
       :filter-keys="['name']"
       :headers="headers"
+    density="compact"
+
       :items="categoryItems"
     >
       <template #item.sn="{ index }">

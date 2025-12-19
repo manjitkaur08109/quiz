@@ -22,8 +22,9 @@
       v-model:search="search"
       :filter-keys="['name', 'email']"
       :items="users"
+       class="text-caption"
+    density="compact"
       :headers="headers"
-      class="elevation-2"
     >
       <template #item.image="{ item }">
         <v-avatar size="40">

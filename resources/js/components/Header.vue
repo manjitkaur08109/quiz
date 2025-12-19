@@ -10,9 +10,7 @@
       :close-on-content-click="false"
       location="bottom end"
     >
-    <template>
-      <v-btn icon="mdi-bell-outline"></v-btn>
-    </template>
+    
     <template #activator="{ props }">
         <v-btn v-bind="props" icon="mdi-account" variant="text"></v-btn>
       </template>

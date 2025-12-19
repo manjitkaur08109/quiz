@@ -24,6 +24,6 @@ class UserSeeder extends Seeder {
                 'password' => Hash::make( 'qwerty' ),
                 'account_type' => 'admin'
             ] ) ;
-            // User::factory()->count(50)->create();
+            User::factory()->count(5)->create();
     }
 }

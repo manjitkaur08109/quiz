@@ -11,7 +11,9 @@
       </v-btn>
     </v-card-title>
     <v-divider></v-divider>
-    <v-data-table v-model:search="search" :headers="headers" :items="quizzes">
+    <v-data-table v-model:search="search" :headers="headers" 
+    density="compact"
+    :items="quizzes">
       <template #item.sn="{ index }">
         {{ index + 1 }}
       </template>
