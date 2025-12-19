@@ -8,9 +8,7 @@ use Stripe\Checkout\Session;
 use App\Models\QuizModel;
 use App\Models\PaymentModel;
 use App\Models\User;
-use App\notifications\UserNotification;
-
-
+use App\Notifications\UserNotification;
 
 class PaymentController extends Controller
 {
@@ -23,7 +21,7 @@ class PaymentController extends Controller
     {
         $quiz = QuizModel::findOrFail($request->quiz_id);
         Stripe::setApiKey(config('services.stripe.secret'));
-        
+
         $session = Session::create([
             'payment_method_types' => ['card'],
             'line_items' => [[
@@ -32,12 +30,12 @@ class PaymentController extends Controller
                      'product_data' => [
                     'name' => $quiz->title,
                 ],
-                'unit_amount' => $quiz->price * 100, 
+                'unit_amount' => $quiz->price * 100,
                 ],
                 'quantity' => 1,
                 ]],
                 'mode' => 'payment',
-                
+
         'metadata' => [
             'user_id' => auth()->id(),
             'quiz_id' => $quiz->id,
@@ -50,7 +48,7 @@ class PaymentController extends Controller
         return $this->actionSuccess('Checkout successful', $session->url);
     }
 
-    
+
 public function paymentSuccess(Request $request)
 {
     Stripe::setApiKey(config('services.stripe.secret'));
@@ -70,8 +68,8 @@ public function paymentSuccess(Request $request)
             'quiz_id' => $quizId,
         ],
         [
-            
-            'amount' => $session->amount_total/100, 
+
+            'amount' => $session->amount_total/100,
             'transaction_id' => $session->payment_intent,
             'status' => PaymentModel::PAID,
         ]);
@@ -85,7 +83,7 @@ public function paymentSuccess(Request $request)
                 $admin->id
             ));
         }
-        
+
         return redirect('/quiz');
 }
 

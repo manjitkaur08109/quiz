@@ -67,11 +67,12 @@ class UserNotification extends Notification implements ShouldBroadcastNow
 
     /**
      * Get the broadcast channel name for the notification.
+     * Removed to use default 'notification' event name for Echo compatibility
      */
-    public function broadcastAs()
-    {
-        return 'notification.created';
-    }
+    // public function broadcastAs()
+    // {
+    //     return 'notification.created';
+    // }
 
     /**
      * Get the mail representation of the notification.

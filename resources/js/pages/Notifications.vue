@@ -26,7 +26,7 @@
   Delete All
 </v-btn>
 
-     
+
     </v-card-title>
 
     <v-divider></v-divider>
@@ -71,7 +71,7 @@
           <v-icon>mdi-check</v-icon>
         </v-btn>
 
-  
+
         <v-btn
   class="ml-2"
   icon="mdi-delete"
@@ -164,7 +164,7 @@ const markAsRead = async (id) => {
 };
 
 const deleteNotification = async (id) => {
-    console.log(id); 
+    console.log(id);
   if (!confirm("Delete this notification?")) return;
 
   try {
@@ -186,7 +186,7 @@ const deleteAllNotifications = async () => {
     // instant UI clear
     notificationItems.value = [];
     unreadCount.value = 0;
-    
+
   localStorage.setItem("unreadCount", 0);
   window.dispatchEvent(new Event("notifications-updated"));
   } catch (error) {
@@ -196,26 +196,50 @@ const deleteAllNotifications = async () => {
 
 onMounted(() => {
   fetchNotifications();
-  
+
   // Set up Echo listener for real-time notifications
   const setupEchoListener = () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const token = localStorage.getItem('token');
-    
-    if (window.Echo && user.id && token) {
+
+    if (!window.Echo) {
+      console.warn('Echo is not available');
+      return;
+    }
+
+    if (!user.id || !token) {
+      console.warn('User ID or token not available');
+      return;
+    }
+
+    console.log("Setting up Echo listener for user:", user.id);
+
+    try {
       // Listen for notifications on user's private channel
-      window.Echo.private(`App.Models.User.${user.id}`)
+      const channel = window.Echo.private(`App.Models.User.${user.id}`);
+
+      channel
         .notification((notification) => {
-          console.log('New notification received:', notification);
-          // Refresh notifications list
-          fetchNotifications();
+          console.log('New notification received via Echo:', notification);
+          // Add a small delay to ensure database is updated
+          setTimeout(() => {
+            // Refresh notifications list
+            fetchNotifications();
+          }, 500);
+        })
+        .error((error) => {
+          console.error('Echo notification error:', error);
         });
+
+      console.log('Echo listener set up successfully');
+    } catch (error) {
+      console.error('Error setting up Echo listener:', error);
     }
   };
-  
+
   // Setup immediately if user is logged in
   setupEchoListener();
-  
+
   // Also setup when token is set (for login scenarios)
   const checkInterval = setInterval(() => {
     const token = localStorage.getItem('token');
@@ -224,7 +248,7 @@ onMounted(() => {
       clearInterval(checkInterval);
     }
   }, 1000);
-  
+
   // Cleanup interval after 10 seconds
   setTimeout(() => clearInterval(checkInterval), 10000);
 });

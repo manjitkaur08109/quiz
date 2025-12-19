@@ -9,7 +9,7 @@ class NotificationController extends Controller
 public function index()
 {
     return $this->actionSuccess('Notifications successfully fetched',
-         auth()->user()->notifications,
+         auth()->user()->notifications()->latest()->get(),
     );
 }
 

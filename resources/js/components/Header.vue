@@ -56,7 +56,7 @@
       :close-on-content-click="false"
       location="bottom end"
     >
-    
+
     <template #activator="{ props }">
         <v-btn v-bind="props" icon="mdi-account" variant="text"></v-btn>
       </template>
@@ -195,37 +195,61 @@ onMounted(() => {
   fetchHeaderNotifications();
   window.addEventListener("notifications-updated", updateUnreadCount);
   window.addEventListener("notifications-updated", fetchHeaderNotifications);
-  
+
   // Set up Echo listener for real-time notifications
   const setupEchoListener = () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const token = localStorage.getItem('token');
-    
-    if (window.Echo && user.id && token) {
+
+    if (!window.Echo) {
+      console.warn('Echo is not available');
+      return;
+    }
+
+    if (!user.id || !token) {
+      console.warn('User ID or token not available');
+      return;
+    }
+
+    console.log("Setting up Echo listener for user:", user.id);
+
+    try {
       // Disconnect any existing connection
       try {
         window.Echo.leave(`App.Models.User.${user.id}`);
       } catch (e) {
         console.log('No existing connection to leave');
       }
-      
+
       // Listen for notifications on user's private channel
-      window.Echo.private(`App.Models.User.${user.id}`)
+      const channel = window.Echo.private(`App.Models.User.${user.id}`);
+
+      channel
         .notification((notification) => {
-          console.log('New notification received:', notification);
-          // Refresh notifications
-          fetchHeaderNotifications();
-          // Update unread count
-          updateUnreadCount();
-          // Dispatch event for other components
-          window.dispatchEvent(new Event("notifications-updated"));
+          console.log('New notification received via Echo:', notification);
+          // Add a small delay to ensure database is updated
+          setTimeout(() => {
+            // Refresh notifications
+            fetchHeaderNotifications();
+            // Update unread count
+            updateUnreadCount();
+            // Dispatch event for other components
+            window.dispatchEvent(new Event("notifications-updated"));
+          }, 500);
+        })
+        .error((error) => {
+          console.error('Echo notification error:', error);
         });
+
+      console.log('Echo listener set up successfully');
+    } catch (error) {
+      console.error('Error setting up Echo listener:', error);
     }
   };
-  
+
   // Setup immediately if user is logged in
   setupEchoListener();
-  
+
   // Also setup when token is set (for login scenarios)
   const checkInterval = setInterval(() => {
     const token = localStorage.getItem('token');
@@ -234,7 +258,7 @@ onMounted(() => {
       clearInterval(checkInterval);
     }
   }, 1000);
-  
+
   // Cleanup interval after 10 seconds
   setTimeout(() => clearInterval(checkInterval), 10000);
 });
@@ -242,7 +266,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("notifications-updated", updateUnreadCount);
   window.removeEventListener("notifications-updated", fetchHeaderNotifications);
-  
+
   // Clean up Echo listener
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   if (window.Echo && user.id) {
