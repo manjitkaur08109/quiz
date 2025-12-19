@@ -30,6 +30,25 @@ class QuizSeeder extends Seeder
                 ],
                 'price' => 100,
             ],
+             [
+                'title' => 'Laravel ',
+                'passing_score' => 2,
+                'description' => 'Test your knowledge on Laravel basics',
+                'category_id' => $category_id,
+                'questions' => [
+                    [
+                        'question' => 'What is Laravel?',
+                        'options' => ['Framework', 'Library', 'Language', 'Database'],
+                        'correctAnswer' => 'Framework'
+                    ],
+                    [
+                        'question' => 'Which template engine Laravel uses?',
+                        'options' => ['Blade', 'Twig', 'Smarty', 'PHP'],
+                        'correctAnswer' => 'Blade'
+                    ]
+                ],
+                'price' => 100,
+            ],
         ];
 
         foreach ($data as $d) {

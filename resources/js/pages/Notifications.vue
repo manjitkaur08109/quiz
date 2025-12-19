@@ -46,7 +46,7 @@
 
 <!-- Message -->
 <template #item.description="{ item }">
-  {{ item.data.description }}
+  {{ item.data?.description }}
 </template>
 
 <!-- Status -->
@@ -80,9 +80,7 @@
   @click.stop="deleteNotification(item.id)"
 />
 
-  <!-- <v-btn size="x-small" class="ml-2" icon color="red" @click="deleteNotification(item.id)">
-    <v-icon>mdi-delete</v-icon>
-  </v-btn> -->
+
 </template>
 
     </v-data-table>
@@ -90,7 +88,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { inject } from "vue";
 const api = inject("api");
@@ -98,6 +96,9 @@ const toast = inject("toast");
 const router = useRouter();
 const search = ref("");
 const loading = ref(false);
+
+const notifications = ref([]);
+// const unreadCount = ref(0);
 
 const notificationItems = ref([]);
 const headers = [
@@ -108,15 +109,40 @@ const headers = [
   { title: "Actions", value: "actions", sortable: false },
 ];
 
+const unreadCount = ref(
+  Number(localStorage.getItem("unreadCount") || 0)
+);
 
-// const unreadCount = computed(() =>
-//   notifications.value.filter(n => !n.read_at).length
-// );
+// listen for updates
+const updateUnreadCount = () => {
+  unreadCount.value = Number(localStorage.getItem("unreadCount") || 0);
+};
+
+onMounted(() => {
+  window.addEventListener("notifications-updated", updateUnreadCount);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("notifications-updated", updateUnreadCount);
+});
+
 const fetchNotifications = async () => {
   loading.value = true;
   try {
     const res = await api.get("/notifications/index");
     notificationItems.value = res.data.data;
+    const unread = notificationItems.value.filter(
+      n => n.read_at === null
+    ).length;
+
+     unreadCount.value = unread;
+
+    // 🔔 store for header
+    localStorage.setItem("unreadCount", unread);
+
+    // 🔁 notify header
+    window.dispatchEvent(new Event("notifications-updated"));
+
   } catch (error) {
     toast.value.showToast(
       error?.response?.data?.message || "Something went wrong!",
@@ -159,6 +185,10 @@ const deleteAllNotifications = async () => {
 
     // instant UI clear
     notificationItems.value = [];
+    unreadCount.value = 0;
+    
+  localStorage.setItem("unreadCount", 0);
+  window.dispatchEvent(new Event("notifications-updated"));
   } catch (error) {
     toast.value.showToast("Failed to delete notifications", "error");
   }

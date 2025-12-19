@@ -5,6 +5,52 @@
         <v-toolbar-title>Quiz</v-toolbar-title>
         <v-spacer></v-spacer>
 
+        <v-menu location="bottom end">
+  <template #activator="{ props }">
+    <v-btn v-bind="props" icon variant="text">
+      <v-badge
+        v-if="unreadCount > 0"
+        :content="unreadCount"
+        color="red"
+      >
+        <v-icon>mdi-bell-outline</v-icon>
+      </v-badge>
+
+      <v-icon v-else>mdi-bell-outline</v-icon>
+    </v-btn>
+  </template>
+
+  <v-card width="320">
+    <v-list density="compact">
+      <v-list-item
+        v-for="notification in notifications.slice(0, 5)"
+        :key="notification.id"
+      >
+        <v-list-item-title>
+          {{ notification.data.title }}
+        </v-list-item-title>
+        <v-list-item-subtitle>
+ {{ notification.data.description }}
+        </v-list-item-subtitle>
+      </v-list-item>
+
+      <v-list-item v-if="notifications.length === 0">
+        <v-list-item-title>No notifications</v-list-item-title>
+      </v-list-item>
+    </v-list>
+    <v-card-actions class="justify-end">
+  <v-btn
+    variant="text"
+    color="primary"
+    @click="goToNotifications"
+  >
+    View all
+  </v-btn>
+</v-card-actions>
+
+  </v-card>
+</v-menu>
+
     <v-menu
       v-model="menu"
       :close-on-content-click="false"
@@ -45,10 +91,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
-import axios from "axios";
 import { inject } from "vue";
+
+const notifications = ref([]);
+const unreadCount = ref(0);
 
 const api = inject("api");
 const router = useRouter();
@@ -110,4 +158,45 @@ const logout = async () => {
 const goToProfile = () => {
   router.push("/profile");
 };
+
+const goToNotifications = () => {
+  router.push("/notifications");
+};
+
+  Number(localStorage.getItem("unreadCount") || 0)
+
+
+// 🔁 sync unread count
+const updateUnreadCount = () => {
+  unreadCount.value = Number(localStorage.getItem("unreadCount") || 0);
+};
+
+// 🔔 fetch notifications for bell
+const fetchHeaderNotifications = async () => {
+  try {
+    const res = await api.get("/notifications/index");
+
+    notifications.value = res.data.data || [];
+
+    const unread = notifications.value.filter(
+      n => n.read_at === null
+    ).length;
+
+    unreadCount.value = unread;
+    localStorage.setItem("unreadCount", unread);
+  } catch (e) {
+    console.error("Header notification error", e);
+  }
+};
+
+
+onMounted(() => {
+  fetchHeaderNotifications();
+  window.addEventListener("notifications-updated", fetchHeaderNotifications);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("notifications-updated", fetchHeaderNotifications);
+});
+
 </script>
