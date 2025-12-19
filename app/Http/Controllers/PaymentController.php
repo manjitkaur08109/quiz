@@ -81,7 +81,8 @@ public function paymentSuccess(Request $request)
             $admin->notify(new UserNotification(
                 'New payment',
                 'A new payment has been made by a user',
-                'payment'
+                'payment',
+                $admin->id
             ));
         }
         

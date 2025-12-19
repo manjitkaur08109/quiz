@@ -27,7 +27,8 @@ class AuthController extends Controller
     $user->notify(new UserNotification(
         'welcome',
         'Welcome to our app',
-        'user'
+        'user',
+        $user->id
     ));
 
     $admin = User::where('account_type', 'admin')->first();
@@ -35,7 +36,8 @@ class AuthController extends Controller
         $admin->notify(new UserNotification(
             'new_user',
             'A new user has registered',
-            'admin'
+            'admin',
+            $admin->id
         ));
     }
      $token = $user->createToken('api_token')->plainTextToken;

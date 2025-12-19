@@ -6,24 +6,28 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 
-class UserNotification extends Notification
+class UserNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
      public $title;
      public $description;
      public $type;
+     public $user_id;
 
 
 
     /**
      * Create a new notification instance.
      */
-    public function __construct( $title, $description, $type)
+    public function __construct( $title, $description, $type, $user_id)
     {
         $this->title = $title;
         $this->description = $description;
         $this->type = $type;
+        $this->user_id = $user_id;
     }
 
     /**
@@ -33,7 +37,7 @@ class UserNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database','broadcast'];
     }
     public function toDatabase($notifiable){
         return [
@@ -41,6 +45,24 @@ class UserNotification extends Notification
             'description' => $this->description,
             'type' => $this->type,
         ];
+    }
+    
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage([
+            'title' => $this->title,
+            'description' => $this->description,
+            'type' => $this->type,
+        ]);
+    }
+
+    /**
+     * Broadcast channel
+     */
+    public function broadcastOn()
+    {
+        // Private channel for the user
+        return new \Illuminate\Broadcasting\PrivateChannel('App.Models.User.' . $this->user_id);
     }
 
     /**

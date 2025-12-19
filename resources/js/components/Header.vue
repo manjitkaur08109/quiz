@@ -95,6 +95,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { inject } from "vue";
 
+
 const notifications = ref([]);
 const unreadCount = ref(0);
 
@@ -192,6 +193,16 @@ const fetchHeaderNotifications = async () => {
 
 onMounted(() => {
   fetchHeaderNotifications();
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+   if (window.Echo && user.id) {
+    window.Echo.private(`App.Models.User.${user.id}`)
+      .notification((notification) => {
+        console.log('New notification:', notification);
+        fetchHeaderNotifications();
+      });
+  
+  }
+
   window.addEventListener("notifications-updated", fetchHeaderNotifications);
 });
 

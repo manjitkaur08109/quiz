@@ -67,7 +67,9 @@ class QuizController extends Controller {
         foreach($users as $user){
             $user->notify(new UserNotification('New Quiz Added', 
                         "A new quiz '{$quiz->title}' is available now!",
-             'quiz'));
+             'quiz',
+             $user->id
+            ));
         }
         
         
