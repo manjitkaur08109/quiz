@@ -1,87 +1,53 @@
 <template>
   <v-card flat>
     <v-card-title class="d-flex align-center pe-2">
-    Notifications
+      Notifications
       <v-spacer></v-spacer>
 
-      <v-text-field
-        v-model="search"
-        density="compact"
-        label="Search"
-        prepend-inner-icon="mdi-magnify"
-        variant="solo-filled"
-        :flat="true"
-        :hide-details="true"
-        :single-line="true"
-      />
+      <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
+        variant="solo-filled" :flat="true" :hide-details="true" :single-line="true" />
       <v-spacer></v-spacer>
-      <v-btn
-  color="red"
-  size="small"
-  variant="outlined"
-  class="ml-2"
-  @click="deleteAllNotifications"
->
-  <v-icon start>mdi-delete-sweep</v-icon>
-  Delete All
-</v-btn>
+      <v-btn color="red" size="small" variant="outlined" class="ml-2" @click="deleteAllNotifications">
+        <v-icon start>mdi-delete-sweep</v-icon>
+        Delete All
+      </v-btn>
 
 
     </v-card-title>
 
     <v-divider></v-divider>
-    <v-data-table
-      v-model:search="search"
-      :headers="headers"
-      :items="notificationItems"
-        :filter-keys="['data.title', 'data.description']"
-    >
-<template #item.sn="{ index }">
+    <v-data-table v-model:search="search" :headers="headers" :items="notificationItems"
+      :filter-keys="['data.title', 'data.description']">
+      <template #item.sn="{ index }">
         {{ index + 1 }}
       </template>
-    <!-- Title -->
-<template #item.title="{ item }">
-  {{ item.data.title }}
-</template>
+      <!-- Title -->
+      <template #item.title="{ item }">
+        {{ item.data.title }}
+      </template>
 
-<!-- Message -->
-<template #item.description="{ item }">
-  {{ item.data?.description }}
-</template>
+      <!-- Message -->
+      <template #item.description="{ item }">
+        {{ item.data?.description }}
+      </template>
 
-<!-- Status -->
-<template #item.status="{ item }">
-  <v-chip
-    size="small"
-    :color="item.read_at ? 'green' : 'orange'"
-  >
-    {{ item.read_at ? 'read' : 'unread' }}
-  </v-chip>
-</template>
+      <!-- Status -->
+      <template #item.status="{ item }">
+        <v-chip size="small" :color="item.read_at ? 'green' : 'orange'">
+          {{ item.read_at ? 'read' : 'unread' }}
+        </v-chip>
+      </template>
 
-     <template #item.actions="{ item }">
-        <v-btn
-          class="ml-2"
-          size="x-small"
-          icon
-          color="primary"
-          :disabled="item.read_at"
-          @click="markAsRead(item.id)"
-        >
+      <template #item.actions="{ item }">
+        <v-btn class="ml-2" size="x-small" icon color="primary" :disabled="item.read_at" @click="markAsRead(item.id)">
           <v-icon>mdi-check</v-icon>
         </v-btn>
 
 
-        <v-btn
-  class="ml-2"
-  icon="mdi-delete"
-  size="x-small"
-  color="red"
-  @click.stop="deleteNotification(item.id)"
-/>
+        <v-btn class="ml-2" icon="mdi-delete" size="x-small" color="red" @click.stop="deleteNotification(item.id)" />
 
 
-</template>
+      </template>
 
     </v-data-table>
   </v-card>
@@ -135,7 +101,7 @@ const fetchNotifications = async () => {
       n => n.read_at === null
     ).length;
 
-     unreadCount.value = unread;
+    unreadCount.value = unread;
 
     // 🔔 store for header
     localStorage.setItem("unreadCount", unread);
@@ -164,7 +130,7 @@ const markAsRead = async (id) => {
 };
 
 const deleteNotification = async (id) => {
-    console.log(id);
+  console.log(id);
   if (!confirm("Delete this notification?")) return;
 
   try {
@@ -187,8 +153,8 @@ const deleteAllNotifications = async () => {
     notificationItems.value = [];
     unreadCount.value = 0;
 
-  localStorage.setItem("unreadCount", 0);
-  window.dispatchEvent(new Event("notifications-updated"));
+    localStorage.setItem("unreadCount", 0);
+    window.dispatchEvent(new Event("notifications-updated"));
   } catch (error) {
     toast.value.showToast("Failed to delete notifications", "error");
   }
@@ -266,6 +232,3 @@ onUnmounted(() => {
 });
 
 </script>
-
-
-

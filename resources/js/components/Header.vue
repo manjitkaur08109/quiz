@@ -1,63 +1,48 @@
 <template>
-    <v-app-bar color="primary">
+  <v-app-bar color="primary">
 
-        <v-app-bar-nav-icon @click="drawer = !drawer" />
-        <v-toolbar-title>Quiz</v-toolbar-title>
-        <v-spacer></v-spacer>
+    <v-app-bar-nav-icon @click="drawer = !drawer" />
+    <v-toolbar-title>Quiz</v-toolbar-title>
+    <v-spacer></v-spacer>
 
-        <v-menu location="bottom end">
-  <template #activator="{ props }">
-    <v-btn v-bind="props" icon variant="text">
-      <v-badge
-        v-if="unreadCount > 0"
-        :content="unreadCount"
-        color="red"
-      >
-        <v-icon>mdi-bell-outline</v-icon>
-      </v-badge>
+    <v-menu location="bottom end">
+      <template #activator="{ props }">
+        <v-btn v-bind="props" icon variant="text">
+          <v-badge v-if="unreadCount > 0" :content="unreadCount" color="red">
+            <v-icon>mdi-bell-outline</v-icon>
+          </v-badge>
 
-      <v-icon v-else>mdi-bell-outline</v-icon>
-    </v-btn>
-  </template>
+          <v-icon v-else>mdi-bell-outline</v-icon>
+        </v-btn>
+      </template>
 
-  <v-card width="320">
-    <v-list density="compact">
-      <v-list-item
-        v-for="notification in notifications.slice(0, 5)"
-        :key="notification.id"
-      >
-        <v-list-item-title>
-          {{ notification.data.title }}
-        </v-list-item-title>
-        <v-list-item-subtitle>
- {{ notification.data.description }}
-        </v-list-item-subtitle>
-      </v-list-item>
+      <v-card width="320">
+        <v-list density="compact">
+          <v-list-item v-for="notification in notifications.slice(0, 5)" :key="notification.id">
+            <v-list-item-title>
+              {{ notification.data.title }}
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              {{ notification.data.description }}
+            </v-list-item-subtitle>
+          </v-list-item>
 
-      <v-list-item v-if="notifications.length === 0">
-        <v-list-item-title>No notifications</v-list-item-title>
-      </v-list-item>
-    </v-list>
-    <v-card-actions class="justify-end">
-  <v-btn
-    variant="text"
-    color="primary"
-    @click="goToNotifications"
-  >
-    View all
-  </v-btn>
-</v-card-actions>
+          <v-list-item v-if="notifications.length === 0">
+            <v-list-item-title>No notifications</v-list-item-title>
+          </v-list-item>
+        </v-list>
+        <v-card-actions class="justify-end">
+          <v-btn variant="text" color="primary" @click="goToNotifications">
+            View all
+          </v-btn>
+        </v-card-actions>
 
-  </v-card>
-</v-menu>
+      </v-card>
+    </v-menu>
 
-    <v-menu
-      v-model="menu"
-      :close-on-content-click="false"
-      location="bottom end"
-    >
+    <v-menu v-model="menu" :close-on-content-click="false" location="bottom end">
 
-    <template #activator="{ props }">
+      <template #activator="{ props }">
         <v-btn v-bind="props" icon="mdi-account" variant="text"></v-btn>
       </template>
       <v-list>
@@ -72,18 +57,12 @@
         </v-list-item>
       </v-list>
     </v-menu>
-</v-app-bar>
+  </v-app-bar>
 
   <v-navigation-drawer v-model="drawer" app permanent>
     <v-list>
-        <v-list-item
-        v-for="item in filteredItems"
-        :key="item.title"
-        :title="item.title"
-        :prepend-icon="item.icon"
-        :to="item.path"
-        link
-        />
+      <v-list-item v-for="item in filteredItems" :key="item.title" :title="item.title" :prepend-icon="item.icon"
+        :to="item.path" link />
     </v-list>
   </v-navigation-drawer>
 
@@ -110,8 +89,8 @@ const items = [
   { title: "Category", path: "/category", icon: "mdi-view-grid-outline" },
   { title: "Discover", path: "/discover", icon: "mdi-compass-outline" },
   { title: "MyLearning", path: "/myLearning", icon: "mdi-school-outline" },
-  {title: "Payments", path: "/payments", icon: "mdi-cash-multiple", },
-  {title: "Notifications", path: "/notifications", icon: "mdi-bell-outline", }
+  { title: "Payments", path: "/payments", icon: "mdi-cash-multiple", },
+  { title: "Notifications", path: "/notifications", icon: "mdi-bell-outline", }
 ];
 
 let user = {};
@@ -152,7 +131,6 @@ const logout = async () => {
   }
 };
 
-
 const goToProfile = () => {
   router.push("/profile");
 };
@@ -161,14 +139,9 @@ const goToNotifications = () => {
   router.push("/notifications");
 };
 
-  // Number(localStorage.getItem("unreadCount") || 0)
-
-
 const updateUnreadCount = () => {
   unreadCount.value = Number(localStorage.getItem("unreadCount") || 0);
 };
-
-
 
 const fetchHeaderNotifications = async () => {
   try {
@@ -192,7 +165,7 @@ const setupEchoListener = () => {
 
   try {
     window.Echo.leave("public-notifications");
-  } catch (e) {}
+  } catch (e) { }
 
   window.Echo
     .channel("public-notifications")
