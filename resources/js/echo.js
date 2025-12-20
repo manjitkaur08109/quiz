@@ -22,23 +22,25 @@ const reverbHost = import.meta.env.VITE_REVERB_HOST || window.location.hostname;
 const reverbPort = import.meta.env.VITE_REVERB_PORT || 8080;
 const useTLS = reverbScheme === 'https';
 
+
 window.Echo = new Echo({
     broadcaster: 'reverb',
     key: import.meta.env.VITE_REVERB_APP_KEY,
-    wsHost: reverbHost,
-    wsPort: reverbPort,
-    wssPort: useTLS ? (import.meta.env.VITE_REVERB_WSS_PORT || 443) : reverbPort,
-    forceTLS: useTLS,
-    enabledTransports: useTLS ? ['wss'] : ['ws'],
-    authEndpoint: `${apiBaseURL}/broadcasting/auth`,
+
+    wsHost: import.meta.env.VITE_REVERB_HOST || window.location.hostname,
+    wsPort: import.meta.env.VITE_REVERB_PORT || 8080,
+    forceTLS: false,
+    enabledTransports: ['ws'],
+
+    authEndpoint: 'http://127.0.0.1:8000/broadcasting/auth',
     auth: {
-        headers: getAuthHeaders(),
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
     },
-    disableStats: true,
 });
 
-// Export function to reconnect Echo with new token
-window.reconnectEcho = () => {
+ window.reconnectEcho = () => {
     if (window.Echo) {
         window.Echo.disconnect();
     }

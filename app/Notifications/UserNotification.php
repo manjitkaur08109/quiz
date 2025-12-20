@@ -62,21 +62,9 @@ class UserNotification extends Notification implements ShouldBroadcastNow
     public function broadcastOn()
     {
         // Private channel for the user
-        return new \Illuminate\Broadcasting\PrivateChannel('App.Models.User.' . $this->user_id);
+        return new \Illuminate\Broadcasting\PublicChannel('App.Models.User.' . $this->notifiable->id);
     }
 
-    /**
-     * Get the broadcast channel name for the notification.
-     * Removed to use default 'notification' event name for Echo compatibility
-     */
-    // public function broadcastAs()
-    // {
-    //     return 'notification.created';
-    // }
-
-    /**
-     * Get the mail representation of the notification.
-     */
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)

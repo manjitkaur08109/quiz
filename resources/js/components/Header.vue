@@ -74,7 +74,6 @@
     </v-menu>
 </v-app-bar>
 
-  <!-- Navigation Drawer -->
   <v-navigation-drawer v-model="drawer" app permanent>
     <v-list>
         <v-list-item
@@ -142,13 +141,11 @@ const logout = async () => {
 
     );
 
-    // Token delete from localStorage
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     router.push("/login");
   } catch (error) {
     console.error("Logout failed:", error);
-    // toast.value.showToast("Something went wrong during logout!", "error");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     router.push("/login");
@@ -164,25 +161,21 @@ const goToNotifications = () => {
   router.push("/notifications");
 };
 
-  Number(localStorage.getItem("unreadCount") || 0)
+  // Number(localStorage.getItem("unreadCount") || 0)
 
 
-// 🔁 sync unread count
 const updateUnreadCount = () => {
   unreadCount.value = Number(localStorage.getItem("unreadCount") || 0);
 };
 
-// 🔔 fetch notifications for bell
+
+
 const fetchHeaderNotifications = async () => {
   try {
     const res = await api.get("/notifications/index");
-
     notifications.value = res.data.data || [];
 
-    const unread = notifications.value.filter(
-      n => n.read_at === null
-    ).length;
-
+    const unread = notifications.value.filter(n => n.read_at === null).length;
     unreadCount.value = unread;
     localStorage.setItem("unreadCount", unread);
   } catch (e) {
@@ -190,91 +183,42 @@ const fetchHeaderNotifications = async () => {
   }
 };
 
+// ---------------- PUBLIC ECHO LISTENER ----------------
+const setupEchoListener = () => {
+  if (!window.Echo) {
+    console.warn("Echo not available");
+    return;
+  }
 
+  try {
+    window.Echo.leave("public-notifications");
+  } catch (e) {}
+
+  window.Echo
+    .channel("public-notifications")
+    .listen(".notification.created", (e) => {
+      console.log("Public notification received:", e);
+
+      fetchHeaderNotifications();
+      updateUnreadCount();
+
+      window.dispatchEvent(new Event("notifications-updated"));
+    });
+};
+
+// ---------------- LIFECYCLE ----------------
 onMounted(() => {
   fetchHeaderNotifications();
-  window.addEventListener("notifications-updated", updateUnreadCount);
-  window.addEventListener("notifications-updated", fetchHeaderNotifications);
-
-  // Set up Echo listener for real-time notifications
-  const setupEchoListener = () => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const token = localStorage.getItem('token');
-
-    if (!window.Echo) {
-      console.warn('Echo is not available');
-      return;
-    }
-
-    if (!user.id || !token) {
-      console.warn('User ID or token not available');
-      return;
-    }
-
-    console.log("Setting up Echo listener for user:", user.id);
-
-    try {
-      // Disconnect any existing connection
-      try {
-        window.Echo.leave(`App.Models.User.${user.id}`);
-      } catch (e) {
-        console.log('No existing connection to leave');
-      }
-
-      // Listen for notifications on user's private channel
-      const channel = window.Echo.private(`App.Models.User.${user.id}`);
-
-      channel
-        .notification((notification) => {
-          console.log('New notification received via Echo:', notification);
-          // Add a small delay to ensure database is updated
-          setTimeout(() => {
-            // Refresh notifications
-            fetchHeaderNotifications();
-            // Update unread count
-            updateUnreadCount();
-            // Dispatch event for other components
-            window.dispatchEvent(new Event("notifications-updated"));
-          }, 500);
-        })
-        .error((error) => {
-          console.error('Echo notification error:', error);
-        });
-
-      console.log('Echo listener set up successfully');
-    } catch (error) {
-      console.error('Error setting up Echo listener:', error);
-    }
-  };
-
-  // Setup immediately if user is logged in
   setupEchoListener();
 
-  // Also setup when token is set (for login scenarios)
-  const checkInterval = setInterval(() => {
-    const token = localStorage.getItem('token');
-    if (token && window.Echo) {
-      setupEchoListener();
-      clearInterval(checkInterval);
-    }
-  }, 1000);
-
-  // Cleanup interval after 10 seconds
-  setTimeout(() => clearInterval(checkInterval), 10000);
+  window.addEventListener("notifications-updated", updateUnreadCount);
 });
 
 onUnmounted(() => {
   window.removeEventListener("notifications-updated", updateUnreadCount);
-  window.removeEventListener("notifications-updated", fetchHeaderNotifications);
 
-  // Clean up Echo listener
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  if (window.Echo && user.id) {
-    try {
-      window.Echo.leave(`App.Models.User.${user.id}`);
-    } catch (e) {
-      console.log('Error leaving channel:', e);
-    }
+  if (window.Echo) {
+    window.Echo.leave("public-notifications");
   }
 });
 
