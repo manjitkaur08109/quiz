@@ -78,6 +78,16 @@ const handleLogin = async () => {
     localStorage.setItem("user", JSON.stringify(res.data.data.user));
     localStorage.setItem("token", res.data.data.token);
 
+       localStorage.setItem(
+      "roles",
+      JSON.stringify(res.data.data.roles || [])
+    );
+
+    localStorage.setItem(
+      "permissions",
+      JSON.stringify(res.data.data.permissions || [])
+    );
+
     // Reconnect Echo with new token after login
     if (window.reconnectEcho) {
       window.reconnectEcho();

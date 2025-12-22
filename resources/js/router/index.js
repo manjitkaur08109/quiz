@@ -14,6 +14,9 @@ import MyLearning from "../pages/MyLearning.vue";
 import Discover from "../pages/Discover.vue";
 import Payments from "../pages/Payments.vue";
 import Notifications from "../pages/Notifications.vue";
+import RolePermission from "../pages/RolePermission.vue";
+import AddRolePermission from "../pages/AddRolePermission.vue";
+import EditRolePermission from "../pages/EditRolePermission.vue";
 
 const routes = [
   { path: "/", name: "Dashboard", component: Dashboard , meta: { requiresAuth: true } },
@@ -31,6 +34,9 @@ const routes = [
   { path: "/myLearning", name: "MyLearning", component: MyLearning, meta: { requiresAuth: true } },
   {path:"/payments",name:"Payments",component:Payments, meta: { requiresAuth: true } },
   {path:"/notifications",name:"Notifications",component:Notifications, meta: { requiresAuth: true } },
+  {path:"/rolepermission",name:"RolePermission",component:RolePermission, meta: { requiresAuth: true } },
+  {path:"/addrolepermission",name:"AddRolePermission",component:AddRolePermission, meta: { requiresAuth: true } },
+  {path:"/editrolepermission/:id",name:"EditRolePermission",component:EditRolePermission, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({

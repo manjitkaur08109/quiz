@@ -92,12 +92,18 @@
 import { ref, reactive, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { inject } from "vue";
+// import { can } from '@/permission'
 
 import {
   validateRequired,
   validatePassingScore,
   validateMaxLength
 } from "@/utils/validationRules.js";
+
+
+// const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+
+
 const router = useRouter();
 const api = inject("api");
 const toast = inject("toast");
@@ -128,6 +134,12 @@ const apiQuiz = computed(() => {
 
 const loading = ref(false);
 onMounted(async () => {
+
+  if (!can("create quiz")) {
+    toast.value.showToast("You are not authorized to create quiz", "error");
+    router.push("/quiz"); 
+    return;
+  }
   try {
     const res = await api.get("/category/index");
     categories.value = res.data.data;

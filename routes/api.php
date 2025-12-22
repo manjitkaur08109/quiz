@@ -10,6 +10,7 @@ use App\Http\Controllers\QuizAttemptController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RoleController;
 
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -41,7 +42,18 @@ Route::prefix('notifications')->group(function () {
     Route::prefix('category')->group(function(){
         Route::get('/index', [CategoryController::class, 'index']);
     });
+    Route::post('/quiz/store', [QuizController::class, 'store'])
+        ->middleware('permission:create quiz');
 
+ Route::prefix('rolepermission')->group(function () {
+     Route::get('/index', [RoleController::class, 'index']);
+     Route::post('/copy',[RoleController::class,'copy']);
+     Route::post('/store', [RoleController::class, 'store']);
+     Route::get('/show/{id}', [RoleController::class, 'show']);
+     Route::put('/update/{id}', [RoleController::class, 'update']);
+     Route::delete('/delete/{id}', [RoleController::class, 'destroy']);
+     Route::get('/get-permissions', [RoleController::class, 'getPermissions']);
+    });
 
 Route::middleware(['admin'])->group(function () {
     

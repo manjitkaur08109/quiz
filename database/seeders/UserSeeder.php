@@ -15,7 +15,7 @@ class UserSeeder extends Seeder {
 
     public function run(): void {
         
-        User::updateOrCreate( [
+        $admin = User::updateOrCreate( [
             'email' => 'admin@admin.com'],
         
         [
@@ -24,6 +24,6 @@ class UserSeeder extends Seeder {
                 'password' => Hash::make( 'qwerty' ),
                 'account_type' => 'admin'
             ] ) ;
-            User::factory()->count(5)->create();
-    }
+            $admin->assignRole('admin');
+                                                       }
 }

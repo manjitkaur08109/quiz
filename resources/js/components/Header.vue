@@ -82,6 +82,11 @@ const router = useRouter();
 const drawer = ref(true);
 const menu = ref(false);
 
+const permissions = JSON.parse(
+  localStorage.getItem("permissions") || "[]"
+);
+
+
 const items = [
   { title: "Dashboard", path: "/", icon: "mdi-view-dashboard" },
   { title: "Quiz", path: "/quiz", icon: "mdi-help-circle-outline" },
@@ -90,7 +95,8 @@ const items = [
   { title: "Discover", path: "/discover", icon: "mdi-compass-outline" },
   { title: "MyLearning", path: "/myLearning", icon: "mdi-school-outline" },
   { title: "Payments", path: "/payments", icon: "mdi-cash-multiple", },
-  { title: "Notifications", path: "/notifications", icon: "mdi-bell-outline", }
+  { title: "Notifications", path: "/notifications", icon: "mdi-bell-outline", },
+  {title:"Role and Permission",path:"/rolepermission",icon:"mdi-account-group-outline"},
 ];
 
 let user = {};
@@ -125,12 +131,17 @@ const logout = async () => {
     );
 
     localStorage.removeItem("token");
+     localStorage.removeItem("permissions");
+  localStorage.removeItem("roles");
     localStorage.removeItem("user");
     router.push("/login");
   } catch (error) {
     console.error("Logout failed:", error);
     localStorage.removeItem("token");
+     localStorage.removeItem("permissions");
+  localStorage.removeItem("roles");
     localStorage.removeItem("user");
+
     router.push("/login");
   }
 };

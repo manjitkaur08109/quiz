@@ -6,7 +6,7 @@
 
       <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
         variant="solo-filled" flat hide-details single-line></v-text-field>
-      <v-btn color="primary" @click="goToAddQuiz" prepend-icon="mdi-plus" class="ml-4 mb-3">
+      <v-btn  @click="goToAddQuiz" color="primary" prepend-icon="mdi-plus" class="ml-4 mb-3">
         Add New
       </v-btn>
     </v-card-title>
@@ -101,6 +101,7 @@ import { useRouter } from "vue-router";
 import { inject } from "vue";
 import moment from "moment";
 
+// import { can } from '@/permission';
 const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
