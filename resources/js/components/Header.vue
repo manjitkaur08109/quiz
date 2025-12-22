@@ -104,8 +104,12 @@ try {
 
 const filteredItems = computed(() => {
   if (user?.account_type === "admin") {
-    return items;
+    // Admin ke liye Discover aur MyLearning hata do
+    return items.filter(
+      (item) => item.title !== "Discover" && item.title !== "MyLearning"
+    );
   } else {
+    // Normal user ke liye sirf Discover aur MyLearning
     return items.filter(
       (item) => item.title === "Discover" || item.title === "MyLearning"
     );
