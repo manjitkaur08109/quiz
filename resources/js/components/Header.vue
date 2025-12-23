@@ -88,15 +88,15 @@ const permissions = JSON.parse(
 
 
 const items = [
-  { title: "Dashboard", path: "/", icon: "mdi-view-dashboard" },
-  { title: "Quiz", path: "/quiz", icon: "mdi-help-circle-outline" },
-  { title: "Users", path: "/users", icon: "mdi-account-group" },
-  { title: "Category", path: "/category", icon: "mdi-view-grid-outline" },
-  { title: "Discover", path: "/discover", icon: "mdi-compass-outline" },
-  { title: "MyLearning", path: "/myLearning", icon: "mdi-school-outline" },
-  { title: "Payments", path: "/payments", icon: "mdi-cash-multiple", },
-  { title: "Notifications", path: "/notifications", icon: "mdi-bell-outline", },
-  {title:"Role and Permission",path:"/rolepermission",icon:"mdi-account-group-outline"},
+  { title: "Dashboard", path: "/", icon: "mdi-view-dashboard",permission: 'view dashboard' },
+  { title: "Quiz", path: "/quiz", icon: "mdi-help-circle-outline" , permission: 'create quiz' },
+  { title: "Users", path: "/users", icon: "mdi-account-group" , permission: 'view user' },
+  { title: "Category", path: "/category", icon: "mdi-view-grid-outline" , permission: 'create category' },
+  { title: "Discover", path: "/discover", icon: "mdi-compass-outline" ,permission: 'view discover' },
+  { title: "MyLearning", path: "/myLearning", icon: "mdi-school-outline" ,permission: 'view myLearning' },
+  { title: "Payments", path: "/payments", icon: "mdi-cash-multiple", permission: 'view payments' },
+  { title: "Notifications", path: "/notifications", icon: "mdi-bell-outline" },
+  {title:"Role and Permission",path:"/rolepermission",icon:"mdi-account-group-outline" , permission: 'view rolepermissions'},
 ];
 
 let user = {};
@@ -109,18 +109,12 @@ try {
 }
 
 const filteredItems = computed(() => {
-  if (user?.account_type === "admin") {
-    // Admin ke liye Discover aur MyLearning hata do
-    return items.filter(
-      (item) => item.title !== "Discover" && item.title !== "MyLearning"
-    );
-  } else {
-    // Normal user ke liye sirf Discover aur MyLearning
-    return items.filter(
-      (item) => item.title === "Discover" || item.title === "MyLearning"
-    );
-  }
+  return items.filter(
+    (item) =>
+      !item.permission || permissions.includes(item.permission)
+  );
 });
+
 
 const logout = async () => {
   try {

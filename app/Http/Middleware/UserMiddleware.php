@@ -18,12 +18,9 @@ class UserMiddleware extends Controller
     public function handle(Request $request, Closure $next)
     {
 
+       $user = $request->user();
 
-        if (!Auth::check()) {
-            return $this->unauthorized('Unauthorized');
-        }
-
-        if ($request->user()->account_type !== 'user') {
+        if (!$user->hasRole('user')) {
             return $this->forbidden('User Access Only');
         }
         return $next($request);

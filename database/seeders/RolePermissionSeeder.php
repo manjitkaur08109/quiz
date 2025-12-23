@@ -40,6 +40,7 @@ class RolePermissionSeeder extends Seeder
             'view payments',
             'view discover',
             'view myLearning',
+            'view rolepermission'
             ];
 
         foreach ($permissions as $permission) {
@@ -52,6 +53,7 @@ class RolePermissionSeeder extends Seeder
 
         // Assign permissions
         $admin->givePermissionTo($permissions);
+        $admin->revokePermissionTo(['view myLearning', 'view discover']);
 
         $user->givePermissionTo(['view quiz','view category','view myLearning','view discover']);
     }

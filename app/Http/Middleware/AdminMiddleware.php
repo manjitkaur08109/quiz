@@ -13,11 +13,10 @@ class AdminMiddleware extends Controller
     public function handle(Request $request, Closure $next)
     {
 
-        if (!Auth::check()) {
-            return $this->unauthorized('Unauthorized');
-        }
+        $user = $request->user();
 
-        if ($request->user()->account_type !== 'admin') {
+
+        if (!$user->hasRole('admin') ) {
             return $this->forbidden('Admin Access Only');
         }
 
