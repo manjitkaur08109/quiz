@@ -153,6 +153,11 @@ import { inject } from "vue";
 
 import { validateMaxLength, validateRequired, validatePassingScore } from "../utils/validationRules";
 
+const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+
+const can = (permission) => {
+  return permissions.includes(permission);
+};
 const toast = inject("toast");
 
 const quiz = reactive({
@@ -215,6 +220,11 @@ const removeOption = (qIndex, oIndex) => {
 };
 
 onMounted(async () => {
+   if (!can("view category")) {
+    toast.value.showToast("You are not authorized to view category", "error");
+  
+    return;
+  }
   try {
     const res = await api.get("/category/index");
     categories.value = res.data.data;
@@ -229,6 +239,11 @@ onMounted(async () => {
 });
 
 onMounted(async () => {
+   if (!can("view quiz")) {
+    toast.value.showToast("You are not authorized to view quiz", "error");
+    router.push("/quiz"); 
+    return;
+  }
   try {
     const res = await api.get(`/quiz/show/${quizId}`);
     const data = res.data.data;
@@ -252,6 +267,11 @@ onMounted(async () => {
 });
 
 const updateQuiz = async () => {
+   if (!can("edit quiz")) {
+    toast.value.showToast("You are not authorized to edit quiz", "error");
+    router.push("/quiz"); 
+    return;
+  }
   const { valid } = await formRef.value.validate();
   if (!valid) return;
   loading.value = true;

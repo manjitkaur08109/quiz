@@ -15,6 +15,7 @@
         :single-line="true"
       />
       <v-btn
+       v-if="can('create category')"
         class="ml-5"
         color="primary"
         @click="goToAddCategory"
@@ -43,10 +44,10 @@
 
 
 <template #item.actions="{ item }">
-  <v-btn size="x-small" icon color="primary" @click="editCategory(item.id)">
+  <v-btn v-if="can('edit category')" size="x-small" icon color="primary" @click="editCategory(item.id)">
     <v-icon>mdi-pencil</v-icon>
   </v-btn>
-  <v-btn size="x-small" class="ml-2" icon color="red" @click="deleteCategory(item.id)">
+  <v-btn v-if="can('delete category')" size="x-small" class="ml-2" icon color="red" @click="deleteCategory(item.id)">
     <v-icon>mdi-delete</v-icon>
   </v-btn>
 </template>
@@ -59,6 +60,13 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { inject } from "vue";
+const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+
+const can = (permission) => {
+  return permissions.includes(permission);
+};
+
+
 const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
@@ -80,10 +88,13 @@ const goToAddCategory = () => {
 const editCategory = (id) => {
   router.push(`/editCategory/${id}`);
 };
-//
-
 
 const fetchCategories = async () => {
+  if (!can("view category")) {
+    toast.value.showToast("You are not authorized to view category", "error");
+    router.push("/category"); 
+    return;
+  }
   loading.value = true;
   try {
     const res = await api.get("/category/index");
@@ -99,6 +110,11 @@ const fetchCategories = async () => {
 };
 
 const deleteCategory = async (id) => {
+   if (!can("delete category")) {
+    toast.value.showToast("You are not authorized to delete category", "error");
+    router.push("/category"); 
+    return;
+  }
   if (!confirm("Delete this category?")) return;
   try {
     await api.delete(`/category/delete/${id}`);
@@ -114,6 +130,7 @@ const deleteCategory = async (id) => {
 };
 
 onMounted(() => {
+   console.log('Injected permissions:', permissions);
   fetchCategories();
 });
 

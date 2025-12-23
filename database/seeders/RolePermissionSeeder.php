@@ -37,10 +37,13 @@ class RolePermissionSeeder extends Seeder
             'delete role',
             'view role',
             'view dashboard',
-            'view payments',
+            'view payment',
             'view discover',
             'view myLearning',
-            'view rolepermission'
+            'view rolepermission',
+            'create rolepermission',
+            'edit rolepermission',
+            'delete rolepermission'
             ];
 
         foreach ($permissions as $permission) {

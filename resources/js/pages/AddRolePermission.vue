@@ -30,7 +30,7 @@
             <h4 class="mb-3">Assign Permissions</h4>
             <v-row>
               <v-col
-                v-for="permission in permissions"
+                v-for="permission in allPermissions"
                 :key="permission.name"
                 cols="12"
                 sm="6"
@@ -71,13 +71,19 @@
 import { ref, reactive, onMounted, inject } from "vue";
 import { useRouter } from "vue-router";
 
+const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+
+const can = (permission) => {
+  return permissions.includes(permission);
+};
+
 const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
 
 const loading = ref(false);
 
-const permissions = ref([]);
+const allPermissions = ref([]);
 
 const form = reactive({
   name: "",
@@ -85,18 +91,29 @@ const form = reactive({
 });
 
 const fetchPermission = async () => {
+    if (!can("view rolepermission")) {
+    toast.value.showToast("You are not authorized to view rolepermission", "error");
+    router.push("/rolepermission"); 
+    return;
+  } 
   try {
     const res = await api.get("/rolepermission/get-permissions");
 
 console.log(res.data.data);
         // permissions.value = res.data.permissions ?? res.data;
-    permissions.value = res.data.data;
+    allPermissions.value = res.data.data;
   } catch (e) {
     console.error(e);
   }
 };
 
 const submit = async () => {
+  
+    if (!can("create rolepermission")) {
+    toast.value.showToast("You are not authorized to create rolepermission", "error");
+    router.push("/rolepermission"); 
+    return;
+  } 
   if (!form.name) {
     toast.value.showToast("Role name is required", "error");
     return;

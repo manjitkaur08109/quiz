@@ -52,6 +52,12 @@ import { inject } from "vue";
 import {
     validateMaxLength
 } from "@/utils/validationRules.js";
+
+const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+
+const can = (permission) => {
+  return permissions.includes(permission);
+};
 const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
@@ -67,6 +73,11 @@ const loading = ref(false);
 const formRef = ref("");
 
 onMounted(async () => {
+   if (!can("view category")) {
+    toast.value.showToast("You are not authorized to create category", "error");
+    router.push("/category"); 
+    return;
+  }
   try {
     const res = await api.get(`/category/show/${categoryId}`);
     const data = res.data.data;
@@ -82,6 +93,11 @@ onMounted(async () => {
 });
 
 const handleSubmit = async () => {
+   if (!can("edit category")) {
+    toast.value.showToast("You are not authorized to edit category", "error");
+    router.push("/category"); 
+    return;
+  }
   const { valid } = await formRef.value.validate(); // ✅ validate all fields
   if (!valid) return; // stop if invalid
   loading.value = true;

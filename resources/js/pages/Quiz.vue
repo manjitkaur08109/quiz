@@ -27,13 +27,13 @@
         {{ item?.category?.title }}
       </template>
       <template #item.actions="{ item }">
-        <v-btn size="x-small" icon color="success" class="mr-2" @click="info(item)">
+        <v-btn v-if="can('view quiz')" size="x-small" icon color="success" class="mr-2" @click="info(item)">
           <v-icon>mdi-information</v-icon>
         </v-btn>
-        <v-btn size="x-small" icon color="primary" @click="editQuiz(item.id)">
+        <v-btn v-if="can('edit quiz')" size="x-small" icon color="primary" @click="editQuiz(item.id)">
           <v-icon>mdi-pencil</v-icon>
         </v-btn>
-        <v-btn size="x-small" class="ml-2" icon color="red" @click="deleteQuiz(item.id)">
+        <v-btn v-if="can('delete quiz')" size="x-small" class="ml-2" icon color="red" @click="deleteQuiz(item.id)">
           <v-icon>mdi-delete</v-icon>
         </v-btn>
 
@@ -100,8 +100,11 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { inject } from "vue";
 import moment from "moment";
+const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
 
-// import { can } from '@/permission';
+const can = (permission) => {
+  return permissions.includes(permission);
+};
 const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
@@ -120,6 +123,11 @@ const headers = [
 ];
 
 const fetchQuizzes = async () => {
+    if (!can("view quiz")) {
+    toast.value.showToast("You are not authorized to view quiz", "error");
+    router.push("/quiz"); 
+    return;
+  }
   loading.value = true;
   try {
     const res = await api.get("/quiz/index");
@@ -141,6 +149,11 @@ const info = async (item) => {
 };
 
 const deleteQuiz = async (id) => {
+    if (!can("delete quiz")) {
+    toast.value.showToast("You are not authorized to delete quiz", "error");
+    router.push("/quiz"); 
+    return;
+  }
   if (!confirm("Delete this quiz?")) return;
   try {
     await api.delete(`/quiz/delete/${id}`);

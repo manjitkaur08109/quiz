@@ -19,6 +19,13 @@ import { ref, onMounted } from 'vue';
 import { inject } from "vue";
 import moment from 'moment';
 
+const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+
+const can = (permission) => {
+  return permissions.includes(permission);
+};
+
+
 const api = inject("api");
 
 const toast = inject("toast");
@@ -38,6 +45,11 @@ const headers = [
 ];
 
 const fetchPayments = async () => {
+     if (!can("view payment")) {
+    toast.value.showToast("You are not authorized to view payment", "error");
+    router.push("/payments"); 
+    return;
+  }
     try {
 
         const res = await api.get("/payments/index");

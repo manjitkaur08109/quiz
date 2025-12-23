@@ -94,7 +94,7 @@ const items = [
   { title: "Category", path: "/category", icon: "mdi-view-grid-outline" , permission: 'create category' },
   { title: "Discover", path: "/discover", icon: "mdi-compass-outline" ,permission: 'view discover' },
   { title: "MyLearning", path: "/myLearning", icon: "mdi-school-outline" ,permission: 'view myLearning' },
-  { title: "Payments", path: "/payments", icon: "mdi-cash-multiple", permission: 'view payments' },
+  { title: "Payments", path: "/payments", icon: "mdi-cash-multiple", permission: 'view payment' },
   { title: "Notifications", path: "/notifications", icon: "mdi-bell-outline" },
   {title:"Role and Permission",path:"/rolepermission",icon:"mdi-account-group-outline" , permission: 'view rolepermissions'},
 ];

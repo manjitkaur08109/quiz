@@ -25,14 +25,14 @@
                     <v-spacer />
 
                     <v-btn icon size="small" variant="text">
-                        <v-icon size="18" @click="goToEditRolePermission(role.id)">mdi-pencil-outline</v-icon>
+                        <v-icon v-if="can('edit rolepermission')" size="18" @click="goToEditRolePermission(role.id)">mdi-pencil-outline</v-icon>
                     </v-btn>
 
-                    <v-btn icon size="small" variant="text">
+                    <v-btn v-if="can('view rolepermission')" icon size="small" variant="text">
                         <v-icon size="18" @click="copyRole(role)" > mdi-content-copy</v-icon>
                     </v-btn>
 
-                    <v-btn icon size="small" variant="text" color="red">
+                    <v-btn v-if="can('delete rolepermission')" icon size="small" variant="text" color="red">
                         <v-icon size="18" @click="deleteRole(role.id)">mdi-delete-outline</v-icon>
                     </v-btn>
                 </div>
@@ -46,6 +46,12 @@
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from "vue-router";
 import { inject } from "vue";
+
+const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+
+const can = (permission) => {
+  return permissions.includes(permission);
+};
 const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
@@ -72,6 +78,11 @@ const user = reactive({
 const roles = ref([]);
 
 const fetchRoles = async () => {
+      if (!can("view rolepermission")) {
+    toast.value.showToast("You are not authorized to view rolepermission", "error");
+    router.push("/rolepermission"); 
+    return;
+  }
     const res = await api.get('/rolepermission/index');
     console.log(res.data);
     roles.value = res.data.data;
@@ -79,6 +90,11 @@ const fetchRoles = async () => {
 }
 
 const deleteRole = async (id) => {
+      if (!can("delete rolepermission")) {
+    toast.value.showToast("You are not authorized to delete rolepermission", "error");
+    router.push("/rolepermission"); 
+    return;
+  }
     if (!confirm("Delete this role?")) return;
     try {
         await api.delete(`/rolepermission/delete/${id}`);
@@ -91,6 +107,11 @@ const deleteRole = async (id) => {
 };
 
 const copyRole = async (role) => {
+      if (!can("view rolepermission")) {
+    toast.value.showToast("You are not authorized to view rolepermission", "error");
+    router.push("/rolepermission"); 
+    return;
+  }
     const newName = prompt(
         "Enter new role name",
         `${role.name}_copy`

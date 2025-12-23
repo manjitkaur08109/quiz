@@ -40,6 +40,7 @@
       <template #item.actions="{ item }">
 
         <v-btn
+        v-if="can('delete user')"
           size="x-small"
           class="ml-2"
           icon
@@ -49,7 +50,7 @@
           <v-icon>mdi-delete</v-icon>
         </v-btn>
 
-          <v-btn icon color="success" class="ml-2" size="x-small" @click="impersonateUser(item)">
+          <v-btn v-if="can('view user')" icon color="success" class="ml-2" size="x-small" @click="impersonateUser(item)">
             <v-icon left>mdi-account-switch</v-icon>
     </v-btn>
       </template>
@@ -61,6 +62,11 @@
 import { ref, onMounted } from "vue";
 import { inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
+const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+
+const can = (permission) => {
+  return permissions.includes(permission);
+};
 const router = useRouter();
 const route = useRoute();
 const api = inject("api");
@@ -75,6 +81,11 @@ const headers = [
 ];
 
 const getUsers = async () => {
+   if (!can("view user")) {
+    toast.value.showToast("You are not authorized to view user", "error");
+    router.push("/users"); 
+    return;
+  }
   try {
     const res = await api.get("/users");
     users.value = res.data.data;
@@ -86,8 +97,13 @@ const getUsers = async () => {
     );
   }
 };
-
 const deleteUser = async (id) => {
+  
+   if (!can("delete user")) {
+    toast.value.showToast("You are not authorized to delete user", "error");
+    router.push("/users"); 
+    return;
+  }
   if (!confirm("Are you sure you want to delete this user?")) return;
 
   try {

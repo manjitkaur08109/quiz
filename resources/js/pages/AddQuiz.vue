@@ -101,9 +101,12 @@ import {
 } from "@/utils/validationRules.js";
 
 
-// const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
 
+const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
 
+const can = (permission) => {
+  return permissions.includes(permission);
+};
 const router = useRouter();
 const api = inject("api");
 const toast = inject("toast");
@@ -135,9 +138,8 @@ const apiQuiz = computed(() => {
 const loading = ref(false);
 onMounted(async () => {
 
-  if (!can("create quiz")) {
-    toast.value.showToast("You are not authorized to create quiz", "error");
-    router.push("/quiz"); 
+  if (!can("view category")) {
+    toast.value.showToast("You are not authorized to view category", "error");
     return;
   }
   try {
@@ -198,6 +200,11 @@ const removeOption = (qIndex, oIndex) => {
 };
 
 const handleSubmit = async () => {
+   if (!can("create quiz")) {
+    toast.value.showToast("You are not authorized to create quiz", "error");
+    router.push("/quiz"); 
+    return;
+  }
   const { valid } = await formRef.value.validate();
   if (!valid) return;
 

@@ -24,7 +24,7 @@
                         <h4 class="mb-3">Assign Permissions</h4>
 
                         <v-row>
-                            <v-col v-for="permission in permissions" :key="permission.name" cols="12" sm="6" md="4">
+                            <v-col v-for="permission in allPermissions" :key="permission.name" cols="12" sm="6" md="4">
                                 <v-checkbox v-model="form.permissions" :label="permission.name" :value="permission.name"
                                     density="compact" />
                             </v-col>
@@ -51,13 +51,19 @@
 import { ref, reactive, onMounted, inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
+const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+
+const can = (permission) => {
+  return permissions.includes(permission);
+};
+
 const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
 const route = useRoute();
 
 const loading = ref(false);
-const permissions = ref([]);
+const allPermissions = ref([]);
 
 const form = reactive({
     name: "",
@@ -68,12 +74,22 @@ const roleId = route.params.id;
 
 /* Fetch ALL permissions */
 const fetchPermissions = async () => {
+    if (!can("view rolepermission")) {
+    toast.value.showToast("You are not authorized to view rolepermission", "error");
+    router.push("/rolepermission"); 
+    return;
+  } 
     const res = await api.get("/rolepermission/get-permissions");
-    permissions.value = res.data.data;
+    allPermissions.value = res.data.data;
 };
 
 /* Fetch ROLE details */
 const fetchRole = async () => {
+    if (!can("view rolepermission")) {
+    toast.value.showToast("You are not authorized to view rolepermission", "error");
+    router.push("/rolepermission"); 
+    return;
+  } 
     const res = await api.get(`/rolepermission/show/${roleId}`);
 
     form.name = res.data.data.name;
@@ -83,6 +99,12 @@ const fetchRole = async () => {
 };
 
 const updateRole = async () => {
+    
+ if (!can("edit rolepermission")) {
+    toast.value.showToast("You are not authorized to edit rolepermission", "error");
+    router.push("/rolepermission"); 
+    return;
+  } 
     loading.value = true;
     try {
         await api.put(`/rolepermission/update/${roleId}`, form);

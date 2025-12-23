@@ -1,12 +1,12 @@
-<?php
-
-// use App\Http\Middleware\CheckTokenExpiry;
+    <?php
 
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\UserMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Spatie\Permission\Middleware\PermissionMiddleware;
+use Spatie\Permission\Middleware\RoleMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,12 +17,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+
         $middleware->alias([
-            'admin' => AdminMiddleware::class,
-            'user' => UserMiddleware::class
+            'admin'      => AdminMiddleware::class,
+            'user'       => UserMiddleware::class,
+            'role'       => RoleMiddleware::class,
+            'permission' => PermissionMiddleware::class,
         ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-    })->create();
+        //
+    })
+    ->create();
 
 
