@@ -41,9 +41,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('category')->group(function () {
         Route::get('/index', [CategoryController::class, 'index']);
     });
-    Route::post('/quiz/store', [QuizController::class, 'store'])
-        ->middleware('permission:create quiz');
-
+ 
     Route::prefix('rolepermission')->group(function () {
         Route::get('/index', [RoleController::class, 'index'])->middleware('permission:view rolepermission');
         Route::post('/copy', [RoleController::class, 'copy'])->middleware('permission:view rolepermission');

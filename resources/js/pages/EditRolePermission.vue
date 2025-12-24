@@ -17,7 +17,7 @@
                     <v-divider class="my-4" />
 
                     <!-- Role Name -->
-                    <v-text-field v-model="form.name" label="Role Name" variant="outlined" required />
+                    <v-text-field v-model="form.name" readonly label="Role Name" variant="outlined" required />
 
                     <!-- Permissions -->
                     <div class="mt-6">

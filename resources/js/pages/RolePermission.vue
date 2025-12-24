@@ -13,9 +13,9 @@
 
 
             <v-card elevation="4" class="pa-4">
-                <v-chip color="deep-purple-lighten-4" text-color="deep-purple" size="small" class="mb-3">
-                    <!-- {{ role.users_count }} <span v-if="role.users_count > 1"></span> -->
-                </v-chip>
+                <!-- <v-chip color="deep-purple-lighten-4" text-color="deep-purple" size="small" class="mb-3">
+             {{ role.users_count }} <span v-if="role.users_count > 1"></span> -->
+                <!-- </v-chip> --> 
 
                 <div class="d-flex align-center">
                     <div class="text-subtitle-1 font-weight-medium">

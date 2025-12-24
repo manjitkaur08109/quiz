@@ -60,8 +60,8 @@ class RoleController extends Controller
         ]);
 
         $role = Role::findOrFail($id);
-        $role->name = $request->name;
-        $role->save();
+        // $role->name = $request->name;
+        // $role->save();
 
         if ($request->has('permissions') && is_array($request->permissions)) {
             $role->syncPermissions($request->permissions);

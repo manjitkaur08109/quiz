@@ -19,7 +19,6 @@ class RolePermissionSeeder extends Seeder
 
         // Permissions
         $permissions = [
-           
             'create user',
             'edit user',
             'delete user',
