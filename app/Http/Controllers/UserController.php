@@ -2,31 +2,37 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 
-
-class UserController extends Controller {
-    public function index( Request $request ) {
+class UserController extends Controller
+{
+    public function index(Request $request)
+    {
 
         return $this->actionSuccess(
             "Success",
-            User::where('account_type' , 'user')->latest()->get()
+            User::where('account_type', 'user')->latest()->get()
         );
     }
 
-    public function destroy( $id ) {
-        $user = User::find( $id );
-        if ( !$user ) {
-            return $this->actionFailure( 'User not found', 404 );
+    public function destroy($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return $this->actionFailure('User not found', 404);
         }
         $user->delete();
-        return $this->actionSuccess( 'User deleted' );
+        return $this->actionSuccess('User deleted');
     }
 
-    public function profile( Request $request ) {
+    public function profile(Request $request)
+    {
         return $this->actionSuccess(
             "Success",
             $request->user()
@@ -34,29 +40,28 @@ class UserController extends Controller {
     }
 
     public function impersonate(Request $request)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    if ($user->account_type !== 'admin') {
-        return response()->json(['message' => 'Unauthorized'], 403);
+        if ($user->account_type !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $targetUser = User::findOrFail($request->user_id);
+        $tokenResult = $targetUser->createToken('api_token');
+        $token = $tokenResult->plainTextToken;
+
+        $tokenResult->accessToken->update([
+            'expires_at' => Carbon::now()->addDay(),
+        ]);
+
+        return $this->actionSuccess('Login successful', [
+            'user' => $targetUser,
+            'token' => $token,
+            'expires_at' => Carbon::now()->addDay()->toDateTimeString(),
+        ]);
     }
-
-    $targetUser = User::findOrFail($request->user_id);
-    $tokenResult = $targetUser->createToken('api_token');
-    $token = $tokenResult->plainTextToken;
-
-    $tokenResult->accessToken->update([
-        'expires_at' => Carbon::now()->addDay(),
-    ]);
-
-    return $this->actionSuccess('Login successful', [
-        'user' => $targetUser,
-        'token' => $token,
-        'expires_at' => Carbon::now()->addDay()->toDateTimeString(),
-    ]);
-
-}
-public function currentUser(Request $request)
+    public function currentUser(Request $request)
     {
         return $this->actionSuccess("Success", $request->user());
     }
@@ -76,5 +81,63 @@ public function currentUser(Request $request)
             'user' => $admin,
             'token' => $token,
         ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => 'required|string|min:6',
+        ]);
+
+        DB::beginTransaction();
+        try {
+
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+
+            ]);
+            $role = Role::find($request->role_id);
+            $user->assignRole($role->name);
+
+            DB::commit();
+            return $this->actionSuccess('User created successfully', $user);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->actionFailure($e->getMessage());
+        }
+    }
+
+    public function show($id)
+    {
+        $user = User::findOrFail($id);
+        return $this->actionSuccess('User show', $user);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'role_id' => 'required|exists:roles,id',
+        ]);
+        $user = User::findOrFail($id);
+        $updateData = [
+            'name' => $request->name,
+            'role_id' => $request->role_id
+        ];
+
+        if ($request->password) {
+            $updateData['password'] = bcrypt($request->password);
+        }
+        $user->update($updateData);
+
+
+        $role = Role::find($request->role_id);
+        $user->assignRole($role->name);
+
+        return $this->actionSuccess('User updated successfully', $user);
     }
 }

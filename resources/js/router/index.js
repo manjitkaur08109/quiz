@@ -17,10 +17,14 @@ import Notifications from "../pages/Notifications.vue";
 import RolePermission from "../pages/RolePermission.vue";
 import AddRolePermission from "../pages/AddRolePermission.vue";
 import EditRolePermission from "../pages/EditRolePermission.vue";
+import AddUser from "../pages/AddUser.vue";
+import EditUser from "../pages/EditUser.vue";
 
 const routes = [
   { path: "/", name: "Dashboard", component: Dashboard , meta: { requiresAuth: true } },
   { path: "/users", name: "Users", component: Users , meta: { requiresAuth: true } },
+  { path: "/addUser", name: "AddUser", component: AddUser , meta: { requiresAuth: true } },
+  { path: "/editUser/:id", name: "EditUser", component: EditUser , meta: { requiresAuth: true } },
   {path:"/profile",name:"Profile",component:Profile, meta: { requiresAuth: true } },
   { path: "/quiz", name: "Quiz", component: Quiz , meta: { requiresAuth: true } },
   { path:"/addQuiz", name:"AddQuiz", component:AddQuiz, meta: { requiresAuth: true }  },

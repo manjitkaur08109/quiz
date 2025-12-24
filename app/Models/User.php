@@ -25,6 +25,7 @@ class User extends Authenticatable {
         'password',
         'account_type',
         'phone_no',
+        'role_id'
     ];
 
     /**

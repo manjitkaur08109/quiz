@@ -14,6 +14,13 @@
         hide-details
         single-line
       ></v-text-field>
+      <v-btn v-if="can('create user')"
+        class="ml-5"
+        color="primary"
+        @click="goToAdduser"
+        prepend-icon="mdi-plus">
+         Add New user
+      </v-btn>
     </v-card-title>
 
     <v-divider></v-divider>
@@ -26,6 +33,10 @@
     density="compact"
       :headers="headers"
     >
+      <template #item.created_at="{ item }">
+                {{ moment(item.created_at).format("DD MMM YYYY, hh:mm A") }}
+            </template>
+
       <template #item.image="{ item }">
         <v-avatar size="40">
           <v-img
@@ -39,6 +50,10 @@
 
       <template #item.actions="{ item }">
 
+        <v-btn v-if="can('edit user')" size="x-small" icon color="primary" @click="edituser(item.id)">
+    <v-icon>mdi-pencil</v-icon>
+  </v-btn>
+ 
         <v-btn
         v-if="can('delete user')"
           size="x-small"
@@ -53,7 +68,9 @@
           <v-btn v-if="can('view user')" icon color="success" class="ml-2" size="x-small" @click="impersonateUser(item)">
             <v-icon left>mdi-account-switch</v-icon>
     </v-btn>
-      </template>
+ 
+</template>
+
     </v-data-table>
   </v-card>
 </template>
@@ -63,7 +80,8 @@ import { ref, onMounted } from "vue";
 import { inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
 const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-
+ 
+import moment from "moment";
 const can = (permission) => {
   return permissions.includes(permission);
 };
@@ -79,6 +97,14 @@ const headers = [
   { title: "Created At", key: "created_at" },
   { title: "Actions", key: "actions", sortable: false },
 ];
+
+const goToAdduser = () => {
+  router.push("/adduser");
+}
+
+const edituser = (id) => {
+  router.push(`/edituser/${id}`);
+}
 
 const getUsers = async () => {
    if (!can("view user")) {
@@ -107,7 +133,7 @@ const deleteUser = async (id) => {
   if (!confirm("Are you sure you want to delete this user?")) return;
 
   try {
-    await api.delete(`/users/${id}`);
+    await api.delete(`/users/delete/${id}`);
     users.value = users.value.filter((u) => u.id !== id);
 
     toast.value.showToast("User Deleted.", "success");

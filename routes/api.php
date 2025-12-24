@@ -4,14 +4,13 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QuizAttemptController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\RoleController;
-
+use App\Http\Controllers\UserController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -54,10 +53,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::middleware(['admin'])->group(function () {
 
-        Route::get('/users', [UserController::class, 'index'])
-            ->middleware('permission:view user');
+        Route::get('/users', [UserController::class, 'index']) ->middleware('permission:view user');
+        Route::post('/users/store', [UserController::class, 'store']) ->middleware('permission:create user');
+        Route::put('/users/update/{id}', [UserController::class, 'update']) ->middleware('permission:edit user');
+        Route::get('/users/show/{id}', [UserController::class, 'show']) ->middleware('permission:view user');
 
-        Route::delete('/users/{id}', [UserController::class, 'destroy'])
+        Route::delete('/users/delete/{id}', [UserController::class, 'destroy'])
             ->middleware('permission:delete user');
 
         Route::post('/impersonate', [UserController::class, 'impersonate'])
