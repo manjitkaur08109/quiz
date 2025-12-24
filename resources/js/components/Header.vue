@@ -96,7 +96,7 @@ const items = [
   { title: "MyLearning", path: "/myLearning", icon: "mdi-school-outline" ,permission: 'view myLearning' },
   { title: "Payments", path: "/payments", icon: "mdi-cash-multiple", permission: 'view payment' },
   { title: "Notifications", path: "/notifications", icon: "mdi-bell-outline" },
-  {title:"Role and Permission",path:"/rolepermission",icon:"mdi-account-group-outline" , permission: 'view rolepermissions'},
+  {title:"Role and Permission",path:"/rolepermission",icon:"mdi-account-group-outline" , permission: 'view rolepermission'},
 ];
 
 let user = {};
