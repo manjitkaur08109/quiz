@@ -17,9 +17,6 @@ class UserSeeder extends Seeder
 
     public function run(): void
     {
-      $adminRole = Role::where('name', 'admin')->first();
-
-      $userRole = Role::where('name', 'user')->first();
 
         $admin = User::updateOrCreate(
             [
@@ -30,8 +27,7 @@ class UserSeeder extends Seeder
                 'name' => 'Admin',
                 'phone_no' => '1234567890',
                 'password' => Hash::make('qwerty'),
-                'account_type' => 'admin',
-                'role_id' => $adminRole->id
+                'role_id' => getRoleId('admin')
             ]
         );
         $admin->assignRole('admin');
@@ -45,8 +41,7 @@ class UserSeeder extends Seeder
                 'name' => 'ABC',
                 'phone_no' => '1234567890',
                 'password' => Hash::make(123456),
-                'account_type' => 'user',
-                'role_id' => $userRole->id
+                'role_id' => getRoleId('user')
             ]
         );
         $user->assignRole('user');

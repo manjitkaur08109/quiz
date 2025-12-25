@@ -11,14 +11,14 @@ use Illuminate\Http\Request;
 class DashboardController extends Controller {
     function getDashboard( Request $request ) {
         $totalQuiz = QuizModel::count();
-        $totalUsers = User::where('account_type' , 'user')->count();
+        $totalUsers = User::where('role_id' , getRoleId('user'))->count();
         $totalCategory = CategoryModel::count();
          $totalPayments = PaymentModel::where('status', 'paid')->count();
             $recentPayments= PaymentModel::with('user')
                                     ->latest()
                                     ->take(5)
                                     ->get();
-        $recentUsers = User::where('account_type' , 'user')->limit( 5 )->latest()->get();
+        $recentUsers = User::where('role_id' , getRoleId('user'))->limit( 5 )->latest()->get();
         $data = [
             'totalQuiz' => $totalQuiz,
             'totalUsers' => $totalUsers,

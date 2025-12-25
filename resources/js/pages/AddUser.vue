@@ -12,7 +12,7 @@
         <v-form ref="formRef" @submit.prevent="handleSubmit">
           <v-text-field
             v-model="users.name"
-            label="users name"
+            label="User Name"
             :rules="validateMaxLength('users', 20)"
             prepend-inner-icon="mdi-shape-outline"
             required
@@ -74,9 +74,9 @@ const formRef = ref(null);
 
 const rolepermission = ref([]);
 const users = reactive({
-  name: "abc",
- email:"abc@abc.com",
-  password:"qwerty",
+  name: "",
+ email:"",
+  password:"",
   role_id:"",
 });
 const loading = ref(false);

@@ -74,7 +74,7 @@ public function paymentSuccess(Request $request)
             'status' => PaymentModel::PAID,
         ]);
 
-        $admin = User::where('account_type', 'admin')->first();
+        $admin = User::where('rolr_id',getRoleId('admin'))->first();
         if ($admin) {
             $admin->notify(new UserNotification(
                 'New payment',

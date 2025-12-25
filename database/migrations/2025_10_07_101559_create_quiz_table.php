@@ -16,8 +16,9 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->uuid('category_id');
+            $table->integer('price')->default(0);
             $table->text('questions')->nullable();
-
+             $table->integer('passing_score')->default(50);
             $table->timestamps();
         });
     }

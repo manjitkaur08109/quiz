@@ -63,7 +63,7 @@ class QuizController extends Controller {
             'questions' => $request->questions,
         ] );
 
-        $users = User::where('account_type', 'user')->get();
+        $users = User::where('role_id', getRoleId('user'))->get();
         foreach($users as $user){
             $user->notify(new UserNotification('New Quiz Added',
                         "A new quiz '{$quiz->title}' is available now!",
@@ -113,7 +113,7 @@ class QuizController extends Controller {
             'questions' => $request->questions,
         ] );
 
-        $users = User::where('account_type', 'user')->get();
+        $users = User::where('role_id', getRoleId('user'))->get();
         foreach($users as $user){
             $user->notify(new UserNotification('Quiz Updated',
                         "Quiz '{$request->title}' has been updated!",

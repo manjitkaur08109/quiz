@@ -124,7 +124,7 @@ const submit = async () => {
     await api.post("/rolepermission/store", form);
 
     toast.value.showToast("Role created successfully", "success");
-    router.push("/roles");
+    router.push("/rolepermission");
   } catch (e) {
     toast.value.showToast("Something went wrong", "error");
   } finally {

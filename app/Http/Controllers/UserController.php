@@ -14,10 +14,9 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-
         return $this->actionSuccess(
             "Success",
-            User::where('account_type', 'user')->latest()->get()
+            User::where('role_id','!=',getRoleId('admin'))->latest()->get()
         );
     }
 
@@ -42,8 +41,8 @@ class UserController extends Controller
     public function impersonate(Request $request)
     {
         $user = Auth::user();
-
-        if ($user->account_type !== 'admin') {
+            
+        if (!$user|| $user->hasRole('admin'))  {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -71,7 +70,7 @@ class UserController extends Controller
     {
         $admin = Auth::user();
 
-        if (!$admin || $admin->account_type !== 'admin') {
+        if (!$admin || $admin->hasRole ( 'admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -89,6 +88,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:6',
+            'role_id' => 'required|exists:roles,id',
         ]);
 
         DB::beginTransaction();
@@ -98,10 +98,10 @@ class UserController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
+                'role_id' => $request->role_id
 
             ]);
-            $role = Role::find($request->role_id);
-            $user->assignRole($role->name);
+            $user->assignRole(getRoleName($request->role_id));
 
             DB::commit();
             return $this->actionSuccess('User created successfully', $user);
@@ -135,8 +135,7 @@ class UserController extends Controller
         $user->update($updateData);
 
 
-        $role = Role::find($request->role_id);
-        $user->assignRole($role->name);
+        $user->assignRole(getRoleName($request->role_id));
 
         return $this->actionSuccess('User updated successfully', $user);
     }

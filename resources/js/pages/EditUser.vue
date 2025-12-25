@@ -10,7 +10,7 @@
 
             <v-card-text>
                 <v-form ref="formRef" @submit.prevent="handleSubmit">
-                    <v-text-field v-model="users.name" label="users name" :rules="validateMaxLength('users', 20)"
+                    <v-text-field v-model="users.name" label="User Name" :rules="validateMaxLength('users', 20)"
                         prepend-inner-icon="mdi-shape-outline" required />
 
                     <v-text-field v-model="users.email" label="Email" prepend-inner-icon="mdi-email" type="email"

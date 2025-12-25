@@ -1,6 +1,6 @@
   <template>
     <div>
-      <div v-if="isAdmin">
+      <div >
   <v-row>
     <v-col cols="3">
       <v-card
@@ -177,8 +177,6 @@ const totalQuiz = ref(0);
 const totalPayments = ref(0);
 const recentPayments = ref([]);
 
-const user = JSON.parse(localStorage.getItem("user") || "{}");
-const isAdmin = computed(() => user.account_type === "admin");
 
 const getDashboard = async () => {
   try {
@@ -200,14 +198,7 @@ const getDashboard = async () => {
   }
 };
 onMounted(() => {
-     if (!user || !user.account_type) {
-    router.push("/login");
-    return;
-  }
-
-  if (isAdmin.value) {
     getDashboard();
-  }
 });
 </script>
 <style>
