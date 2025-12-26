@@ -54,6 +54,11 @@ import { inject } from "vue";
 
 import { VueEditor } from "vue3-editor";
 import { validateMaxLength } from "@/utils/validationRules.js";
+const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+
+const can = (permission) => {
+  return permissions.includes(permission);
+};
 const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
@@ -65,8 +70,13 @@ const category = reactive({
 const loading = ref(false);
 
 const handleSubmit = async () => {
+  if (!can("create category")) {
+    toast.value.showToast("You are not authorized to create category", "error");
+    router.push("/category"); 
+    return;
+  } 
   const { valid } = await formRef.value.validate(); // ✅ validate all fields
-  if (!valid) return; // stop if invalid
+  if (!valid) return;
   try {
     loading.value = true;
 

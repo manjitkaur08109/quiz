@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Laravel + Vue SPA</title>
+    <title>Quiz Mangement System</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>

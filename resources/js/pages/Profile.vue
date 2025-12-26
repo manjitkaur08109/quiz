@@ -49,7 +49,7 @@
             <v-text-field
               class="mt-2"
               v-model="password"
-              :v-rules="validatePassword()"
+              :rules="validatePassword()"
               label="New password"
               prepend-inner-icon="mdi-lock-outline"
               :append-inner-icon="
@@ -63,7 +63,7 @@
             <v-text-field
               class="mt-2"
               v-model="confirmPassword"
-              :v-rules="validateConfirmPassword(password)"
+              :rules="validateConfirmPassword(password)"
               label="Confirm password"
               prepend-inner-icon="mdi-lock-check"
 
@@ -107,9 +107,12 @@ const phoneNo = ref("");
 const profileForm = ref(null);
 
 import {
-
-} from "@/utils/validationRules.js";
-import { validateRequired } from "../utils/validationRules";
+  validateRequired,
+  validateEmail,
+  validatePhoneNo,
+  validatePassword,
+  validateConfirmPassword,
+} from "@/utils/validationRules";
 
 const loaded = ref(false);
 onMounted(async () => {

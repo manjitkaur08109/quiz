@@ -41,6 +41,8 @@ const isImpersonating = computed(() => {
   return !!localStorage.getItem("adminBackupToken");
 });
 
+
+
 const revertToAdmin = async () => {
 
      await api.post(
@@ -49,18 +51,23 @@ const revertToAdmin = async () => {
 
     );
   const adminToken = localStorage.getItem("adminBackupToken");
+  const permissionsToken = localStorage.getItem("permissionsBackupToken");
+
+
   if (!adminToken)
     return toast.value.showToast("No admin session found", "error");
-
   // 🔹 Admin token wapas set karo
   localStorage.setItem("token", adminToken);
+  localStorage.setItem("permissions", permissionsToken);
   localStorage.removeItem("adminBackupToken");
+  localStorage.removeItem("permissionsBackupToken");
 
   // 🔹 Admin user data dobara fetch karo
   try {
     const { data } = await api.get("/profile");
     localStorage.setItem("user", JSON.stringify(data.data));
-    user.value = data.data;
+
+    User.value = data.data;
   } catch (e) {
     console.error("Admin user reload failed", e);
   }

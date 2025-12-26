@@ -26,6 +26,7 @@ class CategoryController extends Controller {
         $category = CategoryModel::create( $validated );
         return $this->actionSuccess( 'Category added successfully', $category );
     }
+    
 
     public function show( $id ) {
         $category = CategoryModel::findOrFail( $id );
