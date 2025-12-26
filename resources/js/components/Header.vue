@@ -126,14 +126,12 @@ const logout = async () => {
 
     localStorage.removeItem("token");
      localStorage.removeItem("permissions");
-  localStorage.removeItem("roles");
     localStorage.removeItem("user");
     router.push("/login");
   } catch (error) {
     console.error("Logout failed:", error);
     localStorage.removeItem("token");
      localStorage.removeItem("permissions");
-  localStorage.removeItem("roles");
     localStorage.removeItem("user");
 
     router.push("/login");

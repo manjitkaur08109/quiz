@@ -148,19 +148,26 @@ const deleteUser = async (id) => {
 const impersonateUser = async (userToImpersonate) => {
   try {
     const token = localStorage.getItem("token");
-
+    const permissions = JSON.parse(localStorage.getItem("permissions"));
 
     const response = await api.post(
         "impersonate",
         { user_id: userToImpersonate.id }
     );
+    
     localStorage.setItem("adminBackupToken", token);
+    localStorage.setItem("permissionsBackupToken", JSON.stringify(permissions));
 
     const newToken = response.data.data.token;
     const newUser = response.data.data.user;
 
     localStorage.setItem("token", newToken);
     localStorage.setItem("user", JSON.stringify(newUser));
+    
+    localStorage.setItem(
+      "permissions",
+      JSON.stringify(response.data.data.permissions || [])
+    );
   setTimeout(() => {
       window.location.href = "/myLearning";
     }, 1000);

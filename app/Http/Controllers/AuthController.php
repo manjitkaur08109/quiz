@@ -68,7 +68,6 @@ class AuthController extends Controller
 
         return $this->actionSuccess('Login successful', [
             'user' => $user,
-            'roles' => $user->getRoleNames(),
             'permissions' => $user->getAllPermissions()->pluck('name'),
             'token' => $token,
             'expires_at' => Carbon::now()->addDay()->toDateTimeString(),

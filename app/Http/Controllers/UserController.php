@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -16,7 +17,7 @@ class UserController extends Controller
     {
         return $this->actionSuccess(
             "Success",
-            User::where('role_id','!=',getRoleId('admin'))->latest()->get()
+            User::where('role_id', '!=', getRoleId('admin'))->latest()->get()
         );
     }
 
@@ -40,47 +41,46 @@ class UserController extends Controller
 
     public function impersonate(Request $request)
     {
-        $user = Auth::user();
-            
-        if (!$user|| $user->hasRole('admin'))  {
+        $admin = Auth::user();
+
+        // ✅ Only admins can impersonate
+        if (!$admin || !$admin->hasRole('admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
         $targetUser = User::findOrFail($request->user_id);
-        $tokenResult = $targetUser->createToken('api_token');
+
+        // ❌ Prevent admin → admin impersonation
+        if ($targetUser->hasRole('admin')) {
+            return response()->json(['message' => 'Cannot impersonate admin'], 403);
+        }
+
+        // ✅ Create impersonation token
+        $tokenResult = $targetUser->createToken('impersonation_token');
         $token = $tokenResult->plainTextToken;
 
         $tokenResult->accessToken->update([
-            'expires_at' => Carbon::now()->addDay(),
+            'expires_at' => now()->addHours(12),
         ]);
 
-        return $this->actionSuccess('Login successful', [
+
+        return $this->actionSuccess('Impersonation started', [
             'user' => $targetUser,
             'token' => $token,
-            'expires_at' => Carbon::now()->addDay()->toDateTimeString(),
+            'permissions' => $targetUser->getAllPermissions()->pluck('name'),
+            'expires_at' => now()->addHours(12)->toDateTimeString(),
         ]);
     }
+
     public function currentUser(Request $request)
     {
         return $this->actionSuccess("Success", $request->user());
     }
 
-
-    public function stopImpersonation(Request $request)
-    {
-        $admin = Auth::user();
-
-        if (!$admin || $admin->hasRole ( 'admin')) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $token = $admin->createToken('admin_token')->plainTextToken;
-
-        return $this->actionSuccess('Impersonation stopped', [
-            'user' => $admin,
-            'token' => $token,
-        ]);
-    }
 
     public function store(Request $request)
     {

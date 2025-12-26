@@ -17,19 +17,12 @@
                   <v-text-field v-model="quiz.title" label="Quiz Title" :rules="validateMaxLength('Quiz Title', 20)"
                     prepend-inner-icon="mdi-format-title" required />
                 </v-col>
-            
-                 
-<v-col cols="6" >
-  <v-text-field
-    v-model="quiz.price"
-    label="Quiz Price (₹)"
-    type="number"
-    min="1"
-    :rules="validateRequired('Quiz Price')"
-    prepend-inner-icon="mdi-currency-inr"
-    required
-  />
-</v-col>
+
+
+                <v-col cols="6">
+                  <v-text-field v-model="quiz.price" label="Quiz Price (₹)" type="number" min="1"
+                    :rules="validateRequired('Quiz Price')" prepend-inner-icon="mdi-currency-inr" required />
+                </v-col>
 
                 <v-col cols="6">
                   <v-text-field v-model="quiz.passing_score" label="Passing Score" type="number"
@@ -200,15 +193,15 @@ const removeOption = (qIndex, oIndex) => {
 };
 
 const handleSubmit = async () => {
-   if (!can("create quiz")) {
+  if (!can("create quiz")) {
     toast.value.showToast("You are not authorized to create quiz", "error");
-    router.push("/quiz"); 
+    router.push("/quiz");
     return;
   }
   const { valid } = await formRef.value.validate();
   if (!valid) return;
 
-  
+
   console.log("Submitting quiz:", JSON.stringify(apiQuiz.value));
   try {
     loading.value = true;
