@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EmailController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\QuizAttemptController;
 use App\Http\Controllers\ProfileController;
@@ -27,6 +28,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/profile', [UserController::class, 'profile']);
     Route::post('/checkout', [PaymentController::class, 'checkout']);
 
+    Route::get('/email_logs/index', [EmailController::class, 'index']);
+    Route::delete('/email_logs/delete/{id}', [EmailController::class, 'delete']);
 
     Route::prefix('notifications')->group(function () {
         Route::get('/index', [NotificationController::class, 'index']);

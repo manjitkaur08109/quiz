@@ -8,6 +8,32 @@
     <v-menu location="bottom end">
       <template #activator="{ props }">
         <v-btn v-bind="props" icon variant="text">
+          <v-icon>mdi-email-outline</v-icon>
+        </v-btn>
+      </template>
+
+      <v-card width="300">
+        <v-list density="compact">
+          <v-list-item v-if="emails.length === 0">
+            <v-list-item-title>No Emails</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item v-for="email in emails.slice(0, 5)" :key="email.id">
+            <v-list-item-title>{{ email.subject }}</v-list-item-title>
+            <v-list-item-subtitle>{{ email.message }}</v-list-item-subtitle>
+          </v-list-item>
+        </v-list>
+
+        <v-card-actions class="justify-end">
+          <v-btn variant="text" color="primary" @click="goToEmails">
+            View all
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-menu>
+    <v-menu location="bottom end">
+      <template #activator="{ props }">
+        <v-btn v-bind="props" icon variant="text">
           <v-badge v-if="unreadCount > 0" :content="unreadCount" color="red">
             <v-icon>mdi-bell-outline</v-icon>
           </v-badge>
@@ -26,12 +52,12 @@
               {{ notification.data.description }}
             </v-list-item-subtitle>
           </v-list-item>
-
           <v-list-item v-if="notifications.length === 0">
             <v-list-item-title>No notifications</v-list-item-title>
           </v-list-item>
         </v-list>
         <v-card-actions class="justify-end">
+
           <v-btn variant="text" color="primary" @click="goToNotifications">
             View all
           </v-btn>
@@ -75,6 +101,7 @@ import { inject } from "vue";
 
 
 const notifications = ref([]);
+const emails = ref([]);
 const unreadCount = ref(0);
 
 const api = inject("api");
@@ -88,15 +115,16 @@ const permissions = JSON.parse(
 
 
 const items = [
-  { title: "Dashboard", path: "/", icon: "mdi-view-dashboard",permission: 'view dashboard' },
-  { title: "Quiz", path: "/quiz", icon: "mdi-help-circle-outline" , permission: 'create quiz' },
-  { title: "Users", path: "/users", icon: "mdi-account-group" , permission: 'view user' },
-  { title: "Category", path: "/category", icon: "mdi-view-grid-outline" , permission: 'create category' },
-  { title: "Discover", path: "/discover", icon: "mdi-compass-outline" ,permission: 'view discover' },
-  { title: "MyLearning", path: "/myLearning", icon: "mdi-school-outline" ,permission: 'view myLearning' },
+  { title: "Dashboard", path: "/", icon: "mdi-view-dashboard", permission: 'view dashboard' },
+  { title: "Quiz", path: "/quiz", icon: "mdi-help-circle-outline", permission: 'create quiz' },
+  { title: "Users", path: "/users", icon: "mdi-account-group", permission: 'view user' },
+  { title: "Category", path: "/category", icon: "mdi-view-grid-outline", permission: 'create category' },
+  { title: "Discover", path: "/discover", icon: "mdi-compass-outline", permission: 'view discover' },
+  { title: "MyLearning", path: "/myLearning", icon: "mdi-school-outline", permission: 'view myLearning' },
   { title: "Payments", path: "/payments", icon: "mdi-cash-multiple", permission: 'view payment' },
   { title: "Notifications", path: "/notifications", icon: "mdi-bell-outline" },
-  {title:"Role and Permission",path:"/rolepermission",icon:"mdi-account-group-outline" , permission: 'view rolepermission'},
+  { title: "Role and Permission", path: "/rolepermission", icon: "mdi-account-group-outline", permission: 'view rolepermission' },
+  { title: "Email Logs", path: "/email_logs", icon: "mdi-email-outline" },
 ];
 
 let user = {};
@@ -125,13 +153,13 @@ const logout = async () => {
     );
 
     localStorage.removeItem("token");
-     localStorage.removeItem("permissions");
+    localStorage.removeItem("permissions");
     localStorage.removeItem("user");
     router.push("/login");
   } catch (error) {
     console.error("Logout failed:", error);
     localStorage.removeItem("token");
-     localStorage.removeItem("permissions");
+    localStorage.removeItem("permissions");
     localStorage.removeItem("user");
 
     router.push("/login");
@@ -144,6 +172,10 @@ const goToProfile = () => {
 
 const goToNotifications = () => {
   router.push("/notifications");
+};
+
+const goToEmails = () => {
+  router.push("/email_logs");
 };
 
 const updateUnreadCount = () => {
@@ -163,6 +195,14 @@ const fetchHeaderNotifications = async () => {
   }
 };
 
+const fetchHeaderEmails = async () => {
+  try {
+    const res = await api.get("/email_logs/index");
+    emails.value = res.data.data || [];
+  } catch (e) {
+    console.error("Header email error", e);
+  }
+}
 // ---------------- PUBLIC ECHO LISTENER ----------------
 const setupEchoListener = () => {
   if (!window.Echo) {
@@ -189,6 +229,7 @@ const setupEchoListener = () => {
 // ---------------- LIFECYCLE ----------------
 onMounted(() => {
   fetchHeaderNotifications();
+  fetchHeaderEmails();
   setupEchoListener();
 
   window.addEventListener("notifications-updated", updateUnreadCount);

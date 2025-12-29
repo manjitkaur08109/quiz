@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ContactMail;
+use App\Models\EmailModel;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
@@ -98,11 +99,43 @@ class PaymentController extends Controller
           Payment successfull!";
 
         $mailData = ['message' => $messageText];
-        Mail::to($user->email)->send(new ContactMail($subject, $mailData));
+           $status = 'pending';
+        try{
+
+            Mail::to($user->email)->send(new ContactMail($subject, $mailData));
+            $status = 'success';
+        }catch(\Exception $e){
+           $status = 'failed';
+        }
+
+        EmailModel::create([
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'subject' => $subject,
+            'message' => $mailData['message'],
+            'status' => $status
+        ]);
 
         if ($admin) {
-            Mail::to($admin->email)->send(new ContactMail($subject, $mailData));
+            $adminStatus = 'pending';
+
+            try{
+                Mail::to($admin->email)->send(new ContactMail($subject, $mailData));
+                $adminStatus = 'success';
+            }catch(\Exception $e){
+                $adminStatus = 'failed';
+            }
+
+            EmailModel::create([
+                'user_id' => $admin->id,
+                'email' => $admin->email,
+                'subject' => $subject,
+                'message' => $mailData['message'],
+                'status' => $adminStatus
+            ]);
         }
+
+      
 
         return redirect('/discover');
     }
@@ -146,6 +179,7 @@ class PaymentController extends Controller
 
         $user = User::find($userId);
         $subject = 'Payment Failed';
+
         $total = $session->amount_total / 100;
         $messageText = "
                 Name: {$user->name} 
@@ -154,10 +188,40 @@ class PaymentController extends Controller
                 Payment failed!";
 
         $mailData = ['message' => $messageText];
-        Mail::to($user->email)->send(new ContactMail($subject, $mailData));
+        $status = 'pending';
+        try{
+
+            Mail::to($user->email)->send(new ContactMail($subject, $mailData));
+            $status = 'success';
+        }catch(\Exception $e){
+           $status = 'failed';
+        }
+
+        EmailModel::create([
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'subject' => $subject,
+            'message' => $mailData['message'],
+            'status' => $status
+        ]);
 
         if ($admin) {
-            Mail::to($admin->email)->send(new ContactMail($subject, $mailData));
+            $adminStatus = 'pending';
+
+            try{
+                Mail::to($admin->email)->send(new ContactMail($subject, $mailData));
+                $adminStatus = 'success';
+            }catch(\Exception $e){
+                $adminStatus = 'failed';
+            }
+
+            EmailModel::create([
+                'user_id' => $admin->id,
+                'email' => $admin->email,
+                'subject' => $subject,
+                'message' => $mailData['message'],
+                'status' => $adminStatus
+            ]);
         }
 
         return redirect('/discover');

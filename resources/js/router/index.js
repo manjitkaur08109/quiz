@@ -19,6 +19,7 @@ import AddRolePermission from "../pages/AddRolePermission.vue";
 import EditRolePermission from "../pages/EditRolePermission.vue";
 import AddUser from "../pages/AddUser.vue";
 import EditUser from "../pages/EditUser.vue";
+import EmailLogs from "../pages/EmailLogs.vue";
 
 const routes = [
   { path: "/", name: "Dashboard", component: Dashboard , meta: { requiresAuth: true } },
@@ -41,6 +42,7 @@ const routes = [
   {path:"/rolepermission",name:"RolePermission",component:RolePermission, meta: { requiresAuth: true } },
   {path:"/addrolepermission",name:"AddRolePermission",component:AddRolePermission, meta: { requiresAuth: true } },
   {path:"/editrolepermission/:id",name:"EditRolePermission",component:EditRolePermission, meta: { requiresAuth: true } },
+  {path:"/email_logs",name:"EmailLogs",component:EmailLogs, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({

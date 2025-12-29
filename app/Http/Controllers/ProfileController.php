@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ContactMail;
+use App\Models\EmailModel;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -54,8 +55,21 @@ class ProfileController extends Controller
         Your account password has been changed successfully.
         If this was not you, please contact support immediately.
     ";
+        $status = 'success';
+        try{
 
-        Mail::to($user->email)->send(new ContactMail($subject,$mailData ));
+            Mail::to($user->email)->send(new ContactMail($subject,$mailData ));
+            $status = 'success';
+        }catch(\Exception $e){
+            $status = 'failed';
+        }   
+
+        EmailModel::create([
+            'email' => $user->email,
+            'subject' => $subject,
+            'message' => $mailData,
+            'status' => $status
+        ]);
 
         return $this->actionSuccess(
             'Password changed successfully!'

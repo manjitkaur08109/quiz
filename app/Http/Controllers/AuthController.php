@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\ContactMail;
+use App\Models\EmailModel;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -59,11 +60,42 @@ Registered At: {$user->created_at->format('d-m-Y H:i')}
             'message' => $messageText
         ];
         $subject = 'New User Registered';
+        $status = 'pending';
+        try{
 
-        Mail::to($user->email)->send(new ContactMail($subject,$mailData ));
+            Mail::to($user->email)->send(new ContactMail($subject, $mailData));
+            $status = 'success';
+        }catch(\Exception $e){
+          $status = 'failed';
 
+        }
+
+        EmailModel::create([
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'status' => $status,
+            'subject' => $subject,
+            'message' => $mailData['message']
+
+        ]);
+      
         if ($admin) {
-            Mail::to($admin->email)->send(new ContactMail($subject,$mailData));
+            $adminStatus = 'pending';
+        try{
+
+                Mail::to($admin->email)->send(new ContactMail($subject, $mailData));
+                $adminStatus = 'success';
+            }catch(\Exception $e){
+                $status = 'failed';
+            }
+              EmailModel::create([
+            'user_id' => $admin->id,
+            'email' => $admin->email,
+            'status' => $adminStatus,
+            'subject' => $subject,
+            'message' => $mailData['message']
+
+        ]);
         }
 
 
