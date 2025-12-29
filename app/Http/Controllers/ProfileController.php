@@ -1,8 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Mail\ContactMail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class ProfileController extends Controller
 {
@@ -43,6 +46,16 @@ class ProfileController extends Controller
         $user->update([
             'password' => Hash::make($request->password),
         ]);
+    
+         $subject = 'Your Password Changed Successfully';       
+        $mailData ="
+          Hello {$user->name},
+          Email: {$user->email},
+        Your account password has been changed successfully.
+        If this was not you, please contact support immediately.
+    ";
+
+        Mail::to($user->email)->send(new ContactMail($subject,$mailData ));
 
         return $this->actionSuccess(
             'Password changed successfully!'

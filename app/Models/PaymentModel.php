@@ -19,6 +19,7 @@ class PaymentModel extends Model
         'status',
     ];
     const PAID = 'paid';
+    const FAILED = 'failed';
 
     // ✅ ADD THIS
     public function user()

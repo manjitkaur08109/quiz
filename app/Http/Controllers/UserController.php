@@ -104,6 +104,10 @@ class UserController extends Controller
             $user->assignRole(getRoleName($request->role_id));
 
             DB::commit();
+
+
+
+            
             return $this->actionSuccess('User created successfully', $user);
         } catch (\Exception $e) {
             DB::rollBack();
