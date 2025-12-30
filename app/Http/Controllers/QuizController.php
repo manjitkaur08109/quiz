@@ -18,10 +18,13 @@ class QuizController extends Controller {
     function index( Request $request ) {
         $userId = Auth::user()->id;
         $query = QuizModel::with( [ 'category', 'attempts' ] )->latest();
+          if ($request->search) {
+            $query->where('title', 'like', '%' . trim($request->search) . '%');
+        }
         if ( $request->has( 'category_id' ) ) {
             $query->where( 'category_id', $request->category_id );
         }
-        $quizzes = $query->get();
+         $quizzes = $query->paginate($request->per_page ?? 10);
         foreach ( $quizzes as $quiz ) {
             $quiz->attemptedBy = $quiz->attempts->pluck( 'user_id' )->toArray();
               $quiz->is_paid = PaymentModel::where('user_id', $userId ,)
@@ -29,6 +32,7 @@ class QuizController extends Controller {
                 ->where('status', 'paid')
                 ->exists();
         }
+
         return $this->actionSuccess( 'Quiz fetch successfully', $quizzes );
     }
 

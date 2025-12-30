@@ -6,9 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\CategoryModel;
 
 class CategoryController extends Controller {
-    public function index() {
-        $data = CategoryModel::latest()->get();
-        return $this->actionSuccess( 'Category fetch successfully', $data );
+    public function index(Request $request) {
+        $query = CategoryModel::latest();
+        if($request->search){
+            $query->where('title','like','%'. $request->search .'%')
+                  ->orWhere('description','like','%'. $request->search .'%');
+        }
+        $categories = $query->paginate($request->per_page ?? 5);
+        return $this->actionSuccess( 'Category fetch successfully',$categories);
 
     }
 

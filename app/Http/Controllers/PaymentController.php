@@ -18,7 +18,12 @@ class PaymentController extends Controller
     public function index(Request $request)
     {
 
-        $data = PaymentModel::with('user:id,name', 'quiz:id,title')->latest()->get();
+        $query = PaymentModel::with('user:id,name', 'quiz:id,title')->latest();
+        if($request->search){
+            $query->where('user:name', 'like', '%' . $request->search . '%')
+            ->orWhere('quiz:title', 'like', '%' . $request->search . '%');
+        }
+        $data = $query->paginate($request->per_page ?? 5);
         return $this->actionSuccess('payment fetch successfully', $data);
     }
     public function checkout(Request $request)

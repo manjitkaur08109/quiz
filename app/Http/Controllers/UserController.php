@@ -15,9 +15,17 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
+         $query = User::latest();
+         if($request->search){
+            $query->where('name','like','%' . $request->search . '%')
+                 ->orWhere('email','like' ,'%' . $request->search . '%');
+         }
+           
+         $user = $query->paginate($request->search ?? 5);
+
         return $this->actionSuccess(
-            "Success",
-            User::where('role_id', '!=', getRoleId('admin'))->latest()->get()
+            "Success",$user
+            
         );
     }
 

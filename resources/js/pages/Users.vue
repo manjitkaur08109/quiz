@@ -10,6 +10,7 @@
         label="Search"
         prepend-inner-icon="mdi-magnify"
         variant="solo-filled"
+        @update:modelValue="onSearch"
         flat
         hide-details
         single-line
@@ -30,8 +31,13 @@
       :filter-keys="['name', 'email']"
       :items="users"
        class="text-caption"
-    density="compact"
       :headers="headers"
+      :items-per-page-options="[5, 10, 25, 50]"
+      :items-length="pagination.total"
+      v-model:page="pagination.current_page"
+      v-model:items-per-page="pagination.per_page"
+      @update:page="onPageChange"
+      @update:items-per-page="onPerPageChange"
     >
       <template #item.created_at="{ item }">
                 {{ moment(item.created_at).format("DD MMM YYYY, hh:mm A") }}
@@ -97,6 +103,27 @@ const headers = [
   { title: "Created At", key: "created_at" },
   { title: "Actions", key: "actions", sortable: false },
 ];
+ const pagination = ref({
+  current_page:1,
+  per_page:5,
+  total:0,
+ });
+
+ const onPageChange = (page) => {
+  pagination.value.current_page = page;
+  getUsers();
+ };
+
+ const onPerPageChange = (perPage)=>{
+   pagination.value.per_page = perPage;
+  pagination.value.current_page = 1;
+  getUsers();
+ };
+
+ const onSearch = ()=> {
+  pagination.value.current_page = 1;
+  getUsers();
+ };
 
 const goToAdduser = () => {
   router.push("/adduser");
@@ -113,8 +140,11 @@ const getUsers = async () => {
     return;
   }
   try {
-    const res = await api.get("/users");
-    users.value = res.data.data;
+    const res = await api.get(`/users?page=${pagination.value.current_page}&per_page=${pagination.value.per_page}&search=${search.value}`);
+    users.value = res.data.data.data;
+    pagination.value.current_page = res.data.data.current_page;
+    pagination .value.per_page = res.data.data.per_page;
+    pagination.value.total = res.data.data.total;
   } catch (error) {
 
     toast.value.showToast(

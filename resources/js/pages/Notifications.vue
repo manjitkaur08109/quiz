@@ -5,7 +5,7 @@
       <v-spacer></v-spacer>
 
       <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
-        variant="solo-filled" :flat="true" :hide-details="true" :single-line="true" />
+        variant="solo-filled" @update:modelValue="onSearch" :flat="true" :hide-details="true" :single-line="true" />
       <v-spacer></v-spacer>
       <v-btn color="red" size="small" variant="outlined" class="ml-2" @click="deleteAllNotifications">
         <v-icon start>mdi-delete-sweep</v-icon>
@@ -17,7 +17,13 @@
 
     <v-divider></v-divider>
     <v-data-table v-model:search="search" :headers="headers" :items="notificationItems"
-      :filter-keys="['data.title', 'data.description']">
+      :filter-keys="['data.title', 'data.description']" 
+      v-model:page="pagination.current_page"
+      :items-per-page-options="[5, 10, 25, 50]"
+      v-model:items-per-page="pagination.per_page"
+      :items-length="notificationItems.length"
+      @update:page="onPageChange"
+      @update:items-per-page="onPerPageChange">
       <template #item.sn="{ index }">
         {{ index + 1 }}
       </template>
@@ -75,6 +81,27 @@ const headers = [
   { title: "Actions", value: "actions", sortable: false },
 ];
 
+const pagination = ref({
+  current_page: 1,
+  per_page: 5,
+  total: 0,
+});
+
+const onPageChange = (page) => {
+  pagination.value.current_page = page;
+  fetchNotifications();
+};
+
+const onPerPageChange = (perPage) => {
+  pagination.value.per_page = perPage;
+  pagination.value.current_page = 1;
+  fetchNotifications();
+};
+
+const onSearch = () => {
+  pagination.value.current_page = 1;
+  fetchNotifications();
+};
 const unreadCount = ref(
   Number(localStorage.getItem("unreadCount") || 0)
 );
@@ -95,8 +122,11 @@ onUnmounted(() => {
 const fetchNotifications = async () => {
   loading.value = true;
   try {
-    const res = await api.get("/notifications/index");
-    notificationItems.value = res.data.data;
+    const res = await api.get(`/notifications/index?page=${pagination.value.current_page}&per_page=${pagination.value.per_page}&search=${search.value}`);
+    notificationItems.value = res.data.data.data;
+    pagination.value.current_page = res.data.data.current_page;
+    pagination.value.per_page = res.data.data.per_page;
+    pagination.value.total = res.data.data.total;
     const unread = notificationItems.value.filter(
       n => n.read_at === null
     ).length;
@@ -162,73 +192,6 @@ const deleteAllNotifications = async () => {
 
 onMounted(() => {
   fetchNotifications();
-
-  // Set up Echo listener for real-time notifications
-  const setupEchoListener = () => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const token = localStorage.getItem('token');
-
-    if (!window.Echo) {
-      console.warn('Echo is not available');
-      return;
-    }
-
-    if (!user.id || !token) {
-      console.warn('User ID or token not available');
-      return;
-    }
-
-    console.log("Setting up Echo listener for user:", user.id);
-
-    try {
-      // Listen for notifications on user's private channel
-      const channel = window.Echo.private(`App.Models.User.${user.id}`);
-
-      channel
-        .notification((notification) => {
-          console.log('New notification received via Echo:', notification);
-          // Add a small delay to ensure database is updated
-          setTimeout(() => {
-            // Refresh notifications list
-            fetchNotifications();
-          }, 500);
-        })
-        .error((error) => {
-          console.error('Echo notification error:', error);
-        });
-
-      console.log('Echo listener set up successfully');
-    } catch (error) {
-      console.error('Error setting up Echo listener:', error);
-    }
-  };
-
-  // Setup immediately if user is logged in
-  setupEchoListener();
-
-  // Also setup when token is set (for login scenarios)
-  const checkInterval = setInterval(() => {
-    const token = localStorage.getItem('token');
-    if (token && window.Echo) {
-      setupEchoListener();
-      clearInterval(checkInterval);
-    }
-  }, 1000);
-
-  // Cleanup interval after 10 seconds
-  setTimeout(() => clearInterval(checkInterval), 10000);
-});
-
-onUnmounted(() => {
-  // Clean up Echo listener
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  if (window.Echo && user.id) {
-    try {
-      window.Echo.leave(`App.Models.User.${user.id}`);
-    } catch (e) {
-      console.log('Error leaving channel:', e);
-    }
-  }
 });
 
 </script>

@@ -5,13 +5,19 @@
       <v-spacer></v-spacer>
 
       <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
-        variant="solo-filled" flat hide-details single-line></v-text-field>
+        variant="solo-filled" @update:modelValue="onSearch" flat hide-details single-line></v-text-field>
       <v-btn  @click="goToAddQuiz" color="primary" prepend-icon="mdi-plus" class="ml-4 mb-3">
         Add New
       </v-btn>
     </v-card-title>
     <v-divider></v-divider>
     <v-data-table v-model:search="search" :headers="headers" 
+    v-model:page="pagination.current_page"
+    :items-per-page-options="[5, 10, 25, 50]"
+    v-model:items-per-page="pagination.per_page"
+    :items-length="pagination.total"
+    @update:page="onPageChange"
+    @update:items-per-page="onPerPageChange"
     density="compact"
     :items="quizzes">
       <template #item.sn="{ index }">
@@ -122,6 +128,25 @@ const headers = [
   { title: "Actions", key: "actions", sortable: false },
 ];
 
+const pagination = ref({
+  current_page: 1,
+    per_page: 5,
+  total: 0,
+});
+
+const onPageChange = (page) => {
+  pagination.value.current_page = page;
+  fetchQuizzes();
+};
+const onPerPageChange = (perPage) => {
+  pagination.value.per_page = perPage;
+  pagination.value.current_page = 1;
+  fetchQuizzes();
+};
+const onSearch = () => {
+  pagination.value.current_page = 1;
+  fetchQuizzes();
+};
 const fetchQuizzes = async () => {
     if (!can("view quiz")) {
     toast.value.showToast("You are not authorized to view quiz", "error");
@@ -130,8 +155,11 @@ const fetchQuizzes = async () => {
   }
   loading.value = true;
   try {
-    const res = await api.get("/quiz/index");
-    quizzes.value = res.data.data;
+    const res = await api.get(`/quiz/index?page=${pagination.value.current_page}&per_page=${pagination.value.per_page}&search=${search.value}`);
+    quizzes.value = res.data.data.data;
+    pagination.value.current_page = res.data.data.current_page;
+    pagination.value.per_page =  res.data.data.per_page;
+    pagination.value.total = res.data.data.total;
   } catch (error) {
 
     toast.value.showToast(

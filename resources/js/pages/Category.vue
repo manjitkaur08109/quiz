@@ -11,6 +11,7 @@
         prepend-inner-icon="mdi-magnify"
         variant="solo-filled"
         :flat="true"
+        @update:modelValue="onSearch"
         :hide-details="true"
         :single-line="true"
       />
@@ -26,13 +27,17 @@
     </v-card-title>
 
     <v-divider></v-divider>
-    <v-data-table
+    <v-data-table-server
       v-model:search="search"
       :filter-keys="['name']"
       :headers="headers"
-    density="compact"
-
       :items="categoryItems"
+      :items-per-page-options="[5, 10, 25, 50]"
+      :items-length="pagination.total"
+      v-model:page="pagination.current_page"
+      v-model:items-per-page="pagination.per_page"
+      @update:page="onPageChange"
+      @update:items-per-page="onPerPageChange"
     >
       <template #item.sn="{ index }">
         {{ index + 1 }}
@@ -40,8 +45,6 @@
       <template #item.description="{ item }">
         <span v-html="item.description"></span>
       </template>
-
-
 
 <template #item.actions="{ item }">
   <v-btn v-if="can('edit category')" size="x-small" icon color="primary" @click="editCategory(item.id)">
@@ -52,7 +55,7 @@
   </v-btn>
 </template>
 
-    </v-data-table>
+    </v-data-table-server>
   </v-card>
 </template>
 
@@ -81,6 +84,27 @@ const headers = [
   { title: "Actions", value: "actions", sortable: false },
 ];
 
+const pagination = ref({
+  current_page: 1,
+  per_page: 5,
+  total: 0,
+});
+
+const onPageChange = (page) => {
+  pagination.value.current_page = page;
+  fetchCategories();
+};
+
+const onPerPageChange = (perPage) => {
+  pagination.value.per_page = perPage;
+  pagination.value.current_page = 1;
+  fetchCategories();
+};
+
+const onSearch = () => {
+  pagination.value.current_page = 1;
+  fetchCategories();
+};
 const goToAddCategory = () => {
   router.push("/addCategory");
 };
@@ -97,8 +121,13 @@ const fetchCategories = async () => {
   }
   loading.value = true;
   try {
-    const res = await api.get("/category/index");
-    categoryItems.value = res.data.data;
+    const res = await api.get(`/category/index?page=${pagination.value.current_page}&per_page=${pagination.value.per_page}&search=${search.value}`);
+    categoryItems.value = res.data.data.data;
+
+    pagination.value.current_page = res.data.data.current_page;
+    pagination.value.per_page = res.data.data.per_page;
+    pagination.value.total = res.data.data.total;
+
   } catch (error) {
 
     toast.value.showToast(error?.response?.data?.message || "Something went wrong!", 'error');

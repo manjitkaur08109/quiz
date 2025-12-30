@@ -6,10 +6,12 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-public function index()
-{
+public function index(Request $request)
+{    $notification = auth()->user()->notifications()->latest();
+    
+    $notificatuion = $notification->paginate($request->per_page ?? 5);
     return $this->actionSuccess('Notifications successfully fetched',
-         auth()->user()->notifications()->latest()->get(),
+    $notificatuion
     );
 }
 

@@ -4,11 +4,15 @@
             Email Logs
             <v-spacer></v-spacer>
 
-            <v-text-field v-model="search" density="compact" label="Search" prepend-inner-icon="mdi-magnify"
-                variant="solo-filled" :flat="true" :hide-details="true" :single-line="true" />
+            <v-text-field v-model="search" @update:modelValue="onSearch" density="compact" label="Search"
+                prepend-inner-icon="mdi-magnify" variant="solo-filled" :flat="true" :hide-details="true"
+                :single-line="true" />
         </v-card-title>
         <v-divider></v-divider>
-        <v-data-table v-model:search="search" :headers="headers" :items="emailitems">
+        <v-data-table-server :headers="headers" :items="emailitems" :items-length="pagination.total"
+            v-model:page="pagination.current_page" v-model:items-per-page="pagination.per_page"
+            :items-per-page-options="[5, 10, 25, 50]"
+            @update:page="onPageChange" @update:items-per-page="onPerPageChange">
 
             <template #item.sn="{ index }">
                 {{ index + 1 }}
@@ -17,20 +21,16 @@
                 {{ moment(item.created_at).format("DD-MM-YYYY") }}
             </template>
 
-      <template #item.status="{ item }">
-  <v-chip
-    size="small"
-    :color="
-      item.status === 'success'
-        ? 'green'
-        : item.status === 'pending'
-        ? 'orange'
-        : 'red'
-    "
-  >
-    {{ item.status }}
-  </v-chip>
-</template>
+            <template #item.status="{ item }">
+                <v-chip size="small" :color="item.status === 'success'
+                        ? 'green'
+                        : item.status === 'pending'
+                            ? 'orange'
+                            : 'red'
+                    ">
+                    {{ item.status }}
+                </v-chip>
+            </template>
 
             <template #item.actions="{ item }">
                 <v-btn class="ml-2" icon="mdi-information" size="x-small" color="success" @click="infoDialog(item)">
@@ -62,7 +62,7 @@
                     </v-card>
                 </v-dialog>
             </template>
-        </v-data-table>
+        </v-data-table-server>
     </v-card>
 </template>
 <script setup>
@@ -84,16 +84,46 @@ const headers = [
 
 ];
 
-const getEmailLogs = async () => {
-    loading.value = true
-    try {
-        const res = await api.get("/email_logs/index");
-        emailitems.value = res.data.data;
+const onPageChange = (page) => {
+    pagination.value.current_page = page;
+    getEmailLogs();
+};
 
+const onPerPageChange = (perPage) => {
+    pagination.value.per_page = perPage;
+    pagination.value.current_page = 1;
+    getEmailLogs();
+};
+
+const onSearch = () => {
+    pagination.value.current_page = 1;
+    getEmailLogs();
+};
+
+const pagination = ref({
+    current_page: 1,
+    per_page: 5,
+    total: 0,
+    
+});
+
+
+const getEmailLogs = async () => {
+    loading.value = true;
+    try {
+        const res = await api.get(
+            `/email_logs/index?page=${pagination.value.current_page}&per_page=${pagination.value.per_page}&search=${search.value}`
+        );
+
+        emailitems.value = res.data.data.data;
+
+        pagination.value.current_page = res.data.data.current_page;
+        pagination.value.per_page = res.data.data.per_page;
+        pagination.value.total = res.data.data.total;
     } catch (e) {
         console.log(e);
     } finally {
-        loading.value = false
+        loading.value = false;
     }
 };
 
@@ -120,6 +150,6 @@ const infoDialogClose = () => {
 }
 
 onMounted(() => {
-    getEmailLogs();
+    getEmailLogs(1);
 })
 </script>
