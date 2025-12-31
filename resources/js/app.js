@@ -14,6 +14,9 @@ import VueEditor from "vue3-editor";
 
 import api from "./plugins/api";
 import Toast from "./components/Toast.vue"; // or your toast store
+
+
+import './echo';
 const vuetify = createVuetify({
     components,
     directives,

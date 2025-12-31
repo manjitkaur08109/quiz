@@ -8,5 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class CategoryModel extends Model {
     use HasUuids;
     protected $table = 'category';
+    
+    protected $keyType = 'string';
+    public $incrementing = false;
     protected $fillable = [ 'title','description' ];
 }

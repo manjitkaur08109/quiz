@@ -16,6 +16,19 @@
             :rules="validateMaxLength('quiz title',20)"
             prepend-inner-icon="mdi-format-title"
           />
+
+          <v-col cols="6">
+            <v-text-field
+              v-model="quiz.price"
+              label="Quiz Price (₹)"
+              type="number"
+              min="1"
+              :rules="validateRequired('Quiz Price')"
+              prepend-inner-icon="mdi-currency-inr"
+              required
+            />
+          </v-col>
+          
           <v-col cols="6">
             <v-text-field
               v-model="quiz.passing_score"
@@ -140,10 +153,16 @@ import { inject } from "vue";
 
 import { validateMaxLength, validateRequired, validatePassingScore } from "../utils/validationRules";
 
+const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+
+const can = (permission) => {
+  return permissions.includes(permission);
+};
 const toast = inject("toast");
 
 const quiz = reactive({
   title: "",
+  price:"",
   passing_score: 0,
   description: "",
   category_id: "",
@@ -201,6 +220,11 @@ const removeOption = (qIndex, oIndex) => {
 };
 
 onMounted(async () => {
+   if (!can("view category")) {
+    toast.value.showToast("You are not authorized to view category", "error");
+  
+    return;
+  }
   try {
     const res = await api.get("/category/index");
     categories.value = res.data.data;
@@ -215,11 +239,17 @@ onMounted(async () => {
 });
 
 onMounted(async () => {
+   if (!can("view quiz")) {
+    toast.value.showToast("You are not authorized to view quiz", "error");
+    router.push("/quiz"); 
+    return;
+  }
   try {
     const res = await api.get(`/quiz/show/${quizId}`);
     const data = res.data.data;
 
     quiz.title = data.title;
+    quiz.price = data.price;
     quiz.passing_score = data.passing_score;
     quiz.description = data.description;
     quiz.category_id = data.category_id;
@@ -237,6 +267,11 @@ onMounted(async () => {
 });
 
 const updateQuiz = async () => {
+   if (!can("edit quiz")) {
+    toast.value.showToast("You are not authorized to edit quiz", "error");
+    router.push("/quiz"); 
+    return;
+  }
   const { valid } = await formRef.value.validate();
   if (!valid) return;
   loading.value = true;
