@@ -10,11 +10,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Notifications\UserNotification;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
-    function register(Request $request)
+  public function register(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|min:3',
@@ -37,6 +38,7 @@ class AuthController extends Controller
             'user',
             $user->id
         ));
+        Log::info('New user registered: ' . $user->email);
 
         $admin = User::role('admin')->first();
         if ($admin) {
@@ -62,7 +64,7 @@ class AuthController extends Controller
         ];
         $subject = 'New User Registered';
        
-        SendEmailJob::dispatch($mailData , $subject , $user->email);
+        SendEmailJob::dispatch($mailData , $subject , $user->email , $user->id);
 
         $token = $user->createToken('api_token')->plainTextToken;
         return $this->actionSuccess('User registered successfully', [

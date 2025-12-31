@@ -106,7 +106,7 @@ class PaymentController extends Controller
 
         $mailData = ['message' => $messageText];
 
-        SendEmailJob::dispatch($mailData , $subject , $user->email);
+        SendEmailJob::dispatch($mailData , $subject , $user->emai ,$user->id);
        
         return redirect('/discover');
     }
@@ -160,7 +160,7 @@ class PaymentController extends Controller
 
         $mailData = ['message' => $messageText];
         $status = 'pending';
-        SendEmailJob::dispatch($mailData , $subject , $user->email);
+        SendEmailJob::dispatch($mailData , $subject , $user->email ,$user->id);
 
         return redirect('/discover');
     }

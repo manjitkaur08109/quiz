@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
 
 class SendEmailJob implements ShouldQueue
 {
@@ -24,11 +25,17 @@ class SendEmailJob implements ShouldQueue
      */
     public function __construct($data,$subject,$email, $user_id)
     {
+
+        Log::info('SendEmailJob is handling');
+        Log::info('SendEmailJob data:'.json_encode($data));
+        Log::info('SendEmailJob subject:'.$subject);
+        Log::info('SendEmailJob email :'.$email);
+        Log::info('SendEmailJob userId :'.$user_id);
+        
         $this->data = $data;
         $this->subject = $subject;
         $this->email = $email;
         $this->user_id = $user_id;
-        $this->admin = User::role('admin')->first();
     }
 
     /**
@@ -37,10 +44,10 @@ class SendEmailJob implements ShouldQueue
     public function handle(): void
     {
         try{
-            Mail::to($this->email)->send(new ContactMail($this->data, $this->subject ,));
-            $status = 'success';
+            Mail::to($this->email)->send(new ContactMail( $this->subject , $this->data));
+            $status = EmailModel::SUCCESS;
         }catch(\Exception $e){
-          $status = 'failed';
+          $status = EmailModel::FAILED;
 
         }
 
@@ -52,17 +59,20 @@ class SendEmailJob implements ShouldQueue
             'message' => $this->data['message']
         ]);
 
-        if ($this->admin) {
-            $adminStatus = 'pending';
+                $admin = User::role('role_id',getRoleName('admin'))->first();
+        Log::info('SendEmailJob admin:'.json_encode($admin));
+
+        if ($admin) {
+            $adminStatus = EmailModel::PENDING ;
         try{
-                Mail::to($this->email)->send(new ContactMail($this->subject, $this->data));
-                $adminStatus = 'success';
+                Mail::to($admin->email)->send(new ContactMail($this->subject, $this->data));
+                $adminStatus = EmailModel::SUCCESS;
             }catch(\Exception $e){
-                $status = 'failed';
+                $adminStatus = EmailModel::FAILED;
             }
               EmailModel::create([
-            'admin_id' => $this->admin->id,
-            'email' => $this->email,
+            'admin_id' => $admin->id,
+            'email' => $admin->email,
             'status' => $adminStatus,
             'subject' => $this->subject,
             'message' => $this->data['message']
