@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendEmailJob;
 use App\Mail\ContactMail;
 use App\Models\EmailModel;
 use App\Models\User;
@@ -48,56 +49,20 @@ class AuthController extends Controller
         }
 
         $messageText = "
-New User Registered Successfully
+        New User Registered Successfully
 
-Name: {$user->name}
-Email: {$user->email}
-Role: User
-Registered At: {$user->created_at->format('d-m-Y H:i')}
-";
+        Name: {$user->name}
+        Email: {$user->email}
+        Role: User
+        Registered At: {$user->created_at->format('d-m-Y H:i')}
+          ";
 
         $mailData = [
             'message' => $messageText
         ];
         $subject = 'New User Registered';
-        $status = 'pending';
-        try{
-
-            Mail::to($user->email)->send(new ContactMail($subject, $mailData));
-            $status = 'success';
-        }catch(\Exception $e){
-          $status = 'failed';
-
-        }
-
-        EmailModel::create([
-            'user_id' => $user->id,
-            'email' => $user->email,
-            'status' => $status,
-            'subject' => $subject,
-            'message' => $mailData['message']
-
-        ]);
-      
-        if ($admin) {
-            $adminStatus = 'pending';
-        try{
-
-                Mail::to($admin->email)->send(new ContactMail($subject, $mailData));
-                $adminStatus = 'success';
-            }catch(\Exception $e){
-                $status = 'failed';
-            }
-              EmailModel::create([
-            'user_id' => $admin->id,
-            'email' => $admin->email,
-            'status' => $adminStatus,
-            'subject' => $subject,
-            'message' => $mailData['message']
-
-        ]);
-        }
-
+       
+        SendEmailJob::dispatch($mailData , $subject , $user->email);
 
         $token = $user->createToken('api_token')->plainTextToken;
         return $this->actionSuccess('User registered successfully', [

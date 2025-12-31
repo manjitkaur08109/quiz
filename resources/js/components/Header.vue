@@ -182,18 +182,22 @@ const updateUnreadCount = () => {
   unreadCount.value = Number(localStorage.getItem("unreadCount") || 0);
 };
 
+
 const fetchHeaderNotifications = async () => {
   try {
     const res = await api.get("/notifications/index");
-    notifications.value = res.data.data || [];
 
-    const unread = notifications.value.filter(n => n.read_at === null).length;
+    notifications.value = res?.data?.data?.data ?? [];
+
+    const unread = notifications.value.filter(n => !n.read_at).length;
     unreadCount.value = unread;
+
     localStorage.setItem("unreadCount", unread);
   } catch (e) {
     console.error("Header notification error", e);
   }
 };
+
 
 const fetchHeaderEmails = async () => {
   try {
@@ -203,7 +207,7 @@ const fetchHeaderEmails = async () => {
     console.error("Header email error", e);
   }
 }
-// ---------------- PUBLIC ECHO LISTENER ----------------
+
 const setupEchoListener = () => {
   if (!window.Echo) {
     console.warn("Echo not available");
@@ -226,7 +230,6 @@ const setupEchoListener = () => {
     });
 };
 
-// ---------------- LIFECYCLE ----------------
 onMounted(() => {
   fetchHeaderNotifications();
   fetchHeaderEmails();
