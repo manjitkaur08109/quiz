@@ -57,7 +57,7 @@ class ProfileController extends Controller
         If this was not you, please contact support immediately.
     ";
        
-               SendEmailJob::dispatch($mailData , $subject , $user->email);
+               SendEmailJob::dispatch($mailData , $subject , $user->email ,$user->id);
 
         return $this->actionSuccess(
             'Password changed successfully!'
