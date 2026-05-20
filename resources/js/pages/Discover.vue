@@ -1,45 +1,21 @@
 <template>
   <div>
-    <v-tabs
-      class="mb-4"
-      v-model="tab"
-      align-tabs="end"
-      color="deep-purple-accent-4"
-    >
+    <v-tabs class="mb-4" v-model="tab" align-tabs="end" color="deep-purple-accent-4">
       <v-tab value="all" @click="showAllCategories">All</v-tab>
-      <v-tab
-        v-for="category in categories"
-        :key="category.id"
-        :value="category.id"
-        @click="selectCategory(category)"
-      >
+      <v-tab v-for="category in categories" :key="category.id" :value="category.id" @click="selectCategory(category)">
         {{ category.title }}
       </v-tab>
     </v-tabs>
     <v-row>
-      <v-col
-        v-for="quiz in quizzes"
-        :key="quiz.id"
-        cols="12"
-        sm="6"
-        md="4"
-        lg="4"
-      >
-        <v-card
-          class="hover:scale-105 transition-all mb-4 shadow-lg rounded-xl quiz-card"
-          elevation="8"
+      <v-col v-for="quiz in quizzes" :key="quiz.id" cols="12" sm="6" md="4" lg="4">
+        <v-card class="hover:scale-105 transition-all mb-4 shadow-lg rounded-xl quiz-card" elevation="8"
           @click="openQuizDialog(quiz)"
-        >
+          >
           <v-card-text>
             <div class="d-flex align-center justify-space-between mb-2">
               <span class="text-h6 font-weight-bold">📘 {{ quiz.title }}</span>
-              <v-chip
-                color="deep-purple-accent-4"
-                text-color="white"
-                size="small"
-                class="ml-2"
-                >{{ quiz.category?.title }}</v-chip
-              >
+              <v-chip color="deep-purple-accent-4" text-color="white" size="small" class="ml-2">{{ quiz.category?.title
+                }}</v-chip>
             </div>
             <div class="mb-2 text-caption text-grey-darken-1">
               {{
@@ -50,32 +26,40 @@
             </div>
 
             <div class="d-flex flex-wrap gap-2 mb-1">
-              <v-chip color="blue" size="x-small"
-                >🧮 {{ quiz.questions ? quiz.questions.length : 0 }} Qs</v-chip
-              >
-              <v-chip color="green" size="x-small"
-                >🎯 {{ quiz.passing_score }} Pass</v-chip
-              >
+              <v-chip color="blue" size="x-small">🧮 {{ quiz.questions ? quiz.questions.length : 0 }} Qs</v-chip>
+              <v-chip color="green" size="x-small">🎯 {{ quiz.passing_score }} Pass</v-chip>
             </div>
           </v-card-text>
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              color="primary"
-              variant="flat"
-              size="small"
-              class="float-right"
-              @click.stop="openQuizDialog(quiz)"
-              >Start Quiz</v-btn
-            >
-          </v-card-actions>
+          
+  <!-- BUY BUTTON -->
+   <v-card-actions>
+<v-spacer></v-spacer>
+  <!-- START BUTTON -->
+  <v-btn
+  v-if="quiz.is_paid"
+    color="primary"
+    size="small"
+    @click.stop="openQuizDialog(quiz)"
+    >
+    Start Quiz
+  </v-btn>  
+  <v-btn 
+  v-else
+     color="success"
+     size="small"
+     :loading="loading"
+     @click.stop="buyQuiz(quiz)"
+     >
+     Buy Quiz ₹{{ quiz.price }}
+    </v-btn>
+    
+  
+  
+</v-card-actions>
+          
         </v-card>
       </v-col>
-      <v-col
-        v-if="quizzes.length === 0"
-        cols="12"
-        class="text-center py-10 text-grey"
-      >
+      <v-col v-if="quizzes.length === 0" cols="12" class="text-center py-10 text-grey">
         <v-icon size="x-large" color="grey">mdi-emoticon-sad-outline</v-icon>
         <div>No quizzes available for this category.</div>
       </v-col>
@@ -113,15 +97,9 @@
         <v-card-text>
           <div v-if="selectedQuiz">
             <div class="mb-2 d-flex align-center justify-space-between">
-              <span
-                >📘 <strong>{{ selectedQuiz.title }}</strong></span
-              >
-              <v-chip
-                color="deep-purple-accent-4"
-                text-color="white"
-                size="small"
-                >{{ selectedQuiz.category?.title }}</v-chip
-              >
+              <span>📘 <strong>{{ selectedQuiz.title }}</strong></span>
+              <v-chip color="deep-purple-accent-4" text-color="white" size="small">{{ selectedQuiz.category?.title
+                }}</v-chip>
             </div>
             <div class="mb-1 text-caption">{{ selectedQuiz.description }}</div>
             <div class="mb-1">
@@ -133,29 +111,14 @@
             </div>
             <div class="mt-2 text-subtle">Answer all questions below:</div>
             <v-row>
-              <v-col
-                v-for="(question, index) in selectedQuiz.questions"
-                :key="index"
-                cols="12"
-                md="12"
-              >
+              <v-col v-for="(question, index) in selectedQuiz.questions" :key="index" cols="12" md="12">
                 <div class="pa-4 rounded-lg" style="background: #f8f8ff">
                   <div class="font-weight-bold mb-2">
                     Q{{ index + 1 }}. {{ question.question }}
                   </div>
-                  <v-radio-group
-                    v-model="userAnswers[index]"
-                    :mandatory="true"
-                    class="ml-2"
-                  >
-                    <v-radio
-                      v-for="(option, oindex) in question.options"
-                      :key="oindex"
-                      :label="option"
-                      :value="option"
-                      color="deep-purple-accent-4"
-                      class="mb-1"
-                    />
+                  <v-radio-group v-model="userAnswers[index]" :mandatory="true" class="ml-2">
+                    <v-radio v-for="(option, oindex) in question.options" :key="oindex" :label="option" :value="option"
+                      color="deep-purple-accent-4" class="mb-1" />
                   </v-radio-group>
                 </div>
               </v-col>
@@ -178,9 +141,12 @@
 
 <script setup>
 import { ref, onMounted, inject } from "vue";
-
+import { useRouter } from "vue-router";     
+ 
+const router = useRouter();
 const api = inject("api");
 const tab = ref(null);
+const loading = ref(false);
 const toast = inject("toast");
 const categories = ref([]);
 const quizzes = ref([]);
@@ -229,9 +195,15 @@ const showAllCategories = async () => {
 };
 
 const openQuizDialog = (quiz) => {
+  if (quiz.is_paid == false) {
+    toast?.value?.showToast("⚠️ Please buy this quiz first", "warning");
+    return;
+  }
+
   selectedQuiz.value = quiz;
   dialog.value = true;
 };
+
 
 const closeQuizDialog = () => {
   dialog.value = false;
@@ -283,7 +255,25 @@ const submitQuiz = async () => {
 
 onMounted(fetchCategories);
 onMounted(() => fetchQuizzes());
+
+
+
+  const  buyQuiz = async (quiz) => {
+  try {
+ loading.value = true;
+    const res = await api.post("/checkout", {
+      quiz_id: quiz.id,
+    });
+
+    window.location.href = res.data.data;
+
+  } catch (error) {
+    toast.value.showToast("Payment failed", "error");
+  }
+  finally {
+    loading.value = false;
+  }
+};
+
+
 </script>
-
-
-

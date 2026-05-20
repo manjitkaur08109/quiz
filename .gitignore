@@ -1,8 +1,6 @@
 *.log
 .DS_Store
-.env
 .env.backup
-.env.production
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -22,3 +20,11 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Temporary / Lock files
+composer.lock
+package-lock.json
+*.lock
+yarn.lock
+pnpm-lock.yaml
+config.bat

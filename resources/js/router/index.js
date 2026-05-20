@@ -12,10 +12,20 @@ import Registration from "../pages/Registration.vue";
 import Login from "../pages/Login.vue";
 import MyLearning from "../pages/MyLearning.vue";
 import Discover from "../pages/Discover.vue";
+import Payments from "../pages/Payments.vue";
+import Notifications from "../pages/Notifications.vue";
+import RolePermission from "../pages/RolePermission.vue";
+import AddRolePermission from "../pages/AddRolePermission.vue";
+import EditRolePermission from "../pages/EditRolePermission.vue";
+import AddUser from "../pages/AddUser.vue";
+import EditUser from "../pages/EditUser.vue";
+import EmailLogs from "../pages/EmailLogs.vue";
 
 const routes = [
   { path: "/", name: "Dashboard", component: Dashboard , meta: { requiresAuth: true } },
   { path: "/users", name: "Users", component: Users , meta: { requiresAuth: true } },
+  { path: "/addUser", name: "AddUser", component: AddUser , meta: { requiresAuth: true } },
+  { path: "/editUser/:id", name: "EditUser", component: EditUser , meta: { requiresAuth: true } },
   {path:"/profile",name:"Profile",component:Profile, meta: { requiresAuth: true } },
   { path: "/quiz", name: "Quiz", component: Quiz , meta: { requiresAuth: true } },
   { path:"/addQuiz", name:"AddQuiz", component:AddQuiz, meta: { requiresAuth: true }  },
@@ -27,6 +37,12 @@ const routes = [
   { path: "/login", name: "Login", component: Login, meta: { guest: true } },
   { path: "/discover", name: "Discover", component: Discover, meta: { requiresAuth: true } },
   { path: "/myLearning", name: "MyLearning", component: MyLearning, meta: { requiresAuth: true } },
+  {path:"/payments",name:"Payments",component:Payments, meta: { requiresAuth: true } },
+  {path:"/notifications",name:"Notifications",component:Notifications, meta: { requiresAuth: true } },
+  {path:"/rolepermission",name:"RolePermission",component:RolePermission, meta: { requiresAuth: true } },
+  {path:"/addrolepermission",name:"AddRolePermission",component:AddRolePermission, meta: { requiresAuth: true } },
+  {path:"/editrolepermission/:id",name:"EditRolePermission",component:EditRolePermission, meta: { requiresAuth: true } },
+  {path:"/email_logs",name:"EmailLogs",component:EmailLogs, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({

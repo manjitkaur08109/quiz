@@ -21,14 +21,6 @@
             <!-- ⭐⭐ VUE EDITOR FOR DESCRIPTION ⭐⭐ -->
           <label class="mb-2 font-weight-medium">Category Description</label>
           <vue-editor v-model="category.description"></vue-editor>
-          <!-- <v-textarea
-            v-model="category.description"
-            label="Category Description"
-            :rules="validateMaxLength('Description', 200)"
-            prepend-inner-icon="mdi-text-box-outline"
-            rows="3"
-            auto-grow
-          /> -->
 
           <v-card-actions class="justify-end">
             <v-btn color="secondary" @click="goBack"> Cancel </v-btn>
@@ -54,6 +46,11 @@ import { inject } from "vue";
 
 import { VueEditor } from "vue3-editor";
 import { validateMaxLength } from "@/utils/validationRules.js";
+const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+
+const can = (permission) => {
+  return permissions.includes(permission);
+};
 const api = inject("api");
 const toast = inject("toast");
 const router = useRouter();
@@ -65,8 +62,13 @@ const category = reactive({
 const loading = ref(false);
 
 const handleSubmit = async () => {
+  if (!can("create category")) {
+    toast.value.showToast("You are not authorized to create category", "error");
+    router.push("/category"); 
+    return;
+  } 
   const { valid } = await formRef.value.validate(); // ✅ validate all fields
-  if (!valid) return; // stop if invalid
+  if (!valid) return;
   try {
     loading.value = true;
 

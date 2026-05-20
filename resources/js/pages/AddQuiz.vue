@@ -4,11 +4,7 @@
       <v-col cols="12">
         <v-card class="mx-auto" min-width="600" elevation="8">
           <v-card-title class="text-h6">
-            <v-icon
-              size="x-small"
-              icon="mdi-plus-circle-outline"
-              class="mr-2"
-            />
+            <v-icon size="x-small" icon="mdi-plus-circle-outline" class="mr-2" />
             Add New Quiz
           </v-card-title>
 
@@ -18,110 +14,50 @@
             <v-form ref="formRef" @submit.prevent="handleSubmit">
               <v-row>
                 <v-col cols="6">
-                  <v-text-field
-                    v-model="quiz.title"
-                    label="Quiz Title"
-                    :rules="validateMaxLength('Quiz Title',20)"
-                    prepend-inner-icon="mdi-format-title"
-                    required
-                  />
+                  <v-text-field v-model="quiz.title" label="Quiz Title" :rules="validateMaxLength('Quiz Title', 20)"
+                    prepend-inner-icon="mdi-format-title" required />
                 </v-col>
+
+
                 <v-col cols="6">
-                  <v-text-field
-                    v-model="quiz.passing_score"
-                    label="Passing Score"
-                    type="number"
-                    :rules="validatePassingScore(100)"
-                    prepend-inner-icon="mdi-target"
-                    min="0"
-                    max="100"
-                    required
-                  />
+                  <v-text-field v-model="quiz.price" label="Quiz Price (₹)" type="number" min="1"
+                    :rules="validateRequired('Quiz Price')" prepend-inner-icon="mdi-currency-inr" required />
+                </v-col>
+
+                <v-col cols="6">
+                  <v-text-field v-model="quiz.passing_score" label="Passing Score" type="number"
+                    :rules="validatePassingScore(100)" prepend-inner-icon="mdi-target" min="0" max="100" required />
                 </v-col>
               </v-row>
-              <v-textarea
-                v-model="quiz.description"
-                label="Quiz Description"
-                :rules="validateMaxLength('Quiz Description', 200)"
-                prepend-inner-icon="mdi-text-box-outline"
-                rows="3"
-                auto-grow
-              />
-              <v-select
-                v-model="quiz.category_id"
-                :items="categories"
-                item-title="title"
-                item-value="id"
-                label="Select Category"
-                :rules="validateRequired('Category')"
-                prepend-inner-icon="mdi-shape-outline"
-                required
-              />
+              <v-textarea v-model="quiz.description" label="Quiz Description"
+                :rules="validateMaxLength('Quiz Description', 200)" prepend-inner-icon="mdi-text-box-outline" rows="3"
+                auto-grow />
+              <v-select v-model="quiz.category_id" :items="categories" item-title="title" item-value="id"
+                label="Select Category" :rules="validateRequired('Category')" prepend-inner-icon="mdi-shape-outline"
+                required />
 
-              <div
-                v-for="(q, qIndex) in quiz.questions"
-                :key="qIndex"
-                class="mb-4"
-              >
-                <v-textarea
-                  v-model="q.question"
-                  :label="`Question ${qIndex + 1}`"
-                  prepend-inner-icon="mdi-help-circle-outline"
-                  :rules="validateMaxLength('question', 200)"
-                  rows="2"
-                  auto-grow
-                  class="mb-2"
-                />
+              <div v-for="(q, qIndex) in quiz.questions" :key="qIndex" class="mb-4">
+                <v-textarea v-model="q.question" :label="`Question ${qIndex + 1}`"
+                  prepend-inner-icon="mdi-help-circle-outline" :rules="validateMaxLength('question', 200)" rows="2"
+                  auto-grow class="mb-2" />
 
-                <div
-                  v-for="(o, oIndex) in q.options"
-                  :key="oIndex"
-                  class="mb-2"
-                >
-                  <v-text-field
-                    v-model="q.options[oIndex]"
-                    :label="`Option ${oIndex + 1}`"
-                    :rules="validateRequired(`Option ${oIndex + 1}`)"
-                    class="flex-grow-1"
-                  />
-                  <v-icon
-                    size="x-small"
-                    color="red"
-                    @click="removeOption(qIndex, oIndex)"
-                    >mdi-delete</v-icon
-                  >
+                <div v-for="(o, oIndex) in q.options" :key="oIndex" class="mb-2">
+                  <v-text-field v-model="q.options[oIndex]" :label="`Option ${oIndex + 1}`"
+                    :rules="validateRequired(`Option ${oIndex + 1}`)" class="flex-grow-1" />
+                  <v-icon size="x-small" color="red" @click="removeOption(qIndex, oIndex)">mdi-delete</v-icon>
                 </div>
 
-                <v-btn small color="primary" @click="addOption(qIndex)"
-                  >Add Option</v-btn
-                >
+                <v-btn small color="primary" @click="addOption(qIndex)">Add Option</v-btn>
 
-                <v-select
-                  v-model="q.correctAnswer"
-                  :items="q.options"
-                  label="Select Correct Answer"
-                  :rules="validateRequired(`Correct Answer for Question ${qIndex + 1}`)"
-                  required
-                  class="mt-2"
-                />
+                <v-select v-model="q.correctAnswer" :items="q.options" label="Select Correct Answer"
+                  :rules="validateRequired(`Correct Answer for Question ${qIndex + 1}`)" required class="mt-2" />
 
-                <v-btn
-                  v-if="quiz.questions.length > 1"
-                  color="red"
-                  small
-                  class="mt-2"
-                  @click="removeQuestion(qIndex)"
-                >
+                <v-btn v-if="quiz.questions.length > 1" color="red" small class="mt-2" @click="removeQuestion(qIndex)">
                   Delete Question
                 </v-btn>
 
-                <v-btn
-                  v-if="quiz.questions.length > 1"
-                  color="secondary"
-                  small
-                  class="mt-2"
-                  @click="duplicateQuestion(qIndex)"
-                >
+                <v-btn v-if="quiz.questions.length > 1" color="secondary" small class="mt-2"
+                  @click="duplicateQuestion(qIndex)">
                   Duplicate Question
                 </v-btn>
 
@@ -133,12 +69,7 @@
               </v-btn>
               <v-card-actions class="justify-end">
                 <v-btn color="grey" @click="goBack"> Cancel </v-btn>
-                <v-btn
-                  color="primary"
-                  :loading="loading"
-                  type="submit"
-                  class="ml-2"
-                >
+                <v-btn color="primary" :loading="loading" type="submit" class="ml-2">
                   Save Quiz
                 </v-btn>
               </v-card-actions>
@@ -154,12 +85,21 @@
 import { ref, reactive, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { inject } from "vue";
+// import { can } from '@/permission'
 
 import {
-    validateRequired,
-    validatePassingScore,
-    validateMaxLength
+  validateRequired,
+  validatePassingScore,
+  validateMaxLength
 } from "@/utils/validationRules.js";
+
+
+
+const permissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+
+const can = (permission) => {
+  return permissions.includes(permission);
+};
 const router = useRouter();
 const api = inject("api");
 const toast = inject("toast");
@@ -190,6 +130,11 @@ const apiQuiz = computed(() => {
 
 const loading = ref(false);
 onMounted(async () => {
+
+  if (!can("view category")) {
+    toast.value.showToast("You are not authorized to view category", "error");
+    return;
+  }
   try {
     const res = await api.get("/category/index");
     categories.value = res.data.data;
@@ -248,8 +193,15 @@ const removeOption = (qIndex, oIndex) => {
 };
 
 const handleSubmit = async () => {
+  if (!can("create quiz")) {
+    toast.value.showToast("You are not authorized to create quiz", "error");
+    router.push("/quiz");
+    return;
+  }
   const { valid } = await formRef.value.validate();
   if (!valid) return;
+
+
   console.log("Submitting quiz:", JSON.stringify(apiQuiz.value));
   try {
     loading.value = true;

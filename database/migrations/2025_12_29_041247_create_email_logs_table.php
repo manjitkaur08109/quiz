@@ -11,8 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-         $table->bigInteger('phone_no')->nullable();
+        Schema::create('email_logs', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('message');
+            $table->string('subject');
+            $table->integer('user_id');
+            $table->string('status');  
+            $table->timestamps();
         });
     }
 
@@ -21,8 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('phone_no');
-        });
+        Schema::dropIfExists('email_logs');
     }
 };

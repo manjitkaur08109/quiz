@@ -10,7 +10,7 @@ use App\Models\QuizAttemptModel;
 class QuizModel extends Model {
     use HasUuids;
     protected $table = 'quiz';
-    protected $fillable = [ 'title', 'passing_score', 'description', 'category_id', 'questions' ];
+    protected $fillable = [ 'title', 'passing_score', 'description', 'category_id', 'questions','price' ];
     protected $casts= [
         'questions'=>'array'
     ];

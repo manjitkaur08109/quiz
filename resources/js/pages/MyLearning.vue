@@ -1,48 +1,21 @@
 <template>
   <div>
-    <v-tabs
-      class="mb-4"
-      v-model="tab"
-      align-tabs="end"
-      color="deep-purple-accent-4"
-    >
+    <v-tabs class="mb-4" v-model="tab" align-tabs="end" color="deep-purple-accent-4">
       <v-tab value="all" @click="showAllCategories">All</v-tab>
-      <v-tab
-        v-for="category in categories"
-        :key="category.id"
-        :value="category.id"
-        @click="selectCategory(category)"
-      >
+      <v-tab v-for="category in categories" :key="category.id" :value="category.id" @click="selectCategory(category)">
         {{ category.title }}
       </v-tab>
     </v-tabs>
 
     <v-row>
-      <v-col
-        v-for="attempted in quizzes"
-        :key="attempted.id"
-        cols="12"
-        sm="6"
-        md="4"
-        lg="4"
-      >
-        <v-card
-          class="hover:scale-105 transition-all mb-4 shadow-lg rounded-xl quiz-card"
-          elevation="8"
-          @click="openQuizDialog(attempted)"
-        >
+      <v-col v-for="attempted in quizzes" :key="attempted.id" cols="12" sm="6" md="4" lg="4">
+        <v-card class="hover:scale-105 transition-all mb-4 shadow-lg rounded-xl quiz-card" elevation="8"
+          @click="openQuizDialog(attempted)">
           <v-card-text>
             <div class="d-flex align-center justify-space-between mb-2">
-              <span class="text-h6 font-weight-bold"
-                >📘 {{ attempted.quiz.title }}</span
-              >
-              <v-chip
-                color="deep-purple-accent-4"
-                text-color="white"
-                size="small"
-                class="ml-2"
-                >{{ attempted.quiz.category?.title }}</v-chip
-              >
+              <span class="text-h6 font-weight-bold">📘 {{ attempted.quiz.title }}</span>
+              <v-chip color="deep-purple-accent-4" text-color="white" size="small" class="ml-2">{{
+                attempted.quiz.category?.title }}</v-chip>
             </div>
             <div class="mb-2 text-caption text-grey-darken-1">
               {{
@@ -53,47 +26,31 @@
             </div>
 
             <div class="d-flex flex-wrap gap-2 mb-1">
-              <v-chip color="blue" size="x-small"
-                >🧮
+              <v-chip color="blue" size="x-small">🧮
                 {{
                   attempted.attempted_answers?.length ||
                   attempted.quiz?.questions?.length ||
                   0
                 }}
-                Qs</v-chip
-              >
+                Qs</v-chip>
 
               <v-chip color="green" size="x-small">
                 🎯 {{ attempted.passing_score }} Pass
               </v-chip>
 
-              <v-chip
-                :color="attempted.passed ? 'green' : 'red'"
-                text-color="white"
-                size="x-small"
-              >
+              <v-chip :color="attempted.passed ? 'green' : 'red'" text-color="white" size="x-small">
                 {{ attempted.passed ? "Passed" : "Failed" }}
               </v-chip>
             </div>
           </v-card-text>
           <v-card-actions>
             <v-spacer />
-            <v-btn
-              color="primary"
-              variant="flat"
-              size="small"
-              class="float-right"
-              @click.stop="openQuizDialog(attempted)"
-              >View Quiz</v-btn
-            >
+            <v-btn color="primary" variant="flat" size="small" class="float-right"
+              @click.stop="openQuizDialog(attempted)">View Quiz</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
-      <v-col
-        v-if="quizzes.length === 0"
-        cols="12"
-        class="text-center py-10 text-grey"
-      >
+      <v-col v-if="quizzes.length === 0" cols="12" class="text-center py-10 text-grey">
         <v-icon size="x-large" color="grey">mdi-emoticon-sad-outline</v-icon>
         <div>No quizzes available for this category.</div>
       </v-col>
@@ -113,7 +70,7 @@
             </p>
             <p>
               <strong>Created At:</strong>
-              {{ new Date(selectedQuiz.created_at).toLocaleString() }}
+              {{ moment(selectedQuiz.created_at).format("DD MMM YYYY, hh:mm A") }}
             </p>
 
             <v-divider class="my-3"></v-divider>
@@ -141,11 +98,7 @@
                 🎯 Passing Score: {{ selectedQuiz.passing_score }}
               </v-chip>
 
-              <v-chip
-                color="deep-purple-accent-4"
-                text-color="white"
-                size="small"
-              >
+              <v-chip color="deep-purple-accent-4" text-color="white" size="small">
                 ✅ Correct Answers:
                 {{
                   selectedQuiz.attempted_answers?.filter(
@@ -154,11 +107,7 @@
                 }}
               </v-chip>
 
-              <v-chip
-                :color="selectedQuiz.passed ? 'green' : 'red'"
-                text-color="white"
-                size="small"
-              >
+              <v-chip :color="selectedQuiz.passed ? 'green' : 'red'" text-color="white" size="small">
                 {{ selectedQuiz.passed ? "Passed 🎉" : "Failed ❌" }}
               </v-chip>
             </div>
@@ -167,31 +116,20 @@
 
             <h4 class="text-h6 mb-2">Questions</h4>
 
-            <div
-              v-for="(q, index) in selectedQuiz.attempted_answers"
-              :key="index"
-              class="mb-4 pa-3 rounded-lg border"
-              style="border: 1px solid #ccc"
-            >
+            <div v-for="(q, index) in selectedQuiz.attempted_answers" :key="index" class="mb-4 pa-3 rounded-lg border"
+              style="border: 1px solid #ccc">
               <p>
                 <strong>Q{{ index + 1 }}:</strong> {{ q.question }}
               </p>
 
               <v-list density="compact">
-                <v-list-item
-                  v-for="(opt, i) in q.options"
-                  :key="i"
-                  :title="opt"
-                   :class="{
-    'bg-green-lighten-5': opt === q.correctAnswer,
-    'bg-red-lighten-5': opt === q.attempted && opt !== q.correctAnswer
-  }"
-                >
+                <v-list-item v-for="(opt, i) in q.options" :key="i" :title="opt" :class="{
+                  'bg-green-lighten-5': opt === q.correctAnswer,
+                  'bg-red-lighten-5': opt === q.attempted && opt !== q.correctAnswer
+                }">
                   <template #prepend>
-                    <v-icon
-                      v-if="q.attempted && opt === q.attempted"
-                      :color="q.attempted === q.correctAnswer ? 'green' : 'red'"
-                    >
+                    <v-icon v-if="q.attempted && opt === q.attempted"
+                      :color="q.attempted === q.correctAnswer ? 'green' : 'red'">
                       {{
                         q.attempted === q.correctAnswer
                           ? "mdi-check-circle-outline"
@@ -224,6 +162,7 @@
 <script setup>
 import { ref, computed, onMounted, inject } from "vue";
 import { useRouter } from "vue-router";
+import moment from "moment";
 const api = inject("api");
 const router = useRouter();
 
@@ -296,6 +235,3 @@ const openQuizDialog = async (quiz) => {
 onMounted(fetchCategories);
 onMounted(() => fetchQuizzes());
 </script>
-
-
-
